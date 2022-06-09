@@ -11,6 +11,8 @@ namespace spaghetto {
         public Position posStart = null, posEnd = null;
         public Context context = null;
 
+        public List<BaseFunction> instanceFunctions = new();
+
         public Value SetPosition(Position posStart = null, Position posEnd = null) {
             this.posStart = posStart;
             this.posEnd = posEnd;

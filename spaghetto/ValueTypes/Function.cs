@@ -5,7 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace spaghetto {
-    internal class Function : Value {
+    internal class Function : BaseFunction
+    {
         public string functionName;
         public Node bodyNode;
         public List<string> argNames;

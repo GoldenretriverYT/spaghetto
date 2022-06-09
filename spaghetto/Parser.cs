@@ -37,7 +37,7 @@ namespace spaghetto {
         }
 
         public ParseResult Call() {
-            System.Diagnostics.Debug.WriteLine("[parse] Call");
+            //System.Diagnostics.Debug.WriteLine("[parse] Call");
 
             ParseResult res = new();
             Node atom = res.Register(Atom());
@@ -79,7 +79,7 @@ namespace spaghetto {
         }
 
         public ParseResult Atom() {
-            System.Diagnostics.Debug.WriteLine("[parse] Atom");
+            //System.Diagnostics.Debug.WriteLine("[parse] Atom");
 
             ParseResult res = new ParseResult();
             Token tok = currentToken;
@@ -143,7 +143,7 @@ namespace spaghetto {
         }
 
         public ParseResult ListExpression() {
-            System.Diagnostics.Debug.WriteLine("[parse] ListExpression");
+            //System.Diagnostics.Debug.WriteLine("[parse] ListExpression");
 
             ParseResult res = new();
             List<Node> elementNodes = new();
@@ -183,7 +183,7 @@ namespace spaghetto {
         }
 
         public ParseResult FunctionDefinition() {
-            System.Diagnostics.Debug.WriteLine("[parse] FunctionDefinition");
+            //System.Diagnostics.Debug.WriteLine("[parse] FunctionDefinition");
 
             ParseResult res = new();
 
@@ -259,7 +259,7 @@ namespace spaghetto {
         }
 
         public ParseResult IfExpression() {
-            System.Diagnostics.Debug.WriteLine("[parse] IfExpression");
+            //System.Diagnostics.Debug.WriteLine("[parse] IfExpression");
 
             ParseResult res = new();
             List<(Node, Node)> cases = new();
@@ -317,7 +317,7 @@ namespace spaghetto {
         }
 
         public ParseResult ForExpression() {
-            System.Diagnostics.Debug.WriteLine("[parse] ForExpression");
+            //System.Diagnostics.Debug.WriteLine("[parse] ForExpression");
 
             ParseResult res = new();
 
@@ -378,7 +378,7 @@ namespace spaghetto {
         }
 
         public ParseResult WhileExpression() {
-            System.Diagnostics.Debug.WriteLine("[parse] WhileExpression");
+            //System.Diagnostics.Debug.WriteLine("[parse] WhileExpression");
 
             ParseResult res = new();
 
@@ -402,13 +402,13 @@ namespace spaghetto {
         }
 
         public ParseResult Power() {
-            System.Diagnostics.Debug.WriteLine("[parse] Power");
+            //System.Diagnostics.Debug.WriteLine("[parse] Power");
 
             return BinaryOperation(() => { return Call(); }, new List<TokenType>() { TokenType.Pow }, () => { return Factor(); });
         }
 
         public ParseResult Factor() {
-            System.Diagnostics.Debug.WriteLine("[parse] Factor");
+            //System.Diagnostics.Debug.WriteLine("[parse] Factor");
 
             ParseResult res = new ParseResult();
             Token tok = currentToken;
@@ -425,13 +425,13 @@ namespace spaghetto {
         }
 
         public ParseResult Term() {
-            System.Diagnostics.Debug.WriteLine("[parse] Term");
+            //System.Diagnostics.Debug.WriteLine("[parse] Term");
 
             return BinaryOperation(() => { return Factor(); }, new List<TokenType>() { TokenType.Mul, TokenType.Div, TokenType.Mod, TokenType.Index });
         }
 
         public ParseResult Expression() {
-            System.Diagnostics.Debug.WriteLine("[parse] Expression");
+            //System.Diagnostics.Debug.WriteLine("[parse] Expression");
 
             ParseResult res = new();
 
@@ -470,7 +470,7 @@ namespace spaghetto {
         }
 
         public ParseResult CompExpression() {
-            System.Diagnostics.Debug.WriteLine("[parse] CompExpression");
+            //System.Diagnostics.Debug.WriteLine("[parse] CompExpression");
 
             ParseResult res = new();
             Node node = null;
@@ -496,7 +496,7 @@ namespace spaghetto {
         }
 
         public ParseResult ArithmeticExpression() {
-            System.Diagnostics.Debug.WriteLine("[parse] ArithmeticExpression");
+            //System.Diagnostics.Debug.WriteLine("[parse] ArithmeticExpression");
 
             return BinaryOperation(() => { return Term(); }, new List<TokenType>() { TokenType.Plus, TokenType.Minus });
         }
@@ -504,7 +504,7 @@ namespace spaghetto {
 
         //List<Token> exactTokens = null
         public ParseResult BinaryOperation(Func<ParseResult> funcLeft, List<TokenType> tokenTypes, Func<ParseResult> funcRight = null) {
-            System.Diagnostics.Debug.WriteLine("[parse] BinaryOperation");
+            //System.Diagnostics.Debug.WriteLine("[parse] BinaryOperation");
 
             if (tokenTypes == null) tokenTypes = new();
 
@@ -541,7 +541,7 @@ namespace spaghetto {
         }
 
         public ParseResult BinaryOperation(Func<ParseResult> funcLeft, List<Token> exactTokens, Func<ParseResult> funcRight = null) {
-            System.Diagnostics.Debug.WriteLine("[parse] BinaryOperation");
+            //System.Diagnostics.Debug.WriteLine("[parse] BinaryOperation");
 
             if (funcRight == null) funcRight = funcLeft;
 

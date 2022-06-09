@@ -27,71 +27,123 @@ namespace spaghetto {
                 currentChar = '\0';
         }
 
-        public List<Token> MakeTokens() {
+        public List<Token> MakeTokens(bool ignoreErrors = false) {
             List<Token> tokens = new();
 
             while(currentChar != '\0') {
-                if (currentChar == ' ' || currentChar == '\t') {
+                if (currentChar == ' ' || currentChar == '\t' || currentChar == '\r' || currentChar == '\n')
+                {
                     Advance();
-                } else if (Token.DIGITS.Contains(currentChar)) {
+                }
+                else if (Token.DIGITS.Contains(currentChar))
+                {
                     tokens.Add(MakeNumber());
-                } else if (Token.LETTERS.Contains(currentChar)) {
+                }
+                else if (Token.LETTERS.Contains(currentChar))
+                {
                     tokens.Add(MakeIdentifier());
-                } else if (currentChar == '"') {
+                }
+                else if (currentChar == '"')
+                {
                     tokens.Add(MakeString());
-                } else if (currentChar == '+') {
+                }
+                else if (currentChar == '+')
+                {
                     tokens.Add(new Token(TokenType.Plus, posStart: pos));
                     Advance();
-                } else if (currentChar == '-') {
+                }
+                else if (currentChar == '-')
+                {
                     tokens.Add(MakeMinusOrArrow());
-                } else if (currentChar == '*') {
+                }
+                else if (currentChar == '*')
+                {
                     tokens.Add(new Token(TokenType.Mul, posStart: pos));
                     Advance();
-                } else if (currentChar == '^') {
+                }
+                else if (currentChar == '^')
+                {
                     tokens.Add(new Token(TokenType.Pow, posStart: pos));
                     Advance();
-                } else if (currentChar == '%') {
+                }
+                else if (currentChar == '%')
+                {
                     tokens.Add(new Token(TokenType.Mod, posStart: pos));
                     Advance();
-                } else if (currentChar == '/') {
+                }
+                else if (currentChar == '/')
+                {
                     tokens.Add(new Token(TokenType.Div, posStart: pos));
                     Advance();
-                } else if (currentChar == '(') {
+                }
+                else if (currentChar == '(')
+                {
                     tokens.Add(new Token(TokenType.LeftParen, posStart: pos));
                     Advance();
-                } else if (currentChar == ')') {
+                }
+                else if (currentChar == ')')
+                {
                     tokens.Add(new Token(TokenType.RightParen, posStart: pos));
                     Advance();
-                } else if (currentChar == '[') {
+                }
+                else if (currentChar == '[')
+                {
                     tokens.Add(new Token(TokenType.LeftSqBracket, posStart: pos));
                     Advance();
-                } else if (currentChar == ']') {
+                }
+                else if (currentChar == ']')
+                {
                     tokens.Add(new Token(TokenType.RightSqBracket, posStart: pos));
                     Advance();
-                } else if (currentChar == '#') {
+                }
+                else if (currentChar == '#')
+                {
                     tokens.Add(new Token(TokenType.Index, posStart: pos));
                     Advance();
-                } else if (currentChar == '{') {
+                }
+                else if (currentChar == '{')
+                {
                     tokens.Add(new Token(TokenType.LeftBraces, posStart: pos));
                     Advance();
-                } else if (currentChar == '}') {
+                }
+                else if (currentChar == '}')
+                {
                     tokens.Add(new Token(TokenType.RightBraces, posStart: pos));
                     Advance();
-                } else if (currentChar == '!') {
+                }
+                else if (currentChar == '!')
+                {
                     (Token tok, SpaghettoException error) = MakeNotEquals();
 
                     if (error != null) throw error;
                     tokens.Add(tok);
-                } else if (currentChar == '=') {
+                }
+                else if (currentChar == '=')
+                {
                     tokens.Add(MakeEquals());
-                } else if (currentChar == '<') {
+                }
+                else if (currentChar == '<')
+                {
                     tokens.Add(MakeLessThan());
-                } else if (currentChar == '>') {
+                }
+                else if (currentChar == '>')
+                {
                     tokens.Add(MakeGreaterThan());
-                } else if (currentChar == ',') {
+                }
+                else if (currentChar == ',')
+                {
                     tokens.Add(new Token(TokenType.Comma, posStart: pos));
                     Advance();
-                } else {
+                }
+                else
+                {
+                    if (ignoreErrors)
+                    {
+                        tokens.Add(new Token(TokenType.Unknown, currentChar));
+                        Advance();
+                        continue;
+                    }
+
                     Position posStart = pos.Copy();
                     char chr = currentChar;
                     Advance();
@@ -193,7 +245,7 @@ namespace spaghetto {
             if(currentChar == '=') {
                 Advance();
                 System.Diagnostics.Debug.WriteLine("Adding NotEquals Token");
-                return (new Token(TokenType.NotEquals, posStart, pos), null);
+                return (new Token(TokenType.NotEquals, posStart: pos), null);
             }
 
             Advance();
@@ -269,7 +321,8 @@ namespace spaghetto {
         Comma,
         Arrow,
         LeftSqBracket,
-        RightSqBracket
+        RightSqBracket,
+        Unknown
 }
 
     internal class Token {
@@ -285,6 +338,38 @@ namespace spaghetto {
         public static Dictionary<char, string> ESCAPE_CHARS = new() {
             { 'n', "\n" }, {'t', "\t"}
         };
+
+        public static Dictionary<TokenType, string> TOKEN_REPRESENTATIONS = new()
+        {
+            { TokenType.GreaterThanOrEquals, ">=" },
+            { TokenType.LessThanOrEquals, "<=" },
+            { TokenType.Plus, "+" },
+            { TokenType.Minus, "-" },
+            { TokenType.Mul, "*" },
+            { TokenType.Div, "/" },
+            { TokenType.Pow, "^" },
+            { TokenType.Mod, "%" },
+            { TokenType.Index, "#" },
+            { TokenType.LeftParen, "(" },
+            { TokenType.RightParen, ")" },
+            { TokenType.LeftBraces, "{" },
+            { TokenType.RightBraces, "}" },
+            { TokenType.LeftSqBracket, "[" },
+            { TokenType.RightSqBracket, "]" },
+            { TokenType.Equals, "=" },
+            { TokenType.EqualsEquals, "==" },
+            { TokenType.LessThan, "<" },
+            { TokenType.GreaterThan, ">" },
+            { TokenType.Comma, "," },
+            { TokenType.Arrow, "->" }
+        };
+
+        public static (string, bool) GetRepresentation(Token tok)
+        {
+            if(TOKEN_REPRESENTATIONS.ContainsKey(tok.type)) return (TOKEN_REPRESENTATIONS[tok.type], false);
+            if (tok.type == TokenType.String) return ($"\"{tok.value}\"", true);
+            return (tok?.value?.ToString(), true);
+        }
 
         public TokenType type;
         public object? value;

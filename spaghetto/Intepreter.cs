@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using System.Diagnostics;
 
 namespace spaghetto {
     internal class Intepreter {
@@ -18,7 +20,7 @@ namespace spaghetto {
             }, new() {"str"}) },
 
             { "print", new NativeFunction("print", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
-                Console.Write((args[0] as StringValue).value);
+                Console.Write(args[0].ToString());
                 return null;
             }, new() {"str"}) },
 
@@ -60,8 +62,10 @@ namespace spaghetto {
                     return new StringValue("String");
                 else if(args[0] is ListValue)
                     return new StringValue("List");
-                else if(args[0] is Function || args[0] is NativeFunction)
+                else if (args[0] is Function || args[0] is NativeFunction)
                     return new StringValue("Function");
+                else if (args[0] is null)
+                    return new StringValue("null");
                 else
                     throw new Exception(args[0] + " is of unknown type.");
             }, new() { "val" })},
@@ -70,26 +74,83 @@ namespace spaghetto {
                 Console.Clear();
                 return null;
             }, new() { })},
+
+            {"toString",
+                new NativeFunction("toString", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
+                    return new StringValue(args[0].ToString());
+                }, new() { "val "})
+            },
+
+            { "run",
+                new NativeFunction("run", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
+                    try
+                    {
+                        if (!(args[0] is StringValue)) throw new RuntimeError(posStart, posEnd, "Argument path must be of type String", ctx);
+
+                        if (!File.Exists((args[0] as StringValue).value))
+                        {
+                            throw new RuntimeError(posStart, posEnd, "File not found", ctx);
+                        }
+
+                        //temporarily running line by line
+                        string[] code = File.ReadAllLines((args[0] as StringValue).value);
+                        Value lastVal = null;
+
+                        foreach (string line in code)
+                        {
+                            System.Diagnostics.Debug.WriteLine(line);
+                            (RuntimeResult res, SpaghettoException err) = Run((args[0] as StringValue).value, line);
+
+                            if (err != null)
+                            {
+                                throw err;
+                            }
+
+                            lastVal = (res.value != null ? res.value.Copy() : null);
+                        }
+
+                        return lastVal;
+                    }
+                    catch (Exception ex)
+                    {
+                        if (ex is SpaghettoException || ex is IOException)
+                        {
+                            Console.WriteLine("Error: " + ex.Message);
+                            return null;
+                        }
+                        else throw;
+                    }
+                }, new() { "path" })
+            },
         };
 
         public static (RuntimeResult, SpaghettoException) Run(string fileName, string text) {
+            Stopwatch sw = new();
+            sw.Start();
+
             Lexer lexer = new Lexer(text, fileName);
             List<Token> tokens = lexer.MakeTokens();
 
+            Debug.WriteLine("Lexer took " + sw.ElapsedMilliseconds + "ms");
+            sw.Reset();
             System.Diagnostics.Debug.WriteLine("");
             foreach (Token token in tokens) System.Diagnostics.Debug.Write(token.ToString() + " ");
             System.Diagnostics.Debug.WriteLine("");
 
+            sw.Start();
             Parser parser = new Parser(tokens);
             ParseResult ast = parser.Parse();
             if (ast.error != null) return (null, ast.error);
+
+            Debug.WriteLine("Parser took " + sw.ElapsedMilliseconds + "ms");
+            sw.Reset();
 
             Intepreter intepreter = new Intepreter();
             Context context = new Context("<global>");
             context.symbolTable = globalSymbolTable;
             RuntimeResult result = intepreter.Visit(ast.node, context);
 
-            return (result, ast.error);
+            return (result, result.error);
         }
 
         public RuntimeResult Visit(Node node, Context context) {

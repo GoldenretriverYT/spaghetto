@@ -39,6 +39,11 @@ namespace spaghetto {
             return str.Substring(start, end - start);
         }
 
+        public static string SubstrInBounds(this string str, int start, int end)
+        {
+            return str.Substring(Math.Min(str.Length, Math.Max(0, start)), Math.Max(0, Math.Min(str.Length - start, end - start)));
+        }
+
         public static string Repeat(this string str, int c) {
             string o = "";
             for (int i = 0; i < c; i++) o += str;

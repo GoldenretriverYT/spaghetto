@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace spaghetto {
-    internal class NativeFunction : Value {
-        public string functionName;
+    internal class NativeFunction : BaseFunction {
+        public string functionName
         public Func<List<Value>, Position, Position, Context, Value> func;
         public List<string> argNames;
 

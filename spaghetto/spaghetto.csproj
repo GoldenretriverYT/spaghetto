@@ -15,4 +15,8 @@
     <NoWarn>1701;1702;CS8619;CS8625;CS8602;CS8604</NoWarn>
   </PropertyGroup>
 
+  <ItemGroup>
+    <None Include="bin\Debug\net6.0\test.spag" />
+  </ItemGroup>
+
 </Project>

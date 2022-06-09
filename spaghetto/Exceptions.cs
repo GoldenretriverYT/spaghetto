@@ -78,7 +78,7 @@ namespace spaghetto {
                 ctx = ctx.parentContext;
             }
 
-            return "Traceback (most recent call last):\n" + result;
+            return "Traceback:\n" + result;
         }
     }
 

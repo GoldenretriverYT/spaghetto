@@ -79,7 +79,7 @@ namespace spaghetto {
             System.Diagnostics.Debug.WriteLine("Call to IsNotEqualTo");
 
             if (other is Number) {
-                return (new Number((value != (other as Number).value) ? 1 : 0).SetContext(context), null);
+                return (new Number((value == (other as Number).value) ? 0 : 1).SetContext(context), null);
             }
 
             return (null, new TypeError(posStart, posEnd, "Can not perform IsNotEqualTo with number to " + other.GetType().Name));
