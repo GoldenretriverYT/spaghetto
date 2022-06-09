@@ -6,6 +6,5 @@ using System.Threading.Tasks;
 
 namespace spaghetto {
     internal abstract class BaseFunction : Value {
-        public abstract RuntimeResult Execute(List<Value> args);
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace spaghetto {
     internal class NativeFunction : BaseFunction {
-        public string functionName
+        public string functionName;
         public Func<List<Value>, Position, Position, Context, Value> func;
         public List<string> argNames;
 
