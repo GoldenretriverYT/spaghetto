@@ -15,7 +15,7 @@ namespace spaghetto {
             { "false", new Number(0) },
 
             { "printLine", new NativeFunction("printLine", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
-                Console.WriteLine((args[0] as StringValue).value);
+                Console.WriteLine((args[0]).ToString());
                 return null;
             }, new() {"str"}) },
 
