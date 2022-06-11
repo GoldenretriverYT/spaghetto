@@ -31,19 +31,20 @@ namespace spaghetto {
             List<Token> tokens = new();
 
             while(currentChar != '\0') {
-                if (currentChar == ' ' || currentChar == '\t' || currentChar == '\r' || currentChar == '\n')
+                if (currentChar == ' ' || currentChar == '\t' || currentChar == '\r')
                 {
                     Advance();
-                }
-                else if (Token.DIGITS.Contains(currentChar))
+                } else if (Token.SEPERATORS.Contains(currentChar)) {
+                    tokens.Add(new Token(TokenType.NewLine, posStart: pos));
+                    Advance();
+                } else if (Token.DIGITS.Contains(currentChar))
                 {
                     tokens.Add(MakeNumber());
                 }
                 else if (Token.LETTERS.Contains(currentChar))
                 {
                     tokens.Add(MakeIdentifier());
-                }
-                else if (currentChar == '"')
+                } else if (currentChar == '"')
                 {
                     tokens.Add(MakeString());
                 }
@@ -73,7 +74,8 @@ namespace spaghetto {
                 }
                 else if (currentChar == '/')
                 {
-                    tokens.Add(new Token(TokenType.Div, posStart: pos));
+                    Token ret = MakeCommentOrDivision();
+                    if(ret != null) tokens.Add(ret);
                     Advance();
                 }
                 else if (currentChar == '(')
@@ -192,6 +194,21 @@ namespace spaghetto {
             if(currentChar == '>') {
                 Advance();
                 tokenType = TokenType.Arrow;
+            }
+
+            return new Token(tokenType, posStart, pos);
+        }
+
+        public Token MakeCommentOrDivision() {
+            TokenType tokenType = TokenType.Div;
+            Position posStart = pos.Copy();
+
+            Advance();
+
+            if (currentChar == '/') {
+                while(currentChar != '\n' && currentChar != '\0') { Advance(); };
+
+                return null;
             }
 
             return new Token(tokenType, posStart, pos);
@@ -322,17 +339,19 @@ namespace spaghetto {
         Arrow,
         LeftSqBracket,
         RightSqBracket,
+        NewLine,
         Unknown
 }
 
     internal class Token {
         public const string DIGITS = "0123456789";
         public const string LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        public const string SEPERATORS = ";\n";
         public const string LETTERS_DIGITS = LETTERS + DIGITS;
         public const string DIGITS_WITH_SPECIAL = DIGITS + ".";
 
         public static List<string> KEYWORDS = new() {
-            "var", "and", "or", "not", "if", "then", "elseif", "else" , "for", "until", "also", "while", "step", "func"
+            "var", "and", "or", "not", "if", "then", "elseif", "else" , "for", "until", "also", "while", "step", "func", "end", "return", "continue", "break"
         };
 
         public static Dictionary<char, string> ESCAPE_CHARS = new() {

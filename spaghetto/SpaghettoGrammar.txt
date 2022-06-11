@@ -1,38 +1,59 @@
-﻿expression : KEYWORD:var IDENTIFIER EQUALS expression
-           : comp-expr ((KEYWORD:AND|KEYWORD) comp-expr)*
+﻿statements    : NEWLINE* statement (NEWLINE+ statement)* NEWLINE*
 
-comp-expr  : NOT comp-expr
-           : arith-expr ((==|<|>|<=|>=) aright-expr)*
-
-arith-expr : term ((PLUS|MINUS) term)*
-
-term       : factor ((MOD|MUL|DIV|IDX) factor)*
-
-factor     : (PLUS|MINUS) factor
-           : power
-
-power      : call ((POW) factor)*
-
-call       : atom (LPAREN (expr (COMMA expr)*)? RPAREN)?
-
-atom       : INT|FLOAT|STRING|IDENTIFIER
-           : LPAREN expr RPAREN
-           : list-expr
-           : if-expr
-           : for-expr
-           : while-expr
-           : func-def
-
-list-expr  : LSQBRACKET (expr (COMMA expr)*)? RSQBRACKET
-
-if-expr    : KEYWORD:if expr KEYWORD:then expr
-           : (KEYWORD:elif expr KEYWORD:then expr)*
-           : (KEYWORD:else expr)?
-
-for-expr   : KEYWORD:for IDENTIFIER = expr KEYWORD:until cond KEYWORD:also|step expr KEYWORD:then expr
-
-while-expr : KEYWORD:while expr KEYWORD:then expr
-
-func-def   : KEYWORD:func IDENTIFIER?
-             LPAREN (IDENTIFIER(COMMA IDENTIFIER)*)? RPAREN
-             ARROW expr
+statement     : KEYWORD:return expr?
+              : KEYWORD:continue|break
+              : expr
+              
+expression    : KEYWORD:var IDENTIFIER EQUALS expression
+              : comp-expr ((KEYWORD:AND|KEYWORD) comp-expr)*
+              
+comp-expr     : NOT comp-expr
+              : arith-expr ((==|<|>|<=|>=) aright-expr)*
+              
+arith-expr    : term ((PLUS|MINUS) term)*
+              
+term          : factor ((MOD|MUL|DIV|IDX) factor)*
+              
+factor        : (PLUS|MINUS) factor
+              : power
+              
+power         : call ((POW) factor)*
+              
+call          : atom (LPAREN (expr (COMMA expr)*)? RPAREN)?
+              
+atom          : INT|FLOAT|STRING|IDENTIFIER
+              : LPAREN expr RPAREN
+              : list-expr
+              : if-expr
+              : for-expr
+              : while-expr
+              : func-def
+              
+list-expr     : LSQBRACKET (expr (COMMA expr)*)? RSQBRACKET
+              
+if-expr       : KEYWORD:if expr KEYWORD:then
+                (statement if-expr-elseif?|if-expr-else?)
+               | (NEWLINE statements KEYWORD:end|if-expr-elseif|if-expr-else)
+              
+if-expr-elseif: KEYWORD:elseif expr KEYWORD:then
+                (statement if-expr-elseif?|if-expr-else?)
+               | (NEWLINE statements KEYWORD:end|if-expr-elseif|if-expr-else)
+              
+if-expr-else  : KEYWORD:else
+                statement
+              | (NEWLINE statements KEYWORD:end)
+              
+              
+              
+for-expr      : KEYWORD:for IDENTIFIER = expr KEYWORD:until cond KEYWORD:also|step expr KEYWORD:then
+                statement
+              | (NEWLINE statements KEYWORD:end)
+              
+while-expr    : KEYWORD:while expr KEYWORD:then
+                statement
+              | (NEWLINE statements KEYWORD:end)
+              
+func-def      : KEYWORD:func IDENTIFIER?
+                LPAREN (IDENTIFIER(COMMA IDENTIFIER)*)? RPAREN
+                (ARROW expr)
+              | (NEWLINE statements KEYWORD:end)

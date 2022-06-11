@@ -48,12 +48,16 @@ namespace spaghetto {
             return (null, new TypeError(posStart, posEnd, "Can not perform IsEqualTo with string to " + other.GetType().Name));
         }
 
+        public override string Represent() {
+            return $"\"{value}\"";
+        }
+
         public override bool IsTrue() {
             return (value.Length > 0);
         }
 
         public override string ToString() {
-            return $"\"{value}\"";
+            return value;
         }
     }
 }

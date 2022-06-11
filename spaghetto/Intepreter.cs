@@ -9,6 +9,8 @@ using System.Diagnostics;
 
 namespace spaghetto {
     internal class Intepreter {
+        internal static Random rnd = new();
+
         public static SymbolTable<Value> globalSymbolTable = new() {
             { "null", new Number(0) },
             { "true", new Number(1) },
@@ -81,11 +83,20 @@ namespace spaghetto {
                 }, new() { "val "})
             },
 
+            {"randomBetween",
+                new NativeFunction("randomBetween", (List<Value> args, Position posStart, Position posEnd, Context ctx) => { // func e() -> if(randomBetween(1, 1000000) == 8) then randomBetween("e", "a") else e()
+                    if(args[0] is not Number) throw new RuntimeError(posStart, posEnd, "Argument min must be of type Number but is " + args[0].GetType().Name, ctx);
+                    if(args[1] is not Number) throw new RuntimeError(posStart, posEnd, "Argument max must be of type Number", ctx);
+
+                    return (Number)rnd.Next((int)(args[0] as Number).value, (int)(args[1] as Number).value);
+                }, new() { "min", "max"})
+            },
+
             { "run",
                 new NativeFunction("run", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
                     try
                     {
-                        if (!(args[0] is StringValue)) throw new RuntimeError(posStart, posEnd, "Argument path must be of type String", ctx);
+                        if (args[0] is not StringValue) throw new RuntimeError(posStart, posEnd, "Argument path must be of type String", ctx);
 
                         if (!File.Exists((args[0] as StringValue).value))
                         {
@@ -93,23 +104,17 @@ namespace spaghetto {
                         }
 
                         //temporarily running line by line
-                        string[] code = File.ReadAllLines((args[0] as StringValue).value);
+                        string code = File.ReadAllText((args[0] as StringValue).value);
                         Value lastVal = null;
 
-                        foreach (string line in code)
+                        (RuntimeResult res, SpaghettoException err) = Run((args[0] as StringValue).value, code);
+
+                        if (err != null)
                         {
-                            System.Diagnostics.Debug.WriteLine(line);
-                            (RuntimeResult res, SpaghettoException err) = Run((args[0] as StringValue).value, line);
-
-                            if (err != null)
-                            {
-                                throw err;
-                            }
-
-                            lastVal = (res.value != null ? res.value.Copy() : null);
+                            throw err;
                         }
 
-                        return lastVal;
+                        return (res.value != null ? res.value.Copy() : null);
                     }
                     catch (Exception ex)
                     {
@@ -153,6 +158,7 @@ namespace spaghetto {
             return (result, result.error);
         }
 
+
         public RuntimeResult Visit(Node node, Context context) {
             return node.Visit(context);
         }
@@ -163,10 +169,15 @@ namespace spaghetto {
         public Context parentContext = null;
         public Position parentEntryPosition = null;
         public SymbolTable<Value> symbolTable = new();
+        public int depth = 0;
+
+        public const int MaximumDepth = 5000;
 
         public Context(string displayName, Context parentContext = null, Position parentEntryPosition = null) {
             this.displayName = displayName;
             this.parentContext = parentContext;
+            if (parentContext is not null) depth = parentContext.depth+1;
+            if (depth > MaximumDepth) throw new StackOverflowException($"Attempted to create a context deeper than {MaximumDepth} layers. Your code might contain recursive code without a break-condition");
             this.parentEntryPosition = parentEntryPosition;
         }
     } 
@@ -215,18 +226,51 @@ namespace spaghetto {
     internal class RuntimeResult {
         public Value value;
         public SpaghettoException error;
+        public Value functionReturnValue = null;
+        public bool loopShouldContinue = false, loopShouldBreak = false;
 
         public Value Register(RuntimeResult res) {
             if (res.error != null) this.error = res.error;
+            if (res.functionReturnValue != null) this.functionReturnValue = res.functionReturnValue;
+            if (res.loopShouldContinue != null) this.loopShouldContinue = res.loopShouldContinue;
+            if (res.loopShouldBreak != null) this.loopShouldBreak = res.loopShouldBreak;
             return res.value;
         }
 
+        public void Reset() {
+            this.value = null;
+            this.error = null;
+            this.functionReturnValue = null;
+            this.loopShouldBreak = false;
+            this.loopShouldContinue = false;
+        }
+
         public RuntimeResult Success(Value value) {
+            Reset();
             this.value = value;
             return this;
         }
 
+        public RuntimeResult SuccessReturn(Value value) {
+            this.Reset();
+            this.functionReturnValue = value;
+            return this;
+        }
+
+        public RuntimeResult SuccessContinue() {
+            this.Reset();
+            this.loopShouldContinue = true;
+            return this;
+        }
+
+        public RuntimeResult SuccessBreak() {
+            this.Reset();
+            this.loopShouldBreak = true;
+            return this;
+        }
+
         public RuntimeResult Failure(SpaghettoException error) {
+            Reset();
             this.error = error;
             return this;
         }
@@ -234,6 +278,10 @@ namespace spaghetto {
         public override string ToString() {
             return @$"Value: {value}
 Error: {error}";
+        }
+
+        public bool ShouldReturn() {
+            return (error != null || functionReturnValue != null | loopShouldContinue || loopShouldBreak);
         }
     }
 }

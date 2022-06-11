@@ -55,6 +55,10 @@ namespace spaghetto {
         }
 
         public override string ToString() {
+            return this.Represent();
+        }
+
+        public override string Represent() {
             return $"[{value.Join(", ")}]";
         }
     }

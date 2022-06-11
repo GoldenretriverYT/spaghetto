@@ -141,7 +141,16 @@ namespace spaghetto {
             return (value != 0 ? true : false);
         }
 
+        public static explicit operator Number(int i) => new Number(i);
+        public static explicit operator Number(double d) => new Number(d);
+        public static explicit operator Number(float f) => new Number(f);
+
+
         public override string ToString() {
+            return this.Represent();
+        }
+
+        public override string Represent() {
             if (double.IsInfinity(value)) return (double.IsNegativeInfinity(value) ? "-Inf" : "Inf");
 
             return value.ToString();

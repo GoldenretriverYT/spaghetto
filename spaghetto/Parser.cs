@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,22 +17,104 @@ namespace spaghetto {
 
         public Token Advance() {
             tokenIdx++;
-
-            if(tokenIdx < tokens.Count) {
-                currentToken = tokens[tokenIdx];
-            }
-
+            UpdateCurrentToken();
             return currentToken;
         }
 
+        public Token Advance(ParseResult res) {
+            res.RegisterAdvancement();
+            return Advance();
+        }
+
+        public Token Reverse(int by=1) {
+            tokenIdx -= by;
+            UpdateCurrentToken();
+            return currentToken;
+        }
+
+        public void UpdateCurrentToken() {
+            if (tokenIdx >= 0 && tokenIdx < tokens.Count) {
+                currentToken = tokens[tokenIdx];
+            }
+        }
+
         public ParseResult Parse() {
-            ParseResult res = Expression();
+            ParseResult res = Statements();
 
             if(res.error == null && currentToken.type != TokenType.EndOfFile) {
                 return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected '+', '-', '*', '/', '^', '==', '!=', '<', '>', <=', '>=', 'and' or 'or'"));
             }
 
             return res;
+        }
+
+        public ParseResult Statements() {
+            ParseResult res = new();
+            List<Node> statements = new();
+            var posStart = currentToken.posStart.Copy();
+
+            while(currentToken.type == TokenType.NewLine) {
+                res.RegisterAdvancement();
+                Advance();
+            }
+
+            Node statement = res.Register(Statement());
+            if (res.error is not null) return res;
+            statements.Add(statement);
+
+            bool moreStatements = true;
+
+            while(true) {
+                int newlineCount = 0;
+
+                while(currentToken.type == TokenType.NewLine) {
+                    res.RegisterAdvancement();
+                    Advance();
+                    newlineCount++;
+                }
+
+                if (newlineCount == 0) moreStatements = false;
+                if (!moreStatements) break;
+
+                statement = res.TryRegister(Statement());
+
+                if (statement == null) {
+                    Reverse(res.toReverseCount);
+                    moreStatements = false;
+                    continue;
+                }
+
+                statements.Add(statement);
+            }
+
+            return res.Success(new ListNode(statements, posStart, currentToken.posEnd.Copy()));
+        }
+
+        public ParseResult Statement() {
+            ParseResult res = new();
+            Position posStart = currentToken.posStart.Copy();
+
+            if (currentToken.Matches(TokenType.Keyword, "return")) {
+                Advance(res);
+
+                Node expression = res.TryRegister(Expression());
+                if (expression == null) {
+                    Reverse(res.toReverseCount);
+                }
+
+                return res.Success(new ReturnNode(expression, posStart, currentToken.posStart.Copy()));
+            } else if (currentToken.Matches(TokenType.Keyword, "continue")) {
+                Advance(res);
+                return res.Success(new ContinueNode(posStart, currentToken.posStart.Copy()));
+            } else if (currentToken.Matches(TokenType.Keyword, "break")) {
+                Advance(res);
+                return res.Success(new BreakNode(posStart, currentToken.posStart.Copy()));
+            }
+
+            Node expr = res.Register(Expression());
+            if (res.error) return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected 'var', numeric value, identifier, '[', '-', '+', 'not', 'if', 'for', 'while', 'func', 'return', 'continue', 'break' or parentheses")); ;
+
+            return res.Success(expr);
         }
 
         public ParseResult Call() {
@@ -81,7 +162,7 @@ namespace spaghetto {
         public ParseResult Atom() {
             //System.Diagnostics.Debug.WriteLine("[parse] Atom");
 
-            ParseResult res = new ParseResult();
+            ParseResult res = new();
             Token tok = currentToken;
 
             if (tok.type == TokenType.Int || tok.type == TokenType.Float) {
@@ -245,75 +326,140 @@ namespace spaghetto {
             res.RegisterAdvancement();
             Advance();
 
-            if(currentToken.type != TokenType.Arrow) {
-                return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected '->'"));
+            if (currentToken.type == TokenType.Arrow) {
+                res.RegisterAdvancement();
+                Advance();
+
+                Node nodeToReturn = res.Register(Expression());
+                if (res.error) return res;
+
+                return res.Success(new FunctionDefinitionNode(varNameToken, argNameTokens, nodeToReturn, true));
             }
 
-            res.RegisterAdvancement();
-            Advance();
+            if(currentToken.type != TokenType.NewLine) {
+                return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected '->' or NewLine"));
+            }
 
-            Node nodeToReturn = res.Register(Expression());
+            Advance(res);
+
+            Node body = res.Register(Statements());
             if (res.error) return res;
 
-            return res.Success(new FunctionDefinitionNode(varNameToken, argNameTokens, nodeToReturn));
+            if(!(currentToken.Matches(TokenType.Keyword, "end"))) {
+                return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected 'end'"));
+            }
+
+            Advance(res);
+
+            return res.Success(new FunctionDefinitionNode(varNameToken, argNameTokens, body, false));
         }
 
         public ParseResult IfExpression() {
-            //System.Diagnostics.Debug.WriteLine("[parse] IfExpression");
-
             ParseResult res = new();
-            List<(Node, Node)> cases = new();
+            IfCasesListNode cases = res.Register(IfExpressionCases("if")) as IfCasesListNode;
+            if (res.error) return res;
 
-            if(!(currentToken.Matches(TokenType.Keyword, "if"))) {
-                return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected 'if'"));
+            return res.Success(new IfNode(cases.cases));
+        }
+
+        public ParseResult IfExpressionCases(string keyword) {
+            ParseResult res = new();
+            List<(Node cond, Node statements, bool)> cases = new();
+
+            if(!(currentToken.Matches(TokenType.Keyword, keyword))) {
+                return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, $"Expected '{keyword}'"));
             }
 
-            res.RegisterAdvancement();
-            Advance();
+            Advance(res);
 
             Node condition = res.Register(Expression());
             if (res.error) return res;
 
-            if(!(currentToken.Matches(TokenType.Keyword, "then"))) {
-                return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected 'then'"));
+            if (!(currentToken.Matches(TokenType.Keyword, "then"))) {
+                return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, $"Expected '{keyword}'"));
             }
 
-            res.RegisterAdvancement();
-            Advance();
+            Advance(res);
 
-            Node expr = res.Register(Expression());
-            if (res.error) return res;
-            cases.Add((condition, expr));
+            if (currentToken.type == TokenType.NewLine) {
+                Advance(res);
 
-            while(currentToken.Matches(TokenType.Keyword, "elseif")) {
-                res.RegisterAdvancement();
-                Advance();
-
-                condition = res.Register(Expression());
+                Node statements = res.Register(Statements());
                 if (res.error) return res;
 
-                if (!(currentToken.Matches(TokenType.Keyword, "then"))) {
-                    return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected 'then'"));
+                cases.Add((condition, statements, true));
+
+                if(currentToken.Matches(TokenType.Keyword, "end")) {
+                    Advance(res);
+                }else {
+                    List<(Node cond, Node statements, bool)> newCases = (res.Register(IfExpressionElseIfOrElse()) as IfCasesListNode).cases;
+                    if (res.error) return res;
+
+                    cases = cases.Concat(newCases).ToList();
                 }
-
-                res.RegisterAdvancement();
-                Advance();
-
-                expr = res.Register(Expression());
+            }else {
+                Node expr = res.Register(Statement());
                 if (res.error) return res;
-                cases.Add((condition, expr));
+                cases.Add((condition, expr, false));
+
+                List<(Node cond, Node statements, bool)> newCases = (res.Register(IfExpressionElseIfOrElse()) as IfCasesListNode).cases;
+                if (res.error) return res;
+
+                cases = cases.Concat(newCases).ToList();
             }
+
+            return res.Success(new IfCasesListNode(cases));
+        }
+
+        public ParseResult IfExpressionElseIfOrElse() {
+            ParseResult res = new();
+            IfCasesListNode cases = null;
+
+            if(currentToken.Matches(TokenType.Keyword, "elseif")) {
+                cases = res.Register(IfExpressionElseIf()) as IfCasesListNode;
+                if (res.error) return res;
+            }else {
+                cases = res.Register(IfExpressionElse()) as IfCasesListNode;
+                if (cases.cases[0].expr == null) cases.cases.RemoveAt(0);
+                if (res.error) return res;
+            }
+
+            return res.Success(cases);
+        }
+
+        public ParseResult IfExpressionElseIf() {
+            return IfExpressionCases("elseif");
+        }
+
+        public ParseResult IfExpressionElse() {
+            ParseResult res = new();
+            (Node cond, Node statements, bool) elseCase = (null, null, false);
+            Position startPos = currentToken.posStart.Copy();
+            NumberNode condition = new NumberNode(new Token(TokenType.Float, 1, posStart: startPos));
 
             if (currentToken.Matches(TokenType.Keyword, "else")) {
-                res.RegisterAdvancement();
-                Advance();
+                Advance(res);
 
-                expr = res.Register(Expression());
-                if (res.error) return res;
-                cases.Add((new NumberNode(new Token(TokenType.Float, 1d)), expr));
+                if(currentToken.type == TokenType.NewLine) {
+                    Advance(res);
+
+                    Node statements = res.Register(Statements());
+                    if (res.error) return res;
+                    elseCase = (condition, statements, true);
+
+                    if(currentToken.Matches(TokenType.Keyword, "end")) {
+                        Advance(res);
+                    }else {
+                        return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected 'end'"));
+                    }
+                } else {
+                    Node expr = res.Register(Statement());
+                    if (res.error) return res;
+                    elseCase = (condition, expr, false);
+                }
             }
 
-            return res.Success(new IfNode(cases));
+            return res.Success(new IfCasesListNode(new() { elseCase }));
         }
 
         public ParseResult ForExpression() {
@@ -371,10 +517,26 @@ namespace spaghetto {
             res.RegisterAdvancement();
             Advance();
 
-            Node func = res.Register(Expression());
+            if(currentToken.type == TokenType.NewLine) {
+                Advance(res);
+
+                Node funcMultiLine = res.Register(Statements());
+                if(res.error) return res;
+
+                if(!(currentToken.Matches(TokenType.Keyword, "end"))) {
+                    System.Diagnostics.Debug.WriteLine(currentToken);
+                    return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected 'end'"));
+                }
+
+                Advance(res);
+
+                return res.Success(new ForNode(varName, varStartExpression, condition, continuationExpression, isStep, funcMultiLine, true));
+            }
+
+            Node func = res.Register(Statement());
             if (res.error) return res;
 
-            return res.Success(new ForNode(varName, varStartExpression, condition, continuationExpression, isStep, func));
+            return res.Success(new ForNode(varName, varStartExpression, condition, continuationExpression, isStep, func, false));
         }
 
         public ParseResult WhileExpression() {
@@ -395,10 +557,25 @@ namespace spaghetto {
             res.RegisterAdvancement();
             Advance();
 
-            Node func = res.Register(Expression());
+            if (currentToken.type == TokenType.NewLine) {
+                Advance(res);
+
+                Node funcMultiLine = res.Register(Statements());
+                if (res.error) return res;
+
+                if (!(currentToken.Matches(TokenType.Keyword, "end"))) {
+                    return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected 'end'"));
+                }
+
+                Advance(res);
+
+                return res.Success(new WhileNode(condition, funcMultiLine, true));
+            }
+
+            Node func = res.Register(Statement());
             if (res.error) return res;
 
-            return res.Success(new WhileNode(condition, func));
+            return res.Success(new WhileNode(condition, func, false));
         }
 
         public ParseResult Power() {
@@ -462,8 +639,7 @@ namespace spaghetto {
             Node node = res.Register(BinaryOperation(() => { return CompExpression(); }, exactTokens: new() { new Token(TokenType.Keyword, "and"), new Token(TokenType.Keyword, "or") }));
 
             if (res.error) {
-                System.Diagnostics.Debug.WriteLine(res.error.Message);
-                return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected 'var', numeric value, identifier, '[', '-', '+', 'not' or parentheses"));
+                return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected 'var', numeric value, identifier, '[', '-', '+', 'not', 'if', 'func', 'for', 'while' or parentheses"));
             }
 
             return res.Success(node);
@@ -516,25 +692,16 @@ namespace spaghetto {
 
             if (res.error != null) return res;
 
-            System.Diagnostics.Debug.WriteLine(currentToken.type);
-            System.Diagnostics.Debug.WriteLine(tokenTypes.Join(", "));
 
             while (tokenTypes.Contains(currentToken.type)) {
-                System.Diagnostics.Debug.WriteLine("TOKENTYPE " + currentToken.type + " FOUND! L: " + funcLeft + " | R: " + funcRight);
-
                 opToken = currentToken;
                 res.RegisterAdvancement();
                 Advance();
                 right = res.Register((funcRight == null ? funcLeft() : funcRight()));
-                if (right == null) System.Diagnostics.Debug.WriteLine("EEEE!!!!!!! RIGHT IS NULL");
 
-                System.Diagnostics.Debug.WriteLine("531 | Checking error");
                 if (res.error != null) return res;
-                System.Diagnostics.Debug.WriteLine("533 | No error!");
 
                 left = new BinaryOperationNode(left, opToken, right);
-
-                System.Diagnostics.Debug.WriteLine("Set left to BinOpNode(" + left + ", " + opToken + ", " + right + ")");
             }
 
             return res.Success(left);
@@ -573,36 +740,6 @@ namespace spaghetto {
             }
             
             return false;
-        }
-    }
-
-    internal class ParseResult {
-        public SpaghettoException error;
-        public Node node;
-        public int advanceCount = 0;
-
-        public Node Register(ParseResult parseResult) {
-            advanceCount += parseResult.advanceCount;
-            if (parseResult.error != null) this.error = parseResult.error;
-            return parseResult.node;
-        }
-
-        public void RegisterAdvancement() {
-            advanceCount++;
-        }
-
-        public ParseResult Success(Node node) {
-            this.node = node;
-            return this;
-        }
-
-        public ParseResult Failure(SpaghettoException error, [CallerMemberName] string memberName = "", [CallerFilePath] string fileName = "", [CallerLineNumber] int lineNumber = 0) {
-            System.Diagnostics.Debug.WriteLine("Failure at " + memberName + " in " + fileName + ":" + lineNumber);
-
-            System.Diagnostics.Debug.WriteLine("ParserResult Failure: " + error.Message);
-            if(this.error == null || advanceCount == 0)
-                this.error = error;
-            return this;
         }
     }
 }

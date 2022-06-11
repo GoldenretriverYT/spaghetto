@@ -91,6 +91,8 @@ namespace spaghetto {
             return (null, new RuntimeError(posStart, posEnd, this.GetType().Name + " does not support Not-Operator", context));
         }
 
+        public abstract string Represent();
+
         public virtual bool IsTrue() {
             return false;
         }

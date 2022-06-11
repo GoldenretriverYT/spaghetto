@@ -22,7 +22,15 @@ namespace spaghetto {
 
         public override RuntimeResult Execute(List<Value> args) {
             RuntimeResult res = new();
-            Context newContext = new(functionName, context, posStart);
+
+            Context newContext;
+
+            try {
+                newContext = new(functionName, context, posStart);
+            } catch (StackOverflowException ex) {
+                return res.Failure(new SpaghettoException(posStart, posEnd, "Stack Overflow", ex.Message));
+            }
+
             newContext.symbolTable = new(newContext.parentContext.symbolTable);
 
             if(args.Count > argNames.Count) {
@@ -47,6 +55,10 @@ namespace spaghetto {
         }
 
         public override string ToString() {
+            return this.ToString();
+        }
+
+        public override string Represent() {
             return $"<native {functionName}>";
         }
     }
