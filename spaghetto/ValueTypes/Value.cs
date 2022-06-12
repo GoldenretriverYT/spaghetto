@@ -10,8 +10,8 @@ namespace spaghetto {
         public Position posStart = null, posEnd = null;
         public Context context = null;
 
-        public SymbolTable<Value> instanceTable = new();
-        public static SymbolTable<Value> staticTable = new();
+        public SymbolTable<Value> instanceTable = new();      // No parents, as we don't want
+        public static SymbolTable<Value> staticTable = new(); // higher-ranked values to be available
 
         public Value SetPosition(Position posStart = null, Position posEnd = null) {
             this.posStart = posStart;

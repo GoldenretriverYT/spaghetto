@@ -31,29 +31,29 @@ atom          : INT|FLOAT|STRING|IDENTIFIER
               
 list-expr     : LSQBRACKET (expr (COMMA expr)*)? RSQBRACKET
               
-if-expr       : KEYWORD:if expr KEYWORD:then
+if-expr       : KEYWORD:if expr LEFTBRACES
                 (statement if-expr-elseif?|if-expr-else?)
-               | (NEWLINE statements KEYWORD:end|if-expr-elseif|if-expr-else)
+               | (NEWLINE statements RIGHTBRACES|if-expr-elseif|if-expr-else)
               
-if-expr-elseif: KEYWORD:elseif expr KEYWORD:then
+if-expr-elseif: KEYWORD:elseif expr LEFTBRACES
                 (statement if-expr-elseif?|if-expr-else?)
-               | (NEWLINE statements KEYWORD:end|if-expr-elseif|if-expr-else)
+               | (NEWLINE statements RIGHTBRACES|if-expr-elseif|if-expr-else)
               
 if-expr-else  : KEYWORD:else
                 statement
-              | (NEWLINE statements KEYWORD:end)
+              | (NEWLINE statements RIGHTBRACES)
               
               
               
-for-expr      : KEYWORD:for IDENTIFIER = expr KEYWORD:until cond KEYWORD:also|step expr KEYWORD:then
+for-expr      : KEYWORD:for IDENTIFIER = expr KEYWORD:until cond KEYWORD:also|step expr LEFTBRACES
                 statement
-              | (NEWLINE statements KEYWORD:end)
+              | (NEWLINE statements RIGHTBRACES)
               
-while-expr    : KEYWORD:while expr KEYWORD:then
+while-expr    : KEYWORD:while expr LEFTBRACES
                 statement
-              | (NEWLINE statements KEYWORD:end)
+              | (NEWLINE statements RIGHTBRACES)
               
 func-def      : KEYWORD:func IDENTIFIER?
                 LPAREN (IDENTIFIER(COMMA IDENTIFIER)*)? RPAREN
                 (ARROW expr)
-              | (NEWLINE statements KEYWORD:end)
+              | LEFTBRACES (NEWLINE statements RIGHTBRACES)

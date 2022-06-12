@@ -338,8 +338,8 @@ namespace spaghetto {
                 return res.Success(new FunctionDefinitionNode(varNameToken, argNameTokens, nodeToReturn, true));
             }
 
-            if(currentToken.type != TokenType.NewLine) {
-                return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected '->' or NewLine"));
+            if(currentToken.type != TokenType.LeftBraces) {
+                return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected '->' or '{'"));
             }
 
             Advance(res);
@@ -347,8 +347,8 @@ namespace spaghetto {
             Node body = res.Register(Statements());
             if (res.error) return res;
 
-            if(!(currentToken.Matches(TokenType.Keyword, "end"))) {
-                return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected 'end'"));
+            if (currentToken.type != TokenType.RightBraces) {
+                return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, $"Expected '}}'"));
             }
 
             Advance(res);
@@ -377,8 +377,8 @@ namespace spaghetto {
             Node condition = res.Register(Expression());
             if (res.error) return res;
 
-            if (!(currentToken.Matches(TokenType.Keyword, "then"))) {
-                return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, $"Expected '{keyword}'"));
+            if (currentToken.type != TokenType.LeftBraces) {
+                return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, $"Expected '{{'"));
             }
 
             Advance(res);
@@ -391,7 +391,7 @@ namespace spaghetto {
 
                 cases.Add((condition, statements, true));
 
-                if(currentToken.Matches(TokenType.Keyword, "end")) {
+                if(currentToken.type == TokenType.RightBraces) {
                     Advance(res);
                 }else {
                     List<(Node cond, Node statements, bool)> newCases = (res.Register(IfExpressionElseIfOrElse()) as IfCasesListNode).cases;
@@ -449,10 +449,10 @@ namespace spaghetto {
                     if (res.error) return res;
                     elseCase = (condition, statements, true);
 
-                    if(currentToken.Matches(TokenType.Keyword, "end")) {
+                    if(currentToken.type == TokenType.RightBraces) {
                         Advance(res);
                     }else {
-                        return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected 'end'"));
+                        return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected '}}'"));
                     }
                 } else {
                     Node expr = res.Register(Statement());
@@ -512,8 +512,8 @@ namespace spaghetto {
             Node continuationExpression = res.Register(Expression());
             if (res.error) return res;
 
-            if (!(currentToken.Matches(TokenType.Keyword, "then"))) {
-                return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected 'then'"));
+            if (currentToken.type != TokenType.LeftBraces) {
+                return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, $"Expected '{{'"));
             }
 
             res.RegisterAdvancement();
@@ -525,9 +525,8 @@ namespace spaghetto {
                 Node funcMultiLine = res.Register(Statements());
                 if(res.error) return res;
 
-                if(!(currentToken.Matches(TokenType.Keyword, "end"))) {
-                    System.Diagnostics.Debug.WriteLine(currentToken);
-                    return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected 'end'"));
+                if (currentToken.type != TokenType.RightBraces) {
+                    return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, $"Expected '}}'"));
                 }
 
                 Advance(res);
@@ -552,8 +551,8 @@ namespace spaghetto {
             Node condition = res.Register(Expression());
             if (res.error) return res;
 
-            if (!(currentToken.Matches(TokenType.Keyword, "then"))) {
-                return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected 'then'"));
+            if (currentToken.type != TokenType.LeftBraces) {
+                return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, $"Expected '{{'"));
             }
 
             res.RegisterAdvancement();
@@ -565,8 +564,8 @@ namespace spaghetto {
                 Node funcMultiLine = res.Register(Statements());
                 if (res.error) return res;
 
-                if (!(currentToken.Matches(TokenType.Keyword, "end"))) {
-                    return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected 'end'"));
+                if (currentToken.type != TokenType.RightBraces) {
+                    return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, $"Expected '}}'"));
                 }
 
                 Advance(res);
