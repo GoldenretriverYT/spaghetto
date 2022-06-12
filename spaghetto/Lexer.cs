@@ -77,8 +77,10 @@ namespace spaghetto {
                     Token ret = MakeCommentOrDivision();
                     if(ret != null) tokens.Add(ret);
                     Advance();
-                }
-                else if (currentChar == '(')
+                } else if (currentChar == '.') {
+                    tokens.Add(new Token(TokenType.Dot, posStart: pos));
+                    Advance();
+                } else if (currentChar == '(')
                 {
                     tokens.Add(new Token(TokenType.LeftParen, posStart: pos));
                     Advance();
@@ -340,6 +342,7 @@ namespace spaghetto {
         LeftSqBracket,
         RightSqBracket,
         NewLine,
+        Dot,
         Unknown
 }
 

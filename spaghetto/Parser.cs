@@ -124,6 +124,8 @@ namespace spaghetto {
             Node atom = res.Register(Atom());
             if (res.error) return res;
 
+            // implement dot access
+
             if(currentToken.type == TokenType.LeftParen) {
                 res.RegisterAdvancement();
                 Advance();

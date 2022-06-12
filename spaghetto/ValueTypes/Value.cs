@@ -5,13 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace spaghetto {
-    [Serializable]
     internal abstract class Value {
         public object value;
         public Position posStart = null, posEnd = null;
         public Context context = null;
 
-        public List<BaseFunction> instanceFunctions = new();
+        public SymbolTable<Value> instanceTable = new();
+        public static SymbolTable<Value> staticTable = new();
 
         public Value SetPosition(Position posStart = null, Position posEnd = null) {
             this.posStart = posStart;
