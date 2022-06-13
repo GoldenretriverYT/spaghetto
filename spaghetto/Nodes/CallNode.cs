@@ -17,22 +17,20 @@
         }
 
         public override RuntimeResult Visit(Context context) {
-            return Visit(context, false);
-        }
-
-        public RuntimeResult Visit(Context context, bool force) {
             RuntimeResult res = new();
             List<Value> args = new();
 
             Value valueToCall = res.Register(nodeToCall.Visit(context));
             if (res.ShouldReturn()) return res;
+            if (valueToCall is Number && (valueToCall as Number).value == 0) return res.Failure(new RuntimeError(posStart, posEnd, "Can not execute NULL", context));
             valueToCall = valueToCall.Copy().SetPosition(posStart, posEnd).SetContext(context);
 
-            if (valueToCall is BaseFunction) 
+            if (valueToCall is BaseFunction)
                 if ((valueToCall as BaseFunction).IsStatic)
                     argNodes.RemoveAt(0);
-  
-            foreach(Node argNode in argNodes) {
+
+            foreach (Node argNode in argNodes)
+            {
                 args.Add(res.Register(argNode.Visit(context)));
                 if (res.ShouldReturn()) return res;
             }

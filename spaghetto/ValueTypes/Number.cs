@@ -7,7 +7,13 @@ using System.Threading.Tasks;
 namespace spaghetto {
     [Serializable]
     internal class Number : Value {
-        public static Class ClassImpl = new("Number", new(), new());
+        public static Class ClassImpl = new("Number", new(), new()
+        {
+            { "null", new Number(0) },
+            { "true", new Number(1) },
+            { "false", new Number(0) },
+
+        });
         new public double value;
 
         public Number(double value) {

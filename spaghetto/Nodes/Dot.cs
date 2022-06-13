@@ -29,7 +29,7 @@
                         if (temp.nodeToCall is VariableAccessNode) temp.nodeToCall = new ValueNode(value.Get((temp.nodeToCall as VariableAccessNode).varNameToken.value.ToString()), temp.nodeToCall.posStart, temp.nodeToCall.posEnd);
                     }
 
-                    Value v = res.Register((node as CallNode).Visit(context, true));
+                    Value v = res.Register((node as CallNode).Visit(context));
 
                     if(node is CallNode)
                     {

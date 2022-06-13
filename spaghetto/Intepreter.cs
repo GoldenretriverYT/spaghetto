@@ -16,6 +16,7 @@ namespace spaghetto {
             { "true", new Number(1) },
             { "false", new Number(0) },
             { "String", StringValue.ClassImpl },
+            { "Number", Number.ClassImpl },
             { "Math", MathClass.@class },
 
 

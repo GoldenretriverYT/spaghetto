@@ -13,7 +13,10 @@ namespace spaghetto {
         public List<string> argNames;
 
         public override bool IsStatic { get; set; }
-        public bool UseReflection { get; set; }
+        public bool UseReflection { 
+            get; 
+            set;
+        }
 
         public NativeFunction(string? functionName, Func<List<Value>, Position, Position, Context, Value> func, List<string> argNames, bool isStatic) {
             this.functionName = (functionName ?? "<anon func>");
@@ -24,13 +27,17 @@ namespace spaghetto {
 
         public NativeFunction(string? functionName, Type type, string name, bool isStatic)
         {
-            this.IsStatic = isStatic;
-            this.UseReflection = true;
-            this.Init(functionName, type.GetMethod(name));
+            this.Init(functionName, type.GetMethod(name), isStatic);
         }
 
-        public void Init(string? functionName, MethodInfo method)
+        public NativeFunction(string? functionName, MethodInfo method, bool isStatic)
         {
+            this.Init(functionName, method, isStatic);
+        }
+
+        public void Init(string? functionName, MethodInfo method, bool isStatic)
+        {
+            this.IsStatic = isStatic;
             this.functionName = (functionName ?? "<anon func>");
             this.UseReflection = true;
             this.method = method;
@@ -49,7 +56,10 @@ namespace spaghetto {
         }
 
         public override Value Copy() {
-            return new NativeFunction(functionName, func, argNames, IsStatic).SetContext(context).SetPosition(posStart, posEnd);
+            if(this.UseReflection)
+                return new NativeFunction(functionName, method, IsStatic).SetContext(context).SetPosition(posStart, posEnd);
+            else
+                return new NativeFunction(functionName, func, argNames, IsStatic).SetContext(context).SetPosition(posStart, posEnd);
         }
 
         public override RuntimeResult Execute(List<Value> args) {
