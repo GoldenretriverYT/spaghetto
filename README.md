@@ -9,7 +9,7 @@ Download the latest release and extract it. Run spaghetto.exe (you might need to
 Spaghetto instructions. To run multi-line instructions, use the run(path: String) command.
 
 ## Documentation
-Coming soon, whilst the docs are work in progress, you can check the examples in [/spaghetto/examples/(https://github.com/GoldenretriverYT/spaghetto/tree/main/spaghetto/examples)
+Coming soon, whilst the docs are work in progress, you can check the examples in [/spaghetto/examples/](https://github.com/GoldenretriverYT/spaghetto/tree/main/spaghetto/examples)
 
 ## Credits
 The core of this language is based on [this tutorial](https://www.youtube.com/watch?v=Eythq9848Fg) as I would have been to stupid to do this properly otherwise (like seriously, look at [PoopScript](https://github.com/GoldenretriverYT/PoopScript) to see what a mess I used to make)
