@@ -16,10 +16,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="examples\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="bin\Debug\net6.0\ex2.spag" />
     <None Include="bin\Debug\net6.0\example.spag" />
   </ItemGroup>
