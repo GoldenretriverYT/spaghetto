@@ -69,12 +69,12 @@ namespace spaghetto {
 
         public string GenerateTraceback() {
             string result = "";
-            Position pos = posStart;
+            //Position pos = posStart;
             Context ctx = this.ctx;
 
             while(ctx != null) {
                 result = $"  at {posStart.fileName}:{posStart.ln + 1} in {ctx.displayName}\n" + result;
-                pos = ctx.parentEntryPosition;
+                //pos = ctx.parentEntryPosition;
                 ctx = ctx.parentContext;
             }
 

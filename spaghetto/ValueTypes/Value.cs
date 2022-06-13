@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace spaghetto {
     internal abstract class Value {
-        public object value;
+        public object? value = null;
         public Position posStart = null, posEnd = null;
         public Context context = null;
 

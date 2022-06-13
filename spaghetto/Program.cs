@@ -1,7 +1,7 @@
 ﻿namespace spaghetto {
     internal class Program {
-        static void Main(string[] args) {
-            Thread t = new Thread(() => {
+        static void Main() {
+            Thread t = new(() => {
                 while (true) {
                     Console.Write("spaghetto > ");
                     string text = Console.ReadLine();
@@ -34,7 +34,9 @@
             t.Join();
         }
 
+#pragma warning disable IDE0051 // Nicht verwendete private Member entfernen
         static void StartNewCLI()
+#pragma warning restore IDE0051 // Nicht verwendete private Member entfernen
         {
             string currentCommand = "";
             int cursorPos = 0;
@@ -105,7 +107,7 @@
 
                 Console.SetCursorPosition(0, 0);
 
-                Lexer lex = new Lexer(currentCommand, "<cli_preview>");
+                Lexer lex = new(currentCommand, "<cli_preview>");
                 List<Token> tokens = lex.MakeTokens(true);
                 int totalPrinted = 0;
 

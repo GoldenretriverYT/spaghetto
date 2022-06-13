@@ -50,7 +50,7 @@ namespace spaghetto {
                 newContext.symbolTable.Set(argName, argValue);
             }
 
-            Value value = res.Register(intepreter.Visit(bodyNode, newContext));
+            Value value = res.Register(Intepreter.Visit(bodyNode, newContext));
             if (res.ShouldReturn() && res.functionReturnValue == null) return res;
 
             Value retValue = ((shouldAutoReturn ? value : null) ?? res.functionReturnValue) ?? new Number(0);

@@ -124,7 +124,7 @@ namespace spaghetto {
 
         public override (Value, SpaghettoException) AndBy(Value other) {
             if (other is Number) {
-                return (new Number((value == 0 ? false : true) && ((other as Number).value == 0 ? false : true) ? 1 : 0).SetContext(context), null);
+                return (new Number((value != 0) && ((other as Number).value != 0) ? 1 : 0).SetContext(context), null);
             }
 
             return (null, new TypeError(posStart, posEnd, "Can not perform AndBy with number to " + other.GetType().Name));
@@ -132,7 +132,7 @@ namespace spaghetto {
 
         public override (Value, SpaghettoException) OrBy(Value other) {
             if (other is Number) {
-                return (new Number((value == 0 ? false : true) || ((other as Number).value == 0 ? false : true) ? 1 : 0).SetContext(context), null);
+                return (new Number((value != 0) || ((other as Number).value != 0) ? 1 : 0).SetContext(context), null);
             }
 
             return (null, new TypeError(posStart, posEnd, "Can not perform OrBy with number to " + other.GetType().Name));
@@ -143,12 +143,12 @@ namespace spaghetto {
         }
 
         public override bool IsTrue() {
-            return (value != 0 ? true : false);
+            return (value != 0);
         }
 
-        public static explicit operator Number(int i) => new Number(i);
-        public static explicit operator Number(double d) => new Number(d);
-        public static explicit operator Number(float f) => new Number(f);
+        public static explicit operator Number(int i) => new(i);
+        public static explicit operator Number(double d) => new(d);
+        public static explicit operator Number(float f) => new(f);
 
 
         public override string ToString() {

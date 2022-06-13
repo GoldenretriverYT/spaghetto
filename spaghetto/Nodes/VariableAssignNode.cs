@@ -7,7 +7,7 @@
         public VariableAssignNode(Token varNameToken, Node valueNode) {
             this.varNameToken = varNameToken;
             this.valueNode = valueNode;
-            this.varName = (string)varNameToken.value;
+            this.varName = varNameToken?.value as string;
 
             this.posStart = varNameToken.posStart;
             this.posEnd = valueNode.posEnd;

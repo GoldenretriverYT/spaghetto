@@ -48,18 +48,14 @@ namespace spaghetto {
             }, new(), true)},
 
             { "isType", new NativeFunction("isType", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
-                switch((args[1] as StringValue).value) {
-                    case "Number":
-                        return new Number(args[0] is Number ? 1 : 0);
-                    case "String":
-                        return new Number(args[0] is StringValue ? 1 : 0);
-                    case "List":
-                        return new Number(args[0] is ListValue ? 1 : 0);
-                    case "Function":
-                        return new Number((args[0] is Function || args[0] is NativeFunction) ? 1 : 0);
-                    default:
-                        throw new RuntimeError(posStart, posEnd, "Invalid type. Native types are Number, String, List and Function", ctx);
-                }
+                return (args[1] as StringValue).value switch
+                {
+                    "Number" => new Number(args[0] is Number ? 1 : 0),
+                    "String" => new Number(args[0] is StringValue ? 1 : 0),
+                    "List" => new Number(args[0] is ListValue ? 1 : 0),
+                    "Function" => new Number((args[0] is Function || args[0] is NativeFunction) ? 1 : 0),
+                    _ => throw new RuntimeError(posStart, posEnd, "Invalid type. Native types are Number, String, List and Function", ctx),
+                };
             }, new() { "val", "type" }, true)},
 
             { "getType", new NativeFunction("isType", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
@@ -103,9 +99,7 @@ namespace spaghetto {
                             throw new RuntimeError(posStart, posEnd, "File not found", ctx);
                         }
 
-                        //temporarily running line by line
                         string code = File.ReadAllText((args[0] as StringValue).value);
-                        Value lastVal = null;
 
                         (RuntimeResult res, SpaghettoException err) = Run((args[0] as StringValue).value, code);
 
@@ -114,7 +108,7 @@ namespace spaghetto {
                             throw err;
                         }
 
-                        return (res.value != null ? res.value.Copy() : null);
+                        return (res.value?.Copy());
                     }
                     catch (Exception ex)
                     {
@@ -135,23 +129,22 @@ namespace spaghetto {
             Stopwatch sw = new();
             sw.Start();
 
-            Lexer lexer = new Lexer(text, fileName);
+            Lexer lexer = new(text, fileName);
             List<Token> tokens = lexer.MakeTokens();
 
             lexTime = sw.ElapsedMilliseconds;
             sw.Restart();
 
-            Parser parser = new Parser(tokens);
+            Parser parser = new(tokens);
             ParseResult ast = parser.Parse();
             if (ast.error != null) return (null, ast.error);
 
             parseTime = sw.ElapsedMilliseconds;
             sw.Restart();
 
-            Intepreter intepreter = new Intepreter();
-            Context context = new Context("<global>");
+            Context context = new("<global>");
             context.symbolTable = globalSymbolTable;
-            RuntimeResult result = intepreter.Visit(ast.node, context);
+            RuntimeResult result = Intepreter.Visit(ast.node, context);
 
             interpretTime = sw.ElapsedMilliseconds;
             sw.Stop();
@@ -162,7 +155,7 @@ namespace spaghetto {
         }
 
 
-        public RuntimeResult Visit(Node node, Context context) {
+        public static RuntimeResult Visit(Node node, Context context) {
             return node.Visit(context);
         }
     }
@@ -199,7 +192,7 @@ namespace spaghetto {
                 if (parent != null) {
                     return parent.Get(name);
                 }else {
-                    return default(T);
+                    return default;
                 }
             }
 
@@ -241,8 +234,8 @@ namespace spaghetto {
         public Value Register(RuntimeResult res) {
             if (res.error != null) this.error = res.error;
             if (res.functionReturnValue != null) this.functionReturnValue = res.functionReturnValue;
-            if (res.loopShouldContinue != null) this.loopShouldContinue = res.loopShouldContinue;
-            if (res.loopShouldBreak != null) this.loopShouldBreak = res.loopShouldBreak;
+            this.loopShouldContinue = res.loopShouldContinue;
+            this.loopShouldBreak = res.loopShouldBreak;
             return res.value;
         }
 

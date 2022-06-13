@@ -28,7 +28,7 @@ namespace spaghetto {
         public Node TryRegister(ParseResult res) {
             if(res.error) {
                 this.toReverseCount = res.advanceCount;
-                return default(Node);
+                return default;
             }
 
             return Register(res);

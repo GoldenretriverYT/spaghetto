@@ -8,7 +8,7 @@ namespace spaghetto
 {
     internal class MathClass
     {
-        private static Random rnd = new();
+        private static readonly Random rnd = new();
 
         public static Class @class = new("Math", new(), new()
         {

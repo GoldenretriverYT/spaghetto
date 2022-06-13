@@ -122,7 +122,7 @@ namespace spaghetto {
             ParseResult res = new();
             Node atom = res.Register(Call());
             if (res.error) return res;
-            Dot accessStack = new Dot(atom);
+            Dot accessStack = new(atom);
 
             if (currentToken.type == TokenType.Dot)
             {
@@ -451,7 +451,7 @@ namespace spaghetto {
 
         public ParseResult IfExpressionElseIfOrElse() {
             ParseResult res = new();
-            IfCasesListNode cases = null;
+            IfCasesListNode cases;
 
             if(currentToken.Matches(TokenType.Keyword, "elseif")) {
                 cases = res.Register(IfExpressionElseIf()) as IfCasesListNode;
@@ -473,7 +473,7 @@ namespace spaghetto {
             ParseResult res = new();
             (Node cond, Node statements, bool) elseCase = (null, null, false);
             Position startPos = currentToken.posStart.Copy();
-            NumberNode condition = new NumberNode(new Token(TokenType.Float, 1, posStart: startPos));
+            NumberNode condition = new(new Token(TokenType.Float, 1, posStart: startPos));
 
             if (currentToken.Matches(TokenType.Keyword, "else")) {
                 Advance(res);
@@ -624,7 +624,7 @@ namespace spaghetto {
         public ParseResult Factor() {
             //System.Diagnostics.Debug.WriteLine("[parse] Factor");
 
-            ParseResult res = new ParseResult();
+            ParseResult res = new();
             Token tok = currentToken;
 
             if(tok.type == TokenType.Plus || tok.type == TokenType.Minus) {
@@ -721,7 +721,7 @@ namespace spaghetto {
 
             if (tokenTypes == null) tokenTypes = new();
 
-            ParseResult res = new ParseResult();
+            ParseResult res = new();
 
             Node left = res.Register(funcLeft());
             Node right;
@@ -749,7 +749,7 @@ namespace spaghetto {
 
             if (funcRight == null) funcRight = funcLeft;
 
-            ParseResult res = new ParseResult();
+            ParseResult res = new();
 
             Node left = res.Register(funcLeft());
             Node right;
@@ -771,7 +771,7 @@ namespace spaghetto {
             return res.Success(left);
         }
 
-        public bool TokenListContains(List<Token> exactTokens, Token currentToken) {
+        public static bool TokenListContains(List<Token> exactTokens, Token currentToken) {
             foreach(Token tok in exactTokens) {
                 if (currentToken.Matches(tok.type, (string)tok.value)) return true;
             }

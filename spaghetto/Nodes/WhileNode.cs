@@ -21,7 +21,7 @@
             while (res.Register(condition.Visit(context)).IsTrue()) {
                 if (res.ShouldReturn()) return res;
 
-                Context newCtx = new Context("<while:iter" + iter + ">", context);
+                Context newCtx = new("<while:iter" + iter + ">", context);
                 newCtx.symbolTable = new((SymbolTable<Value>)newCtx.parentContext.symbolTable.Clone());
                 lastValue = res.Register(func.Visit(newCtx));
 

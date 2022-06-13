@@ -42,7 +42,7 @@ namespace spaghetto {
 
     internal static class StringExtensions {
         public static string Substr(this string str, int start, int end) {
-            return str.Substring(start, end - start);
+            return str[start..end];
         }
 
         public static string SubstrInBounds(this string str, int start, int end)

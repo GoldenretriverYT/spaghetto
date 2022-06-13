@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace spaghetto {
     internal class StringValue : Value {
-        public static Class ClassImpl = new Class("String", new()
+        public static Class ClassImpl = new("String", new()
         {
             {"toNumber",
                 new NativeFunction("toNumber", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
