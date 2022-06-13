@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 namespace spaghetto {
     [Serializable]
     internal class Number : Value {
+        public static Class ClassImpl = new("Number", new(), new());
         new public double value;
 
         public Number(double value) {
@@ -76,8 +77,6 @@ namespace spaghetto {
         }
 
         public override (Value, SpaghettoException) IsNotEqualTo(Value other) {
-            System.Diagnostics.Debug.WriteLine("Call to IsNotEqualTo");
-
             if (other is Number) {
                 return (new Number((value == (other as Number).value) ? 0 : 1).SetContext(context), null);
             }
@@ -154,6 +153,11 @@ namespace spaghetto {
             if (double.IsInfinity(value)) return (double.IsNegativeInfinity(value) ? "-Inf" : "Inf");
 
             return value.ToString();
+        }
+
+        public override Value Get(string identifier)
+        {
+            return ClassImpl.Get(identifier);
         }
     }
 }

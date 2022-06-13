@@ -15,14 +15,22 @@
         public override RuntimeResult Visit(Context context) {
             RuntimeResult res = new();
             Value lastValue = null;
-            
+
+            int iter = 0;
+
             while (res.Register(condition.Visit(context)).IsTrue()) {
                 if (res.ShouldReturn()) return res;
-                lastValue = res.Register(func.Visit(context));
+
+                Context newCtx = new Context("<while:iter" + iter + ">", context);
+                newCtx.symbolTable = new((SymbolTable<Value>)newCtx.parentContext.symbolTable.Clone());
+                lastValue = res.Register(func.Visit(newCtx));
+
                 if (res.ShouldReturn() && res.loopShouldBreak == false && res.loopShouldContinue == false) return res;
 
                 if (res.loopShouldContinue) continue;
                 if (res.loopShouldBreak) break;
+
+                iter++;
             }
 
             return res.Success((shouldReturnNull ? new Number(0) : lastValue));

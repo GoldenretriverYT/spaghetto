@@ -15,20 +15,24 @@ namespace spaghetto {
             { "null", new Number(0) },
             { "true", new Number(1) },
             { "false", new Number(0) },
+            { "String", StringValue.ClassImpl },
+            { "Math", MathClass.@class },
 
-            { "printLine", new NativeFunction("printLine", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
+
+            {
+                "printLine", new NativeFunction("printLine", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
                 Console.WriteLine((args[0]).ToString());
                 return null;
-            }, new() {"str"}) },
+            }, new() {"str"}, true) },
 
             { "print", new NativeFunction("print", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
                 Console.Write(args[0].ToString());
                 return null;
-            }, new() {"str"}) },
+            }, new() {"str"}, true) },
 
             { "readLine", new NativeFunction("readLine", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
                 return new StringValue(Console.ReadLine());
-            }, new()) },
+            }, new(), true) },
 
             { "readNumber", new NativeFunction("readNumber", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
                 double result = 0;
@@ -40,7 +44,7 @@ namespace spaghetto {
                 }
 
                 return new Number(result);
-            }, new()) },
+            }, new(), true)},
 
             { "isType", new NativeFunction("isType", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
                 switch((args[1] as StringValue).value) {
@@ -55,7 +59,7 @@ namespace spaghetto {
                     default:
                         throw new RuntimeError(posStart, posEnd, "Invalid type. Native types are Number, String, List and Function", ctx);
                 }
-            }, new() { "val", "type" })},
+            }, new() { "val", "type" }, true)},
 
             { "getType", new NativeFunction("isType", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
                 if(args[0] is Number)
@@ -70,26 +74,21 @@ namespace spaghetto {
                     return new StringValue("null");
                 else
                     throw new Exception(args[0] + " is of unknown type.");
-            }, new() { "val" })},
+            }, new() { "val" }, true)},
 
             { "clear", new NativeFunction("clear", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
                 Console.Clear();
                 return null;
-            }, new() { })},
+            }, new() { }, true )},
 
-            {"toString",
-                new NativeFunction("toString", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
-                    return new StringValue(args[0].ToString());
-                }, new() { "val "})
-            },
-
-            {"randomBetween",
+            {
+                "randomBetween",
                 new NativeFunction("randomBetween", (List<Value> args, Position posStart, Position posEnd, Context ctx) => { // func e() -> if(randomBetween(1, 1000000) == 8) then randomBetween("e", "a") else e()
                     if(args[0] is not Number) throw new RuntimeError(posStart, posEnd, "Argument min must be of type Number but is " + args[0].GetType().Name, ctx);
                     if(args[1] is not Number) throw new RuntimeError(posStart, posEnd, "Argument max must be of type Number", ctx);
 
                     return (Number)rnd.Next((int)(args[0] as Number).value, (int)(args[1] as Number).value);
-                }, new() { "min", "max"})
+                }, new() { "min", "max"}, true)
             },
 
             { "run",
@@ -125,35 +124,38 @@ namespace spaghetto {
                         }
                         else throw;
                     }
-                }, new() { "path" })
+                }, new() { "path" }, true)
             },
         };
 
         public static (RuntimeResult, SpaghettoException) Run(string fileName, string text) {
+            long lexTime, parseTime, interpretTime;
+
             Stopwatch sw = new();
             sw.Start();
 
             Lexer lexer = new Lexer(text, fileName);
             List<Token> tokens = lexer.MakeTokens();
 
-            Debug.WriteLine("Lexer took " + sw.ElapsedMilliseconds + "ms");
-            sw.Reset();
-            System.Diagnostics.Debug.WriteLine("");
-            foreach (Token token in tokens) System.Diagnostics.Debug.Write(token.ToString() + " ");
-            System.Diagnostics.Debug.WriteLine("");
+            lexTime = sw.ElapsedMilliseconds;
+            sw.Restart();
 
-            sw.Start();
             Parser parser = new Parser(tokens);
             ParseResult ast = parser.Parse();
             if (ast.error != null) return (null, ast.error);
 
-            Debug.WriteLine("Parser took " + sw.ElapsedMilliseconds + "ms");
-            sw.Reset();
+            parseTime = sw.ElapsedMilliseconds;
+            sw.Restart();
 
             Intepreter intepreter = new Intepreter();
             Context context = new Context("<global>");
             context.symbolTable = globalSymbolTable;
             RuntimeResult result = intepreter.Visit(ast.node, context);
+
+            interpretTime = sw.ElapsedMilliseconds;
+            sw.Stop();
+
+            System.Diagnostics.Debug.WriteLine("[ -> TIMINGS] Lexing took: " + lexTime + "ms\n[ -> TIMINGS] Parsing took: " + parseTime + "ms\n[ -> TIMINGS] Interpreting took: " + interpretTime + "ms");
 
             return (result, result.error);
         }
@@ -182,11 +184,12 @@ namespace spaghetto {
         }
     } 
 
-    internal class SymbolTable<T> : IEnumerable<Value> {
-        public Dictionary<string, T> symbols = new(); // Second type must be changed later on
+    internal class SymbolTable<T> : IEnumerable<Value>, ICloneable {
+        public Dictionary<string, T> symbols;// Second type must be changed later on
         public SymbolTable<T> parent = null;
 
         public SymbolTable(SymbolTable<T> parent = null) {
+            this.symbols = new();
             this.parent = parent;
         }
 
@@ -220,6 +223,11 @@ namespace spaghetto {
 
         IEnumerator IEnumerable.GetEnumerator() {
             throw new NotImplementedException();
+        }
+
+        public object Clone()
+        {
+            return (object)this.MemberwiseClone();
         }
     }
 

@@ -17,9 +17,9 @@ term          : factor ((MOD|MUL|DIV|IDX) factor)*
 factor        : (PLUS|MINUS) factor
               : power
               
-power         : call ((POW) factor)*
-              
-call          : atom (DOT IDENTIFIER)*? (LPAREN (expr (COMMA expr)*)? RPAREN)?
+power         : dot ((POW) factor)*
+
+call          : atom (DOT IDENTIFIER|call)*? (LPAREN (expr (COMMA expr)*)? RPAREN)?
               
 atom          : INT|FLOAT|STRING|IDENTIFIER
               : LPAREN expr RPAREN

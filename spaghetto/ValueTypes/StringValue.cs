@@ -6,10 +6,25 @@ using System.Threading.Tasks;
 
 namespace spaghetto {
     internal class StringValue : Value {
+        public static Class ClassImpl = new Class("String", new()
+        {
+            {"toNumber",
+                new NativeFunction("toNumber", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
+                    Console.WriteLine("toNumber called with " + args[0]);
+                    bool success = double.TryParse(args[0].ToString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double result);
+                    if (!success) throw new RuntimeError(posStart, posEnd, "Argument 'self' is not a valid number", ctx);
+                    return new Number(result);
+                }, new() { "self" }, false)
+            },
+        }, new()
+        {
+            { "empty", new StringValue("") },
+        });
+
         new public string value;
 
-        public StringValue(string value) {
-            this.value = value;
+        public StringValue(string str) {
+            this.value = str;
         }
 
         public override Value Copy() {
@@ -58,6 +73,11 @@ namespace spaghetto {
 
         public override string ToString() {
             return value;
+        }
+
+        public override Value Get(string identifier)
+        {
+            return ClassImpl.Get(identifier);
         }
     }
 }

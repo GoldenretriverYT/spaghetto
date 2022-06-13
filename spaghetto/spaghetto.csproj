@@ -16,11 +16,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="bin\Debug\net6.0\example.spag" />
+    <Folder Include="examples\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="examples\" />
+    <None Include="bin\Debug\net6.0\ex2.spag" />
+    <None Include="bin\Debug\net6.0\example.spag" />
   </ItemGroup>
 
 </Project>

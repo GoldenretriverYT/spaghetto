@@ -9,21 +9,29 @@
 
             posStart = nodeToCall.posStart;
 
-            if(argNodes.Count > 0) {
+            if (argNodes.Count > 0) {
                 posEnd = argNodes.Last().posEnd;
-            }else {
+            } else {
                 posEnd = nodeToCall.posEnd;
             }
         }
 
         public override RuntimeResult Visit(Context context) {
+            return Visit(context, false);
+        }
+
+        public RuntimeResult Visit(Context context, bool force) {
             RuntimeResult res = new();
             List<Value> args = new();
 
             Value valueToCall = res.Register(nodeToCall.Visit(context));
             if (res.ShouldReturn()) return res;
-            valueToCall = valueToCall.Copy().SetPosition(posStart, posEnd);
+            valueToCall = valueToCall.Copy().SetPosition(posStart, posEnd).SetContext(context);
 
+            if (valueToCall is BaseFunction) 
+                if ((valueToCall as BaseFunction).IsStatic)
+                    argNodes.RemoveAt(0);
+  
             foreach(Node argNode in argNodes) {
                 args.Add(res.Register(argNode.Visit(context)));
                 if (res.ShouldReturn()) return res;

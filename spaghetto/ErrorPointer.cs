@@ -7,6 +7,12 @@ using System.Threading.Tasks;
 namespace spaghetto {
     internal class ErrorPointer {
         public static string GenerateErrorPointer(string text, Position posStart, Position posEnd) {
+            if (posEnd == null)
+            {
+                posEnd = new Position(text.Length - 1, posStart.ln, posStart.col, posStart.fileName, posStart.fileName);
+                Console.WriteLine("[Warn] posEnd was null");
+            }
+
             string result = "";
 
             int idxStart = Math.Max(text.Substr(0, posStart.idx).LastIndexOf('\n'), 0);

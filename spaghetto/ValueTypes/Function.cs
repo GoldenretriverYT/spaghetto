@@ -11,6 +11,7 @@ namespace spaghetto {
         public Node bodyNode;
         public List<string> argNames;
         public bool shouldAutoReturn;
+        public override bool IsStatic { get; set; }
 
         public Function(string? functionName, Node bodyNode, List<string> argNames, bool shouldAutoReturn) {
             this.functionName = (functionName ?? "<anon func>");
@@ -34,9 +35,9 @@ namespace spaghetto {
                 return res.Failure(new SpaghettoException(posStart, posEnd, "Stack Overflow", ex.Message));
             }
 
-            newContext.symbolTable = new(newContext.parentContext.symbolTable);
+            newContext.symbolTable = new((SymbolTable<Value>)newContext.parentContext.symbolTable.Clone());
 
-            if(args.Count > argNames.Count) {
+            if (args.Count > argNames.Count) {
                 return res.Failure(new RuntimeError(posStart, posEnd, $"Too many arguments passed into {functionName}", context));
             }else if (args.Count < argNames.Count) {
                 return res.Failure(new RuntimeError(posStart, posEnd, $"Too few arguments passed into {functionName}", context));

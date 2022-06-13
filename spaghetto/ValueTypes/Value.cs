@@ -10,9 +10,6 @@ namespace spaghetto {
         public Position posStart = null, posEnd = null;
         public Context context = null;
 
-        public SymbolTable<Value> instanceTable = new();      // No parents, as we don't want
-        public static SymbolTable<Value> staticTable = new(); // higher-ranked values to be available
-
         public Value SetPosition(Position posStart = null, Position posEnd = null) {
             this.posStart = posStart;
             this.posEnd = posEnd;
@@ -89,6 +86,11 @@ namespace spaghetto {
 
         public virtual (Value, SpaghettoException) Not() {
             return (null, new RuntimeError(posStart, posEnd, this.GetType().Name + " does not support Not-Operator", context));
+        }
+
+        public virtual Value Get(string identifier)
+        {
+            return new Number(0);
         }
 
         public abstract string Represent();

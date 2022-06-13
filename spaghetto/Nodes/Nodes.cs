@@ -13,5 +13,10 @@ namespace spaghetto {
         public virtual string GenerateCSharp() {
             throw new Exception("Feature not supported for Compilation: " + this.GetType().Name);
         }
+
+        public Node Clone()
+        {
+            return (Node)this.MemberwiseClone();
+        }
     }
 }

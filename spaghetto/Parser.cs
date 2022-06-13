@@ -117,14 +117,50 @@ namespace spaghetto {
             return res.Success(expr);
         }
 
+        public ParseResult Dot()
+        {
+            ParseResult res = new();
+            Node atom = res.Register(Call());
+            if (res.error) return res;
+            Dot accessStack = new Dot(atom);
+
+            if (currentToken.type == TokenType.Dot)
+            {
+                while (currentToken.type == TokenType.Dot)
+                {
+                    Advance(res);
+
+                    if (currentToken.type == TokenType.Identifier)
+                    {
+                        if (res.error) return res.Failure(res.error);
+                        Node n = res.TryRegister(Call());
+
+                        if (res.error)
+                        {
+                            Reverse(res.toReverseCount);
+                            return res.Success(atom);
+                        }
+
+                        accessStack.nextNodes.Add(n);
+
+                        if (res.error) return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected identifier"));
+                    }
+                    else
+                    {
+                        return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected identifier"));
+                    }
+                }
+            }
+
+            return res.Success(accessStack);
+        }
+
         public ParseResult Call() {
             //System.Diagnostics.Debug.WriteLine("[parse] Call");
 
             ParseResult res = new();
             Node atom = res.Register(Atom());
             if (res.error) return res;
-
-            // implement dot access
 
             if(currentToken.type == TokenType.LeftParen) {
                 res.RegisterAdvancement();
@@ -582,7 +618,7 @@ namespace spaghetto {
         public ParseResult Power() {
             //System.Diagnostics.Debug.WriteLine("[parse] Power");
 
-            return BinaryOperation(() => { return Call(); }, new List<TokenType>() { TokenType.Pow }, () => { return Factor(); });
+            return BinaryOperation(() => { return Dot(); }, new List<TokenType>() { TokenType.Pow }, () => { return Factor(); });
         }
 
         public ParseResult Factor() {

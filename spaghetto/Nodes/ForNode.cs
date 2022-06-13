@@ -33,7 +33,6 @@
             double currentIteratorValue = (value as Number).value;
 
             bool isStepStatic = (continuationExpression is NumberNode ? true : false);
-            System.Diagnostics.Debug.WriteLine("IsStepStatic: " + isStepStatic);
 
             double stepStaticValue = (isStepStatic ? (continuationExpression.Visit(context).value as Number).value : 0);
 

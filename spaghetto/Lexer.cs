@@ -257,13 +257,11 @@ namespace spaghetto {
         }
 
         public (Token, SpaghettoException) MakeNotEquals() {
-            System.Diagnostics.Debug.WriteLine("Call to MakeNotEquals");
             Position posStart = pos.Copy();
             Advance();
 
             if(currentChar == '=') {
                 Advance();
-                System.Diagnostics.Debug.WriteLine("Adding NotEquals Token");
                 return (new Token(TokenType.NotEquals, posStart: pos), null);
             }
 
@@ -410,6 +408,14 @@ namespace spaghetto {
             if (posEnd != null) {
                 this.posEnd = posEnd.Copy();
             }
+        }
+
+        public Token SetPosition(Position posStart, Position posEnd)
+        {
+            this.posStart = posStart.Copy();
+            this.posEnd = posEnd.Copy();
+
+            return this;
         }
 
         public static implicit operator TokenType(Token t) => t.type;
