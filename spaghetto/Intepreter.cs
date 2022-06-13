@@ -11,7 +11,7 @@ namespace spaghetto {
     internal class Intepreter {
         internal static Random rnd = new();
 
-        public static SymbolTable<Value> globalSymbolTable = new() {
+        public static SymbolTable<Value> globalSymbolTable = new() { // These methods pretend to be non-static so the first argument is preserved, a better solution will be added at some point
             { "null", new Number(0) },
             { "true", new Number(1) },
             { "false", new Number(0) },
@@ -24,16 +24,16 @@ namespace spaghetto {
                 "printLine", new NativeFunction("printLine", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
                 Console.WriteLine((args[0]).ToString());
                 return null;
-            }, new() {"str"}, true) },
+            }, new() {"str"}, false) },
 
             { "print", new NativeFunction("print", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
                 Console.Write(args[0].ToString());
                 return null;
-            }, new() {"str"}, true) },
+            }, new() {"str"}, false) },
 
             { "readLine", new NativeFunction("readLine", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
                 return new StringValue(Console.ReadLine());
-            }, new(), true) },
+            }, new(), false) },
 
             { "readNumber", new NativeFunction("readNumber", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
                 double result = 0;
@@ -45,7 +45,7 @@ namespace spaghetto {
                 }
 
                 return new Number(result);
-            }, new(), true)},
+            }, new(), false)},
 
             { "isType", new NativeFunction("isType", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
                 return (args[1] as StringValue).value switch
@@ -56,7 +56,7 @@ namespace spaghetto {
                     "Function" => new Number((args[0] is Function || args[0] is NativeFunction) ? 1 : 0),
                     _ => throw new RuntimeError(posStart, posEnd, "Invalid type. Native types are Number, String, List and Function", ctx),
                 };
-            }, new() { "val", "type" }, true)},
+            }, new() { "val", "type" }, false)},
 
             { "getType", new NativeFunction("isType", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
                 if(args[0] is Number)
@@ -71,12 +71,12 @@ namespace spaghetto {
                     return new StringValue("null");
                 else
                     throw new Exception(args[0] + " is of unknown type.");
-            }, new() { "val" }, true)},
+            }, new() { "val" }, false)},
 
             { "clear", new NativeFunction("clear", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
                 Console.Clear();
                 return null;
-            }, new() { }, true )},
+            }, new() { }, false )},
 
             {
                 "randomBetween",
@@ -85,7 +85,7 @@ namespace spaghetto {
                     if(args[1] is not Number) throw new RuntimeError(posStart, posEnd, "Argument max must be of type Number", ctx);
 
                     return (Number)rnd.Next((int)(args[0] as Number).value, (int)(args[1] as Number).value);
-                }, new() { "min", "max"}, true)
+                }, new() { "min", "max"}, false)
             },
 
             { "run",
@@ -119,7 +119,7 @@ namespace spaghetto {
                         }
                         else throw;
                     }
-                }, new() { "path" }, true)
+                }, new() { "path" }, false)
             },
         };
 

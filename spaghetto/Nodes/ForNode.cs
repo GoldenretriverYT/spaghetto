@@ -59,8 +59,6 @@
                 if (res.loopShouldBreak) break;
             }
 
-            Console.WriteLine("\nFinished for loop with var final value being " + context.symbolTable.Get(varName) + " and took " + sw.ElapsedMilliseconds + "ms");
-
             sw.Stop();
 
             return res.Success((shouldReturnNull ? new Number(0) : lastValue));

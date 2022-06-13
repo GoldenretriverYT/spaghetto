@@ -10,7 +10,6 @@ namespace spaghetto {
         {
             {"toNumber",
                 new NativeFunction("toNumber", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
-                    Console.WriteLine("toNumber called with " + args[0]);
                     bool success = double.TryParse(args[0].ToString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double result);
                     if (!success) throw new RuntimeError(posStart, posEnd, "Argument 'self' is not a valid number", ctx);
                     return new Number(result);
