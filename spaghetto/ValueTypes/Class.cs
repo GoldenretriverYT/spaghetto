@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace spaghetto
 {
-    internal class Class : Value
+    public class Class : Value
     {
         public string name;
         public SymbolTable<Value> instanceTable;

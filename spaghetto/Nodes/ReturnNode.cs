@@ -1,5 +1,5 @@
 ﻿namespace spaghetto {
-    internal class ReturnNode : Node {
+    public class ReturnNode : Node {
         public Node nodeToReturn;
 
         public ReturnNode(Node nodeToReturn, Position posStart, Position posEnd) {

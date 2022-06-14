@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace spaghetto {
     [Serializable]
-    internal class Number : Value {
+    public class Number : Value {
         public static Class ClassImpl = new("Number", new(), new()
         {
             { "null", new Number(0) },

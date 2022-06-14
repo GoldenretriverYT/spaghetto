@@ -1,5 +1,5 @@
 ﻿namespace spaghetto {
-    internal class StringNode : Node {
+    public class StringNode : Node {
         public Token token;
 
         public StringNode(Token token) {

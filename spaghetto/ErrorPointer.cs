@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace spaghetto {
-    internal class ErrorPointer {
+    public class ErrorPointer {
         public static string GenerateErrorPointer(string text, Position posStart, Position posEnd) {
             if (posEnd == null)
             {
@@ -40,7 +40,7 @@ namespace spaghetto {
         }
     }
 
-    internal static class StringExtensions {
+    public static class StringExtensions {
         public static string Substr(this string str, int start, int end) {
             return str[start..end];
         }

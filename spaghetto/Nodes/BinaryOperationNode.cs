@@ -1,5 +1,5 @@
 ﻿namespace spaghetto {
-    internal class BinaryOperationNode : Node {
+    public class BinaryOperationNode : Node {
         public Node leftNode, rightNode;
         public Token op;
 

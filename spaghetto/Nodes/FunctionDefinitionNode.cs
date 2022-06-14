@@ -1,5 +1,5 @@
 ﻿namespace spaghetto {
-    internal class FunctionDefinitionNode : Node {
+    public class FunctionDefinitionNode : Node {
         public Token varNameToken = null;
         public List<Token> argNameTokens;
         public Node bodyNode;

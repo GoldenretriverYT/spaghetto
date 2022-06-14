@@ -1,5 +1,5 @@
 ﻿namespace spaghetto {
-    internal class CallNode : Node {
+    public class CallNode : Node {
         public Node nodeToCall;
         public List<Node> argNodes;
 

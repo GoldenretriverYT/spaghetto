@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace spaghetto {
-    internal class StringValue : Value {
+    public class StringValue : Value {
         public static Class ClassImpl = new("String", new()
         {
             {"toNumber",

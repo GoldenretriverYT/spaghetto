@@ -8,8 +8,8 @@ using System.IO;
 using System.Diagnostics;
 
 namespace spaghetto {
-    internal class Intepreter {
-        internal static Random rnd = new();
+    public class Intepreter {
+        public static Random rnd = new();
 
         public static SymbolTable<Value> globalSymbolTable = new() { // These methods pretend to be non-static so the first argument is preserved, a better solution will be added at some point
             { "null", new Number(0) },
@@ -160,7 +160,7 @@ namespace spaghetto {
         }
     }
 
-    internal class Context {
+    public class Context {
         public string displayName = null;
         public Context parentContext = null;
         public Position parentEntryPosition = null;
@@ -178,7 +178,7 @@ namespace spaghetto {
         }
     } 
 
-    internal class SymbolTable<T> : IEnumerable<Value>, ICloneable {
+    public class SymbolTable<T> : IEnumerable<Value>, ICloneable {
         public Dictionary<string, T> symbols;// Second type must be changed later on
         public SymbolTable<T> parent = null;
 
@@ -225,7 +225,7 @@ namespace spaghetto {
         }
     }
 
-    internal class RuntimeResult {
+    public class RuntimeResult {
         public Value value;
         public SpaghettoException error;
         public Value functionReturnValue = null;

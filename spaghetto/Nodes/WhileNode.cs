@@ -1,5 +1,5 @@
 ﻿namespace spaghetto {
-    internal class WhileNode : Node {
+    public class WhileNode : Node {
         public Node condition, func;
         public bool shouldReturnNull;
 

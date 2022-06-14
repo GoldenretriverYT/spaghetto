@@ -1,5 +1,5 @@
 ﻿namespace spaghetto {
-    internal class ContinueNode : Node {
+    public class ContinueNode : Node {
         public ContinueNode(Position posStart, Position posEnd) {
             this.posStart = posStart;
             this.posEnd = posEnd;

@@ -1,5 +1,5 @@
 ﻿namespace spaghetto {
-    internal class Dot : Node {
+    public class Dot : Node {
         public Node? baseNode;
         public List<Node> nextNodes = new();
 

@@ -6,17 +6,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace spaghetto {
-    internal class NativeFunction : BaseFunction {
+    public class NativeFunction : BaseFunction {
         public string functionName;
         public Func<List<Value>, Position, Position, Context, Value> func;
-        public MethodInfo method;
         public List<string> argNames;
 
         public override bool IsStatic { get; set; }
-        public bool UseReflection { 
-            get; 
-            set;
-        }
 
         public NativeFunction(string? functionName, Func<List<Value>, Position, Position, Context, Value> func, List<string> argNames, bool isStatic) {
             this.functionName = (functionName ?? "<anon func>");
@@ -25,17 +20,7 @@ namespace spaghetto {
             this.IsStatic = isStatic;
         }
 
-        public NativeFunction(string? functionName, Type type, string name, bool isStatic)
-        {
-            this.Init(functionName, type.GetMethod(name), isStatic);
-        }
-
-        public NativeFunction(string? functionName, MethodInfo method, bool isStatic)
-        {
-            this.Init(functionName, method, isStatic);
-        }
-
-        public void Init(string? functionName, MethodInfo method, bool isStatic)
+        /*public void Init(string? functionName, MethodInfo method, bool isStatic)
         {
             this.IsStatic = isStatic;
             this.functionName = (functionName ?? "<anon func>");
@@ -53,12 +38,12 @@ namespace spaghetto {
             }
 
             if ((!method.ReturnType.IsSubclassOf(typeof(Value))) && !(method.ReturnType == typeof(Value))) throw new Exception("ReturnType not subclass of Value");
-        }
+        }*/
 
         public override Value Copy() {
-            if(this.UseReflection)
+            /*if(this.UseReflection)
                 return new NativeFunction(functionName, method, IsStatic).SetContext(context).SetPosition(posStart, posEnd);
-            else
+            else*/
                 return new NativeFunction(functionName, func, argNames, IsStatic).SetContext(context).SetPosition(posStart, posEnd);
         }
 
@@ -84,13 +69,13 @@ namespace spaghetto {
             Value retValue = null;
 
             try {
-                if (UseReflection)
+                /*if (UseReflection)
                 {
                     retValue = (Value)method.Invoke(null, args.ToArray<object>());
                 }else
-                {
+                {*/
                     retValue = func.Invoke(args, posStart, posEnd, context);
-                }
+                //}
             }catch(Exception ex) {
                 if(ex is SpaghettoException) {
                     return res.Failure(ex as SpaghettoException);

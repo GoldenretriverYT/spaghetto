@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace spaghetto {
-    internal abstract class Node {
+    public abstract class Node {
         public Position posStart;
         public Position posEnd;
 

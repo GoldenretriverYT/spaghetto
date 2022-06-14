@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace spaghetto {
-    internal class Parser {
+    public class Parser {
         public List<Token> tokens;
         public int tokenIdx = -1;
         public Token currentToken;

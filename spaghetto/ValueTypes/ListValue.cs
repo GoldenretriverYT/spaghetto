@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace spaghetto {
-    internal class ListValue : Value {
+    public class ListValue : Value {
         new public List<Value> value;
 
         public ListValue(List<Value> value) {

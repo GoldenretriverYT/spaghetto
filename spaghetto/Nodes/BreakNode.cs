@@ -1,5 +1,5 @@
 ﻿namespace spaghetto {
-    internal class BreakNode : Node {
+    public class BreakNode : Node {
         public BreakNode(Position posStart, Position posEnd) {
             this.posStart = posStart;
             this.posEnd = posEnd;

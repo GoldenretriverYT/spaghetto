@@ -1,5 +1,5 @@
 ﻿namespace spaghetto {
-    internal class IfCasesListNode : Node {
+    public class IfCasesListNode : Node {
         public List<(Node cond, Node expr, bool)> cases;
 
         public IfCasesListNode(List<(Node cond, Node expr, bool)> cases) {

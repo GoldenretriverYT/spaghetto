@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 
 namespace spaghetto {
-    internal class ParseResult {
+    public class ParseResult {
         public SpaghettoException error;
         public Node node;
         public int advanceCount = 0;

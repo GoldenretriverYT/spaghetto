@@ -1,5 +1,5 @@
 ﻿namespace spaghetto {
-    internal class VariableAssignNode : Node {
+    public class VariableAssignNode : Node {
         public Token varNameToken;
         public Node valueNode;
         public string varName;

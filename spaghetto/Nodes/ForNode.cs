@@ -1,5 +1,5 @@
 ﻿namespace spaghetto {
-    internal class ForNode : Node {
+    public class ForNode : Node {
         public Token varNameToken;
         public Node varStartExpression, condition, continuationExpression, func;
         public bool isStepMode, shouldReturnNull;

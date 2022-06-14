@@ -1,5 +1,5 @@
 ﻿namespace spaghetto {
-    internal class Program {
+    public class Program {
         static void Main() {
             Thread t = new(() => {
                 while (true) {

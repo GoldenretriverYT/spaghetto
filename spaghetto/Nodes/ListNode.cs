@@ -1,5 +1,5 @@
 ﻿namespace spaghetto {
-    internal class ListNode : Node {
+    public class ListNode : Node {
         public List<Node> elementNodes = new();
 
         public ListNode(List<Node> elementNodes, Position posStart, Position posEnd) {

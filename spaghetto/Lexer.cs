@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace spaghetto {
-    internal class Lexer {
+    public class Lexer {
         public string text, fileName;
         public Position pos = null;
         public char currentChar = '\0';
@@ -310,7 +310,7 @@ namespace spaghetto {
         }
     }
 
-    internal enum TokenType {
+    public enum TokenType {
         Int,
         Float,
         Plus,
@@ -344,7 +344,7 @@ namespace spaghetto {
         Unknown
 }
 
-    internal class Token {
+    public class Token {
         public const string DIGITS = "0123456789";
         public const string LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
         public const string SEPERATORS = ";\n";
@@ -430,7 +430,7 @@ namespace spaghetto {
         }
     }
 
-    internal class Position {
+    public class Position {
         public int idx;
         public int ln;
         public int col;

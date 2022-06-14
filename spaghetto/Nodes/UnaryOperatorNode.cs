@@ -1,5 +1,5 @@
 ﻿namespace spaghetto {
-    internal class UnaryOperatorNode : Node {
+    public class UnaryOperatorNode : Node {
         public Node node;
         public Token opToken;
 

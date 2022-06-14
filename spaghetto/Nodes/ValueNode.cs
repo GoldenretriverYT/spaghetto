@@ -1,5 +1,5 @@
 ﻿namespace spaghetto {
-    internal class ValueNode : Node {
+    public class ValueNode : Node {
         public Value value;
 
         public ValueNode(Value value, Position posStart, Position posEnd) {

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace spaghetto
 {
-    internal class MathClass
+    public class MathClass
     {
         private static readonly Random rnd = new();
 
@@ -15,19 +15,17 @@ namespace spaghetto
             { "PI", new Number(Math.PI) },
             { "E", new Number(Math.E) },
 
-            { 
+            {
                 "random", new NativeFunction("random", (List<Value> args, Position posStart, Position posEnd, Context ctx) =>
                 {
                     return new Number(rnd.NextDouble());
-                }, new(), true) 
+                }, new(), true)
             },
 
-            { "floor", new NativeFunction("floor", typeof(MathClass), nameof(Floor), true) },
+            { "floor", new NativeFunction("floor", (List<Value> args, Position posStart, Position posEnd, Context ctx) =>
+                {
+                    return new Number(Math.Floor((args[0] as Number).value));
+                }, new() {"num"}, true) },
         });
-
-        public static Value Floor(Number num)
-        {
-            return new Number(Math.Floor(num.value));
-        }
     }
 }

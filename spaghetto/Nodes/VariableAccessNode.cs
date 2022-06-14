@@ -1,5 +1,5 @@
 ﻿namespace spaghetto {
-    internal class VariableAccessNode : Node {
+    public class VariableAccessNode : Node {
         public Token varNameToken;
 
         public VariableAccessNode(Token varNameToken) {

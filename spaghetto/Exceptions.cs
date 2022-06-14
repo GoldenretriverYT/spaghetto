@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace spaghetto {
-    internal class SpaghettoException : Exception {
+    public class SpaghettoException : Exception {
         public Position posStart;
         public Position posEnd;
         public string errorName;
@@ -33,25 +33,25 @@ namespace spaghetto {
         }
     }
 
-    internal class IllegalCharError : SpaghettoException {
+    public class IllegalCharError : SpaghettoException {
         public IllegalCharError(Position posStart, Position posEnd, object details) : base(posStart, posEnd, "Illegal Character", details) { }
     }
 
-    internal class ExpectedCharError : SpaghettoException {
+    public class ExpectedCharError : SpaghettoException {
         public ExpectedCharError(Position posStart, Position posEnd, object details) : base(posStart, posEnd, "Expected Character", details) { }
     }
 
-    internal class IllegalSyntaxError : SpaghettoException {
+    public class IllegalSyntaxError : SpaghettoException {
         public IllegalSyntaxError(Position posStart, Position posEnd, object details, [CallerMemberName] string memberName = "", [CallerFilePath] string fileName = "", [CallerLineNumber] int lineNumber = 0) : base(posStart, posEnd, "Illegal Syntax", details) {
             System.Diagnostics.Debug.WriteLine("IllegalSyntaxError instatiated at " + memberName + " in " + fileName + ":" + lineNumber);
         }
     }
 
-    internal class InvalidNumericalValueError : SpaghettoException {
+    public class InvalidNumericalValueError : SpaghettoException {
         public InvalidNumericalValueError(Position posStart, Position posEnd, object details) : base(posStart, posEnd, "Invalid numerical value", details) { }
     }
 
-    internal class RuntimeError : SpaghettoException {
+    public class RuntimeError : SpaghettoException {
         public Context ctx;
 
         public RuntimeError(Position posStart, Position posEnd, object details, Context ctx) : base(posStart, posEnd, "RuntimeError", details) {
@@ -82,7 +82,7 @@ namespace spaghetto {
         }
     }
 
-    internal class TypeError : SpaghettoException {
+    public class TypeError : SpaghettoException {
         public TypeError(Position posStart, Position posEnd, object details) : base(posStart, posEnd, "TypeError", details) { }
     }
 }
