@@ -10,13 +10,20 @@ namespace spaghetto
     {
         public Class clazz;
         public SymbolTable instanceValues;
-        private List<Value> args;
+        private List<Value> args
+        {
+            get;
+            set;
+        }
 
-        public ClassInstance(Class clazz, List<Value> args = null)
+        public ClassInstance(Class clazz, List<Value> args = null, SymbolTable instanceValues = null)
         {
             this.args = args;
             this.clazz = clazz;
-            this.instanceValues = new();
+            this.instanceValues = (instanceValues == null ? new()
+            {
+                { "this", this }
+            } : instanceValues);
             this.instanceValues.parent = this.clazz.instanceTable;
             this.clazz.instanceTable.parent = this.clazz.staticTable;
 
@@ -45,8 +52,6 @@ namespace spaghetto
 
         public override Value Get(string identifier)
         {
-            Value st = this.clazz.staticTable.Get(identifier);
-            if (st != null) return st;
             Value ins = this.instanceValues.Get(identifier);
             if (ins != null) return ins;
 
@@ -55,7 +60,7 @@ namespace spaghetto
 
         public override Value Copy()
         {
-            return new ClassInstance(clazz, args);
+            return new ClassInstance(clazz, args.ToList(), (SymbolTable)instanceValues.Clone());
         }
 
         public override string Represent()

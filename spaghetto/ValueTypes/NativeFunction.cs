@@ -58,7 +58,9 @@ namespace spaghetto {
                 return res.Failure(new SpaghettoException(posStart, posEnd, "Stack Overflow", ex.Message));
             }
 
-            newContext.symbolTable = new((SymbolTable)newContext.parentContext.symbolTable.Clone());
+            //newContext.symbolTable = new((SymbolTable)newContext.parentContext.symbolTable.Clone());
+            newContext.symbolTable = new();
+            newContext.symbolTable.parent = newContext.parentContext.symbolTable;
 
             if (args.Count > ArgNames.Count) {
                 return res.Failure(new RuntimeError(posStart, posEnd, $"Too many arguments passed into {functionName}, List: " + ArgNames.Join(", ") + ", Provided: " + args.Join(", "), context));
