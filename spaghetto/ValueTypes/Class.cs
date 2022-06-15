@@ -9,14 +9,16 @@ namespace spaghetto
     public class Class : Value
     {
         public string name;
-        public SymbolTable<Value> instanceTable;
-        public SymbolTable<Value> staticTable;
+        public SymbolTable instanceTable; // The class itself may only define instance functions
+        public SymbolTable staticTable;
+        public BaseFunction? constructor;
 
-        public Class(string name, SymbolTable<Value> instanceTable, SymbolTable<Value> staticTable)
+        public Class(string name, SymbolTable instanceTable, SymbolTable staticTable, BaseFunction constructor = null)
         {
             this.name = name;
             this.instanceTable = instanceTable;
             this.staticTable = staticTable;
+            this.constructor = constructor;
 
             if(instanceTable.Get("toString") == null) // Class has not defined a toString method, so we should insert one
             {
@@ -24,6 +26,18 @@ namespace spaghetto
                 {
                     return new StringValue(args[0].ToString());
                 }, new() { "self" }, false));
+            }
+
+            if(staticTable.Get("new") == null && constructor != null)
+            {
+                staticTable.Add("new", new NativeFunction("new", (List<Value> args, Position posStart, Position posEnd, Context ctx) =>
+                {
+                    var res = new RuntimeResult();
+                    Value ret = res.Register(constructor.Execute(args));
+                    if (res.error) throw res.error;
+
+                    return ret;
+                }, constructor.ArgNames, true));
             }
         }
 

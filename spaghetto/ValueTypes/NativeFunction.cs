@@ -9,14 +9,14 @@ namespace spaghetto {
     public class NativeFunction : BaseFunction {
         public string functionName;
         public Func<List<Value>, Position, Position, Context, Value> func;
-        public List<string> argNames;
+        public override List<string> ArgNames { get; set; }
 
         public override bool IsStatic { get; set; }
 
         public NativeFunction(string? functionName, Func<List<Value>, Position, Position, Context, Value> func, List<string> argNames, bool isStatic) {
             this.functionName = (functionName ?? "<anon func>");
             this.func = func;
-            this.argNames = argNames;
+            this.ArgNames = argNames;
             this.IsStatic = isStatic;
         }
 
@@ -27,13 +27,13 @@ namespace spaghetto {
             this.UseReflection = true;
             this.method = method;
 
-            argNames = new();
+            ArgNames = new();
 
             foreach(ParameterInfo param in method.GetParameters())
             {
                 if(param.ParameterType.IsSubclassOf(typeof(Value)))
                 {
-                    argNames.Add(param.Name);
+                    ArgNames.Add(param.Name);
                 }
             }
 
@@ -44,7 +44,7 @@ namespace spaghetto {
             /*if(this.UseReflection)
                 return new NativeFunction(functionName, method, IsStatic).SetContext(context).SetPosition(posStart, posEnd);
             else*/
-                return new NativeFunction(functionName, func, argNames, IsStatic).SetContext(context).SetPosition(posStart, posEnd);
+                return new NativeFunction(functionName, func, ArgNames, IsStatic).SetContext(context).SetPosition(posStart, posEnd);
         }
 
         public override RuntimeResult Execute(List<Value> args) {
@@ -58,11 +58,11 @@ namespace spaghetto {
                 return res.Failure(new SpaghettoException(posStart, posEnd, "Stack Overflow", ex.Message));
             }
 
-            newContext.symbolTable = new((SymbolTable<Value>)newContext.parentContext.symbolTable.Clone());
+            newContext.symbolTable = new((SymbolTable)newContext.parentContext.symbolTable.Clone());
 
-            if (args.Count > argNames.Count) {
-                return res.Failure(new RuntimeError(posStart, posEnd, $"Too many arguments passed into {functionName}, List: " + argNames.Join(", ") + ", Provided: " + args.Join(", "), context));
-            }else if (args.Count < argNames.Count) {
+            if (args.Count > ArgNames.Count) {
+                return res.Failure(new RuntimeError(posStart, posEnd, $"Too many arguments passed into {functionName}, List: " + ArgNames.Join(", ") + ", Provided: " + args.Join(", "), context));
+            }else if (args.Count < ArgNames.Count) {
                 return res.Failure(new RuntimeError(posStart, posEnd, $"Too few arguments passed into {functionName}", context));
             }
 
@@ -92,7 +92,7 @@ namespace spaghetto {
         }
 
         public override string Represent() {
-            return $"<native {functionName}({argNames.Join(", ")})>";
+            return $"<native {functionName}({ArgNames.Join(", ")})>";
         }
     }
 }

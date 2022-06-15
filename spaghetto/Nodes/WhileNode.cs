@@ -22,7 +22,7 @@
                 if (res.ShouldReturn()) return res;
 
                 Context newCtx = new("<while:iter" + iter + ">", context);
-                newCtx.symbolTable = new((SymbolTable<Value>)newCtx.parentContext.symbolTable.Clone());
+                newCtx.symbolTable = new((SymbolTable)newCtx.parentContext.symbolTable.Clone());
                 lastValue = res.Register(func.Visit(newCtx));
 
                 if (res.ShouldReturn() && res.loopShouldBreak == false && res.loopShouldContinue == false) return res;

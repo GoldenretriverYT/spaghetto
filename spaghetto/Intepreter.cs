@@ -10,15 +10,16 @@ using System.Diagnostics;
 namespace spaghetto {
     public class Intepreter {
         public static Random rnd = new();
+        public static bool isInited = false;
 
-        public static SymbolTable<Value> globalSymbolTable = new() { // These methods pretend to be non-static so the first argument is preserved, a better solution will be added at some point
+        public static SymbolTable globalSymbolTable = new() { // These methods pretend to be non-static so the first argument is preserved, a better solution will be added at some point
             { "null", new Number(0) },
             { "true", new Number(1) },
             { "false", new Number(0) },
             { "String", StringValue.ClassImpl },
             { "Number", Number.ClassImpl },
             { "Math", MathClass.@class },
-
+            { "TestObject", TestObject.@class },
 
             {
                 "printLine", new NativeFunction("printLine", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
@@ -123,7 +124,17 @@ namespace spaghetto {
             },
         };
 
+        public static void Init()
+        {
+            if (isInited) return;
+
+            TestObject.InitStatics();
+            isInited = true;
+        }
+
         public static (RuntimeResult, SpaghettoException) Run(string fileName, string text) {
+            Init();
+
             long lexTime, parseTime, interpretTime;
 
             Stopwatch sw = new();
@@ -164,7 +175,7 @@ namespace spaghetto {
         public string displayName = null;
         public Context parentContext = null;
         public Position parentEntryPosition = null;
-        public SymbolTable<Value> symbolTable = new();
+        public SymbolTable symbolTable = new();
         public int depth = 0;
 
         public const int MaximumDepth = 5000;
@@ -178,16 +189,16 @@ namespace spaghetto {
         }
     } 
 
-    public class SymbolTable<T> : IEnumerable<Value>, ICloneable {
-        public Dictionary<string, T> symbols;// Second type must be changed later on
-        public SymbolTable<T> parent = null;
+    public class SymbolTable : IEnumerable<Value>, ICloneable {
+        public Dictionary<string, Value> symbols;// Second type must be changed later on
+        public SymbolTable parent = null;
 
-        public SymbolTable(SymbolTable<T> parent = null) {
+        public SymbolTable(SymbolTable parent = null) {
             this.symbols = new();
             this.parent = parent;
         }
 
-        public T Get(string name) {
+        public Value Get(string name) {
             if(!symbols.ContainsKey(name)) {
                 if (parent != null) {
                     return parent.Get(name);
@@ -199,11 +210,11 @@ namespace spaghetto {
             return symbols[name];
         }
 
-        public void Set(string name, T value) {
+        public void Set(string name, Value value) {
             symbols[name] = value;
         }
 
-        public void Add(string name, T value) {
+        public void Add(string name, Value value) {
             Set(name, value);
         }
 

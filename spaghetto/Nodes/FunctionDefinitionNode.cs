@@ -26,8 +26,8 @@
             RuntimeResult res = new();
 
             string funcName = (varNameToken == null ? null : (string)varNameToken.value);
-            List<string> argNames = (from tok in argNameTokens select (string)tok.value).ToList();
-            Value funcValue = new Function(funcName, bodyNode, argNames, shouldAutoReturn).SetContext(context).SetPosition(posStart, posEnd);
+            List<string> ArgNames = (from tok in argNameTokens select (string)tok.value).ToList();
+            Value funcValue = new Function(funcName, bodyNode, ArgNames, shouldAutoReturn).SetContext(context).SetPosition(posStart, posEnd);
 
             if(varNameToken != null) {
                 context.symbolTable.Set(funcName, funcValue);

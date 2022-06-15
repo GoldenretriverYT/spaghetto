@@ -9,19 +9,19 @@ namespace spaghetto {
     {
         public string functionName;
         public Node bodyNode;
-        public List<string> argNames;
+        public override List<string> ArgNames { get; set; }
         public bool shouldAutoReturn;
         public override bool IsStatic { get; set; }
 
         public Function(string? functionName, Node bodyNode, List<string> argNames, bool shouldAutoReturn) {
             this.functionName = (functionName ?? "<anon func>");
             this.bodyNode = bodyNode;
-            this.argNames = argNames;
+            this.ArgNames = argNames;
             this.shouldAutoReturn = shouldAutoReturn;
         }
 
         public override Value Copy() {
-            return new Function(functionName, bodyNode, argNames, shouldAutoReturn).SetContext(context).SetPosition(posStart, posEnd);
+            return new Function(functionName, bodyNode, ArgNames, shouldAutoReturn).SetContext(context).SetPosition(posStart, posEnd);
         }
 
         public override RuntimeResult Execute(List<Value> args) {
@@ -35,16 +35,16 @@ namespace spaghetto {
                 return res.Failure(new SpaghettoException(posStart, posEnd, "Stack Overflow", ex.Message));
             }
 
-            newContext.symbolTable = new((SymbolTable<Value>)newContext.parentContext.symbolTable.Clone());
+            newContext.symbolTable = new((SymbolTable)newContext.parentContext.symbolTable.Clone());
 
-            if (args.Count > argNames.Count) {
+            if (args.Count > ArgNames.Count) {
                 return res.Failure(new RuntimeError(posStart, posEnd, $"Too many arguments passed into {functionName}", context));
-            }else if (args.Count < argNames.Count) {
+            }else if (args.Count < ArgNames.Count) {
                 return res.Failure(new RuntimeError(posStart, posEnd, $"Too few arguments passed into {functionName}", context));
             }
 
             for(int i = 0; i < args.Count; i++) {
-                string argName = argNames[i];
+                string argName = ArgNames[i];
                 Value argValue = args[i];
                 argValue.SetContext(newContext);
                 newContext.symbolTable.Set(argName, argValue);

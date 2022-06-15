@@ -16,16 +16,20 @@ namespace spaghetto
             { "E", new Number(Math.E) },
 
             {
-                "random", new NativeFunction("random", (List<Value> args, Position posStart, Position posEnd, Context ctx) =>
+                "random",
+                new NativeFunction("random", (List<Value> args, Position posStart, Position posEnd, Context ctx) =>
                 {
                     return new Number(rnd.NextDouble());
                 }, new(), true)
             },
 
-            { "floor", new NativeFunction("floor", (List<Value> args, Position posStart, Position posEnd, Context ctx) =>
+            {
+                "floor",
+                new NativeFunction("floor", (List<Value> args, Position posStart, Position posEnd, Context ctx) =>
                 {
                     return new Number(Math.Floor((args[0] as Number).value));
-                }, new() {"num"}, true) },
+                }, new() { "num" }, true)
+            },
         });
     }
 }
