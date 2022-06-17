@@ -1,5 +1,5 @@
 # Spaghetto
-Spaghetto is a simple interpreted language with an interpreter written C#
+Spaghetto is a simple interpreted language with an interpreter written in C#
 
 ## Why use Spaghetto?
 Honestly, you shouldn't. It is just a fun project I do in my free time. It isn't really good, stable or quick. Its slower than python. Worse than COBOL (ok thats maybe over exaggerated). Has more bugs than Cyberpunk 2077.
