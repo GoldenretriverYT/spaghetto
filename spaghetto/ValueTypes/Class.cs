@@ -33,14 +33,23 @@ namespace spaghetto
                 staticTable.Add("new", new NativeFunction("new", (List<Value> args, Position posStart, Position posEnd, Context ctx) =>
                 {
                     var res = new RuntimeResult();
+                    constructor.SetContext(MakeContext(ctx));
                     Value ret = res.Register(constructor.Execute(args));
                     if (res.error) throw res.error;
 
                     return ret;
-                }, constructor.ArgNames, true));
+                }, constructor.ArgNames, true).SetContext(context));
             }
         }
 
+        public Context MakeContext(Context ctx)
+        {
+            Context instanceContext = new Context("<constructor @" + name + ">", ctx);
+            instanceContext.symbolTable = null;// this.instanceTable;
+
+            return instanceContext;
+
+        }
         public override Value Get(string identifier)
         {
             Value st = this.staticTable.Get(identifier);

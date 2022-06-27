@@ -20,6 +20,8 @@ namespace spaghetto {
             { "Number", Number.ClassImpl },
             { "Math", MathClass.@class },
             { "TestObject", TestObject.@class },
+            { "File", FileClass.@class },
+
 
             {
                 "printLine", new NativeFunction("printLine", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {

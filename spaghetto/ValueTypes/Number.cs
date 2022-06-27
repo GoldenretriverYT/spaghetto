@@ -13,7 +13,11 @@ namespace spaghetto {
             { "true", new Number(1) },
             { "false", new Number(0) },
 
-        });
+        }, new NativeFunction("ctor", (List<Value> args, Position posStart, Position posEnd, Context ctx) =>
+        {
+            if(args[0] is Number num) return num;
+            throw new RuntimeError(posStart, posEnd, "Argument 0 was not a Number", ctx);
+        }, new() { "str" }, true));
         new public double value;
 
         public Number(double value) {

@@ -50,6 +50,14 @@ namespace spaghetto {
         public override RuntimeResult Execute(List<Value> args) {
             RuntimeResult res = new();
 
+            if(context == null)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.Write("\nWarn: ");
+                Console.ResetColor();
+                Console.Write("Context for NativeFunction not set (" + functionName + ")");
+            }
+
             Context newContext;
 
             try {
