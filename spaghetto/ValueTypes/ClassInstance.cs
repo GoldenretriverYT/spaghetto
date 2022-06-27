@@ -16,7 +16,7 @@ namespace spaghetto
             set;
         }
 
-        public ClassInstance(Class clazz, List<Value> args = null, SymbolTable instanceValues = null)
+        public ClassInstance(Class clazz, List<Value> args = null, SymbolTable instanceValues = null, bool construct = true)
         {
             this.args = args;
             this.clazz = clazz;
@@ -29,7 +29,7 @@ namespace spaghetto
 
             Context newCtx = MakeContext();
 
-            if (this.clazz.constructor is not null)
+            if (this.clazz.constructor is not null && construct) 
             {
                 if(args != null && this.clazz.constructor.ArgNames.Count == args.Count)
                 {
@@ -60,7 +60,7 @@ namespace spaghetto
 
         public override Value Copy()
         {
-            return new ClassInstance(clazz, args.ToList(), (SymbolTable)instanceValues.Clone());
+            return new ClassInstance(clazz, args.ToList(), (SymbolTable)instanceValues.Clone(), false);
         }
 
         public override string Represent()

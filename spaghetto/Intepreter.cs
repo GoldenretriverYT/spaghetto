@@ -201,7 +201,6 @@ namespace spaghetto {
         public Value Get(string name) {
             if(!symbols.ContainsKey(name)) {
                 if (parent != null) {
-                    Console.WriteLine(name + " was loaded from parent");
                     return parent.Get(name);
                 }else {
                     return default;
