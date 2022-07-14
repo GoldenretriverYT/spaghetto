@@ -6,6 +6,18 @@ using System.Threading.Tasks;
 
 namespace spaghetto {
     public class ListValue : Value {
+        public static Class ClassImpl = new("List", new()
+        {
+            {
+                "size",
+                new NativeFunction("size", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
+                    return new Number((args[0] as ListValue).value.Count);
+                }, new() { "self" }, false)
+            },
+        }, new()
+        {
+        });
+
         new public List<Value> value;
 
         public ListValue(List<Value> value) {
