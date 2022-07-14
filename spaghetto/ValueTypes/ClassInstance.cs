@@ -16,9 +16,12 @@ namespace spaghetto
             set;
         }
 
-        public ClassInstance(Class clazz, List<Value> args = null, SymbolTable instanceValues = null, bool construct = true)
+        public ClassInstance(Class clazz, Position posStart, Position posEnd, List<Value> args = null, SymbolTable instanceValues = null, bool construct = true)
         {
-            this.args = args;
+            this.posStart = posStart;
+            this.posEnd = posEnd;
+
+            this.args = args ?? new() { };
             this.clazz = clazz;
             this.instanceValues = (instanceValues == null ? new()
             {
@@ -36,7 +39,7 @@ namespace spaghetto
                     clazz.constructor.SetContext(newCtx).Execute(args);
                 }else
                 {
-                    throw new RuntimeError(this.posStart, this.posEnd, "Passed arguments to not match expected constructor argument count (got " + args.Count + ", expected " + this.clazz.constructor.ArgNames.Count + ")", newCtx);
+                    throw new RuntimeError(this.posStart, this.posEnd, "Passed arguments to not match expected constructor argument count (got " + this.args.Count + ", expected " + this.clazz.constructor.ArgNames.Count + ")", newCtx);
                 }
             }
 
@@ -60,7 +63,7 @@ namespace spaghetto
 
         public override Value Copy()
         {
-            return new ClassInstance(clazz, args.ToList(), (SymbolTable)instanceValues.Clone(), false);
+            return new ClassInstance(clazz, posStart, posEnd, args.ToList(), (SymbolTable)instanceValues.Clone(), false);
         }
 
         public override string Represent()

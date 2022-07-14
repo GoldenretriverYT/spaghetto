@@ -34,7 +34,7 @@
                     if(node is CallNode)
                     {
                         CallNode temp = node as CallNode;
-                        temp.argNodes.RemoveAt(0);
+                        if(temp.argNodes.Count > 0) temp.argNodes.RemoveAt(0);
                     }
                     if (res.error) return res;
                     value = v;

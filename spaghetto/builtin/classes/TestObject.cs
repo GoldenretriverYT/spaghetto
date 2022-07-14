@@ -30,7 +30,7 @@ namespace spaghetto
 
         public static void InitStatics()
         {
-            @class.staticTable.Add("default", new ClassInstance(@class, new() { new StringValue("wow") }));
+            @class.staticTable.Add("default", new ClassInstance(@class, null, null, new() { new StringValue("wow") }));
         }
     }
 }

@@ -33,11 +33,13 @@ namespace spaghetto
                 staticTable.Add("new", new NativeFunction("new", (List<Value> args, Position posStart, Position posEnd, Context ctx) =>
                 {
                     var res = new RuntimeResult();
-                    constructor.SetContext(MakeContext(ctx));
-                    Value ret = res.Register(constructor.Execute(args));
-                    if (res.error) throw res.error;
+                    //constructor.SetContext(MakeContext(ctx));
+                    //constructor.context.symbolTable.Set("this", new ClassInstance())
+                    //Value ret = res.Register(constructor.Execute(args));
+                    //if (res.error) throw res.error;
 
-                    return ret;
+                    //return ret;
+                    return new ClassInstance(this, posStart, posEnd, args);
                 }, constructor.ArgNames, true).SetContext(context));
             }
         }
@@ -45,7 +47,7 @@ namespace spaghetto
         public Context MakeContext(Context ctx)
         {
             Context instanceContext = new Context("<constructor @" + name + ">", ctx);
-            instanceContext.symbolTable = null;// this.instanceTable;
+            instanceContext.symbolTable = this.instanceTable;
 
             return instanceContext;
 

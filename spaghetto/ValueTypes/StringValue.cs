@@ -15,6 +15,20 @@ namespace spaghetto {
                     return new Number(result);
                 }, new() { "self" }, false)
             },
+            {
+                "split",
+                new NativeFunction("split", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
+                    string[] parts = (args[0] as StringValue).value.Split(new string[] { (args[1] as StringValue).value }, StringSplitOptions.None);
+                    List<Value> result = new();
+
+                    foreach(string part in parts)
+                    {
+                        result.Add(new StringValue(part));
+                    }
+
+                    return new ListValue(result);
+                }, new() { "self", "seperator" }, false)
+            },
         }, new()
         {
             { "empty", new StringValue("") },
@@ -60,6 +74,24 @@ namespace spaghetto {
             }
 
             return (null, new TypeError(posStart, posEnd, "Can not perform IsEqualTo with string to " + other.GetType().Name));
+        }
+
+        public override (Value, SpaghettoException) IndexedBy(Value other)
+        {
+            if (other is Number)
+            {
+                int idx = (int)((other as Number).value);
+
+                if (idx < 0 || idx > value.Length - 1)
+                {
+                    return (null, new RuntimeError(posStart, posEnd, "Index " + idx + " was out of range. (0 to " + (value.Length - 1) + ")", context));
+                }
+
+                return (new StringValue(value[idx].ToString()), null);
+            }
+
+
+            return (null, new TypeError(posStart, posEnd, "Can not perform IndexedBy with String to " + other.GetType().Name));
         }
 
         public override string Represent() {

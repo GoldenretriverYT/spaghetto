@@ -57,19 +57,26 @@ namespace spaghetto {
                     "String" => new Number(args[0] is StringValue ? 1 : 0),
                     "List" => new Number(args[0] is ListValue ? 1 : 0),
                     "Function" => new Number((args[0] is Function || args[0] is NativeFunction) ? 1 : 0),
-                    _ => throw new RuntimeError(posStart, posEnd, "Invalid type. Native types are Number, String, List and Function", ctx),
+                    "Class" => new Number((args[0] is Class) ? 1 : 0),
+                    "ClassInstance" => new Number((args[0] is ClassInstance) ? 1 : 0),
+
+                    _ => throw new RuntimeError(posStart, posEnd, "Invalid type. Native types are Number, String, List, Class, ClassInstance and Function", ctx),
                 };
             }, new() { "val", "type" }, false)},
 
             { "getType", new NativeFunction("isType", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
-                if(args[0] is Number)
+                if (args[0] is Number)
                     return new StringValue("Number");
-                else if(args[0] is StringValue)
+                else if (args[0] is StringValue)
                     return new StringValue("String");
-                else if(args[0] is ListValue)
+                else if (args[0] is ListValue)
                     return new StringValue("List");
                 else if (args[0] is Function || args[0] is NativeFunction)
                     return new StringValue("Function");
+                else if (args[0] is Class)
+                    return new StringValue("Class");
+                else if (args[0] is ClassInstance)
+                    return new StringValue((args[0] as ClassInstance).clazz.name);
                 else if (args[0] is null)
                     return new StringValue("null");
                 else
