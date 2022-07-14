@@ -32,6 +32,14 @@ namespace spaghetto {
         }, new()
         {
             { "empty", new StringValue("") },
+            {
+                "fromCharCode",
+                new NativeFunction("fromCharCode", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
+                    bool success = short.TryParse(args[0].ToString(), System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out short result);
+                    if (!success) throw new RuntimeError(posStart, posEnd, "Argument 'chr' is not a valid 16-bit int", ctx);
+                    return new StringValue(((char)result).ToString());
+                }, new() { "chr" }, true)
+            },
         });
 
         new public string value;

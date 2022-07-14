@@ -14,6 +14,13 @@ namespace spaghetto {
                     return new Number((args[0] as ListValue).value.Count);
                 }, new() { "self" }, false)
             },
+            {
+                "set",
+                new NativeFunction("set", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
+                    (args[0] as ListValue).value[(int)(args[1] as Number).value] = args[2];
+                    return new Number(1);
+                }, new() { "self", "idx", "value" }, false)
+            },
         }, new()
         {
         });
