@@ -18,6 +18,7 @@
   <ItemGroup>
     <None Include="bin\Debug\net6.0\ex2.spag" />
     <None Include="bin\Debug\net6.0\example.spag" />
+    <None Include="bin\Debug\net6.0\test.spag" />
   </ItemGroup>
 
 </Project>

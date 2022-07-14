@@ -1,0 +1,5 @@
+﻿var file = File.new(Path.desktop + "\\output.txt");
+
+for i = 0 while i < 100 step 1 {
+	file.append(Math.random().toString() + "\n");
+}

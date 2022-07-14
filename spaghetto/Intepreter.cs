@@ -21,6 +21,7 @@ namespace spaghetto {
             { "Math", MathClass.@class },
             { "TestObject", TestObject.@class },
             { "File", FileClass.@class },
+            { "Path", Path.@class },
 
 
             {
