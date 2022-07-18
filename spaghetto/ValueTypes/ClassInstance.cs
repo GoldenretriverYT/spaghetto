@@ -10,6 +10,7 @@ namespace spaghetto
     {
         public Class clazz;
         public SymbolTable instanceValues;
+        public Dictionary<string, object> hiddenValues = new();
         private List<Value> args
         {
             get;

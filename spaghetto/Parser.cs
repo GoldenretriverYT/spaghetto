@@ -649,7 +649,26 @@ namespace spaghetto {
 
             ParseResult res = new();
 
-            if(currentToken.Matches(TokenType.Keyword, "var")) {
+            if (currentToken.type == TokenType.Identifier)
+            {
+                Token varName = currentToken;
+                Advance(res);
+
+                if (currentToken.type != TokenType.Equals)
+                {
+                    Reverse();
+                }
+                else
+                {
+                    Advance(res);
+
+                    Node expr = res.Register(Expression());
+                    if (res.error != null) return res;
+                    return res.Success(new VariableAssignNode(varName, expr));
+                }
+            }
+
+            if (currentToken.Matches(TokenType.Keyword, "var")) {
                 res.RegisterAdvancement();
                 Advance();
 
@@ -662,7 +681,7 @@ namespace spaghetto {
                 Advance();
 
                 if (currentToken.type != TokenType.Equals) {
-                    return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected equals sign"));
+                    return res.Success(new VariableAssignNode(varName, new NumberNode(new Token(TokenType.Int, 0d))));
                 }
 
                 res.RegisterAdvancement();

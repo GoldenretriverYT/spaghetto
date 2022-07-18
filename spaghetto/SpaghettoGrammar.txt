@@ -4,7 +4,8 @@ statement     : KEYWORD:return expr?
               : KEYWORD:continue|break
               : expr
               
-expression    : KEYWORD:var IDENTIFIER EQUALS expression
+expression    : KEYWORD:var IDENTIFIER (EQUALS expression)?
+              : IDENTIFIER EQUALS expression
               : comp-expr ((KEYWORD:AND|KEYWORD) comp-expr)*
               
 comp-expr     : NOT comp-expr

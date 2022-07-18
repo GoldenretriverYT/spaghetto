@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Diagnostics;
+using System.Reflection;
 
 namespace spaghetto {
     public class Intepreter {
@@ -120,6 +121,49 @@ namespace spaghetto {
                         }
 
                         return (res.value?.Copy());
+                    }
+                    catch (Exception ex)
+                    {
+                        if (ex is SpaghettoException || ex is IOException)
+                        {
+                            Console.WriteLine("Error: " + ex.Message);
+                            return null;
+                        }
+                        else throw;
+                    }
+                }, new() { "path" }, false)
+            },
+            {
+                "loadcslib",
+                new NativeFunction("loadcslib", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
+                    try
+                    {
+                        if (args[0] is not StringValue) throw new RuntimeError(posStart, posEnd, "Argument path must be of type String", ctx);
+
+                        if (!File.Exists((args[0] as StringValue).value))
+                        {
+                            throw new RuntimeError(posStart, posEnd, "File not found", ctx);
+                        }
+
+                        var dll = Assembly.Load(File.ReadAllBytes(((args[0] as StringValue).value)));
+
+                        foreach(AssemblyName refAsm in dll.GetReferencedAssemblies())
+                        {
+                            Debug.WriteLine("Loading " + refAsm.FullName);
+                            Assembly.Load(refAsm);
+                        }
+
+                        var libMainType = dll.GetType("LibMain");
+                        if (libMainType == null) throw new RuntimeError(posStart, posEnd, "Library has no LibMain class", ctx);
+                        if (!libMainType.IsSubclassOf(typeof(CSSpaghettoLibBase.CSSpagLib))) throw new RuntimeError(posStart, posEnd, "Library LibMain class doesn't inherit CSSpagLib", ctx);
+                        var libMain = Activator.CreateInstance(libMainType);
+                        
+                        var method = libMain.GetType().GetMethod("Initiliaze");
+                        if (method == null) throw new RuntimeError(posStart, posEnd, "Library has no LibMain.Initiliaze(SpaghettoBridge) method", ctx);
+
+                        method.Invoke(libMain, new object[] { new CSSpaghettoLibBase.SpaghettoBridge() });
+
+                        return new Number(1);
                     }
                     catch (Exception ex)
                     {
