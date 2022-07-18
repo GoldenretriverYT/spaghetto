@@ -55,9 +55,6 @@ namespace spaghetto {
             {
                 "getNull",
                 new NativeFunction("getNull", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
-                    Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine("[WARN] Null is not supported and might lead to crashes. It will appear as 0 sometimes, but sometimes it just crashes the interpreter! Null related issues won't be fixed if they are caused by this function.");
-                    Console.ResetColor();
                     return null;
                 }, new() {}, false)
             },

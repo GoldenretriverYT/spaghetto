@@ -36,6 +36,14 @@
             }
 
             Value retValue = res.Register(valueToCall.Execute(args));
+
+            if(retValue == null)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("[WARN] A method seems to have returned nothing (NULL) - this is not supported. Crashes caused by null are not an issue. See https://github.com/GoldenretriverYT/spaghetto/wiki/Warning-about-NULL-return-value for more details");
+                Console.ResetColor();
+            }
+
             if (res.ShouldReturn()) return res;
             if (retValue != null) retValue = retValue.Copy().SetPosition(posStart, posEnd).SetContext(context);
 
