@@ -13,3 +13,5 @@ Coming soon, whilst the docs are work in progress, you can check the examples in
 
 ## Credits
 The core of this language is based on [this tutorial](https://www.youtube.com/watch?v=Eythq9848Fg) as I would have been to stupid to do this properly otherwise (like seriously, look at [PoopScript](https://github.com/GoldenretriverYT/PoopScript) to see what a mess I used to make)
+
+(this is not implying that this one is good lmao, it really isnt)
