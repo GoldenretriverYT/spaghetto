@@ -13,6 +13,8 @@ namespace spaghetto {
         public static Random rnd = new();
         public static bool isInited = false;
 
+        public static Dictionary<string, string> runtimeOptions = new();
+
         public static SymbolTable globalSymbolTable = new() { // These methods pretend to be non-static so the first argument is preserved, a better solution will be added at some point
             { "null", new Number(0) },
             { "true", new Number(1) },
@@ -191,6 +193,12 @@ namespace spaghetto {
 
             TestObject.InitStatics();
             isInited = true;
+        }
+
+        public static string GetOpt(string name, string defaultValue = "false")
+        {
+            if (!runtimeOptions.TryGetValue(name, out var opt)) return defaultValue;
+            return opt;
         }
 
         public static (RuntimeResult, SpaghettoException) Run(string fileName, string text) {
