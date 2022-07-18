@@ -28,12 +28,12 @@ namespace spaghetto {
             {
                 "printLine", new NativeFunction("printLine", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
                 Console.WriteLine((args[0]).ToString());
-                return null;
+                return new Number(0);
             }, new() {"str"}, false) },
 
             { "print", new NativeFunction("print", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
                 Console.Write(args[0].ToString());
-                return null;
+                return new Number(0);
             }, new() {"str"}, false) },
 
             { "readLine", new NativeFunction("readLine", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
@@ -51,6 +51,16 @@ namespace spaghetto {
 
                 return new Number(result);
             }, new(), false)},
+
+            {
+                "getNull",
+                new NativeFunction("getNull", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine("[WARN] Null is not supported and might lead to crashes. It will appear as 0 sometimes, but sometimes it just crashes the interpreter! Null related issues won't be fixed if they are caused by this function.");
+                    Console.ResetColor();
+                    return null;
+                }, new() {}, false)
+            },
 
             { "isType", new NativeFunction("isType", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
                 return (args[1] as StringValue).value switch
@@ -87,7 +97,7 @@ namespace spaghetto {
 
             { "clear", new NativeFunction("clear", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
                 Console.Clear();
-                return null;
+                return new Number(0);
             }, new() { }, false )},
 
             {
@@ -127,7 +137,7 @@ namespace spaghetto {
                         if (ex is SpaghettoException || ex is IOException)
                         {
                             Console.WriteLine("Error: " + ex.Message);
-                            return null;
+                            return new Number(0);
                         }
                         else throw;
                     }
@@ -170,7 +180,7 @@ namespace spaghetto {
                         if (ex is SpaghettoException || ex is IOException)
                         {
                             Console.WriteLine("Error: " + ex.Message);
-                            return null;
+                            return new Number(0);
                         }
                         else throw;
                     }

@@ -21,21 +21,104 @@ namespace spaghetto {
                     return new Number(1);
                 }, new() { "self", "idx", "value" }, false)
             },
+            {
+                "get",
+                new NativeFunction("get", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
+                    if (args[1] is Number)
+                    {
+                        int idx = (int)(args[1] as Number).value;
+
+                        if (idx < 0 || idx > (args[0] as ListValue).value.Count - 1)
+                        {
+                            throw new RuntimeError(posStart, posEnd, "Index " + idx + " was out of range. (0 to " + ((args[0] as ListValue).value.Count - 1) + ")", ctx);
+                        }
+
+                        return (args[0] as ListValue).value[idx];
+                    }else
+                    {
+                        throw new RuntimeError(posStart, posEnd, "Argument idx must be a number", ctx);
+                    }
+                }, new() { "self", "idx" }, false)
+            },
+            {
+                "remove",
+                new NativeFunction("remove", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
+                    if (args[1] is Number)
+                    {
+                        int idx = (int)(args[1] as Number).value;
+
+                        if (idx < 0 || idx > (args[0] as ListValue).value.Count - 1)
+                        {
+                            throw new RuntimeError(posStart, posEnd, "Index " + idx + " was out of range. (0 to " + ((args[0] as ListValue).value.Count - 1) + ")", ctx);
+                        }
+
+                        (args[0] as ListValue).value.RemoveAt(idx);
+                        return new Number(1);
+                    }
+                    else
+                    {
+                        throw new RuntimeError(posStart, posEnd, "Argument idx must be a number", ctx);
+                    }
+                }, new() { "self", "idx" }, false)
+            },
+            {
+                "setStrictType",
+                new NativeFunction("setStrictType", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
+                    if (args[1] is StringValue)
+                    {
+                        switch((args[1] as StringValue).value)
+                        {
+                            case "Number":
+                                (args[0] as ListValue).StrictEnforcedType = typeof(Number);
+                                break;
+                            case "String":
+                                (args[0] as ListValue).StrictEnforcedType = typeof(StringValue);
+                                break;
+                            case "List":
+                                (args[0] as ListValue).StrictEnforcedType = typeof(ListValue);
+                                break;
+                            case "Function":
+                                (args[0] as ListValue).StrictEnforcedType = typeof(BaseFunction);
+                                break;
+                            case "Class":
+                                (args[0] as ListValue).StrictEnforcedType = typeof(Class);
+                                break;
+                            case "ClassInstance":
+                                (args[0] as ListValue).StrictEnforcedType = typeof(ClassInstance);
+                                break;
+                            default:
+                                throw new RuntimeError(posStart, posEnd, "Invalid type. Native types are Number, String, List, Class, ClassInstance and Function", ctx);
+                        }
+
+                        return new Number(0);
+                    }
+                    else
+                    {
+                        throw new RuntimeError(posStart, posEnd, "Argument nativeType must be a string", ctx);
+                    }
+                }, new() { "self", "nativeType" }, false)
+            },
         }, new()
         {
         });
 
         new public List<Value> value;
+        public Type StrictEnforcedType { get; set; } = null;
 
-        public ListValue(List<Value> value) {
+        public ListValue(List<Value> value, Type strictEnforcedType = null) {
+            this.StrictEnforcedType = strictEnforcedType;
             this.value = value;
         }
 
         public override Value Copy() {
-            return new ListValue(value).SetPosition(posStart, posEnd).SetContext(context);
+            return new ListValue(value, StrictEnforcedType).SetPosition(posStart, posEnd).SetContext(context);
         }
 
         public override (Value, SpaghettoException) AddedTo(Value other) {
+            if (StrictEnforcedType != null)
+                if (!(other.GetType().FullName == StrictEnforcedType.FullName))
+                    return (null, new RuntimeError(posStart, posEnd, "List has strict type and given argument did not match it.", context));
+
             ListValue val = Copy() as ListValue;
             val.value.Add(other);
             return (val, null);
@@ -79,6 +162,11 @@ namespace spaghetto {
 
         public override string Represent() {
             return $"[{value.Join(", ")}]";
+        }
+
+        public override Value Get(string identifier)
+        {
+            return ClassImpl.Get(identifier);
         }
     }
 }
