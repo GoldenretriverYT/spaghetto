@@ -95,7 +95,7 @@ namespace spaghettoCLI
             }
         }
 
-#pragma warning disable IDE0051 // Nicht verwendete private Member entfernen
+#pragma warning disable IDE0051 // New CLI is work in progress (probably forever:tm:)
         static void StartNewCLI()
 #pragma warning restore IDE0051 // Nicht verwendete private Member entfernen
         {
