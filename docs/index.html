@@ -1,0 +1,61 @@
+<head>
+    <link rel="stylesheet" href="style/style.css"/>
+    <script src="scripts/nav.js"></script>
+    <title>Spaghetto Documentation</title>
+</head>
+<body>
+    <div class="nav" style="position: fixed; top: 0; left: 0;">
+        <div class="navElem" data-goto="welcome">Welcome</div>
+        <div class="navElem" data-goto="gettingStarted">Getting Started</div>
+        <div class="navElem" data-goto="vt">Value types</div>
+        <div class="navElem" data-goto="comments">Comments</div>
+        <div class="navElem" data-goto="variables">Variables</div>
+        <div class="navElem" data-goto="semicolons">Semicolons?</div>
+        <div class="navElem" data-goto="functions">Functions</div>
+    </div>
+    <div class="content" style="margin-left: 16vw;">
+        <div class="warning" style="padding-top: 10px; padding-bottom: 10px; font-size: 16px; font-weight: 800; padding-left: 10px;">This documentation is work in progress!</div>
+
+        <h1 id="welcome">Welcome</h1>
+        <h3>Spaghetto is a simple, interpreted programming language not specialized in anything.</h3>
+        Spaghetto files uses the .spag extension, but you can also run code using the CLI. Also, Spaghetto is quite easy to learn.<br><br>
+        <br><br>
+        <h2 id="gettingStarted">Getting Started</h2>
+        To start using Spaghetto, you are gonna have to <a href="https://github.com/GoldenretriverYT/spaghetto/releases/latest">download the latest release</a> or download <a href="https://github.com/GoldenretriverYT/spaghetto/">the repository</a> and build it yourself.
+        The downloaded file will be in the zip format, extract to to where you want. Inside your new folder, there should be a spaghettoCLI.exe file. Run it to open the CLI interpreter (run code quickly in the console) or use --file to specify a file to run. If you want to
+        run a file, but stay in the CLI, you can use the global run(path: String) method.
+
+        <br><h2 id="vt">Value types</h2>
+        Spaghetto has so called <i>Value types</i>, these are built-in types that hold values. Technically, every variable ever is a value type. Currently, these Value types exist: Number, Function, Class, ClassInstance, List and String.<br>
+        To create a string, you can simple use double quotes like this: <code>"Hello World!"</code> This code will create a string with the content <i>Hello World!</i>. Numbers are created by just, well, typing in numbers.
+        
+        <br><h2 id="comments">Comments</h2>
+        Spaghetto supports single-line comments. To create a comment, start the line with <code>//</code> and it will be ignored.
+
+        <br><h2 id="variables">Variables</h2>
+        To define a variable, you use <code>var myVar = &lt;value&gt;</code>. This will define the variable myVar in the current "context" (function context, global context, etc.). To re-assign your variable, you can use <code>myVar = 3</code> - this technically also works without having defined it previously, but it makes your code less readable if you use it like that.<br>
+        A variable can contain any value type. Lists are used to store a list of values. These can also contain any value, in any order. To define a list, use <code>var myVar = [1, 2, 3]</code>.
+
+        <br><h2 id="semicolons">Semicolons</h2>
+        Semicolons aren't required if you don't want to use them. The only case where you need them is, for example, when using an if with an inline statement. Take a look at this example:
+        <code class="fullWidth">
+            if(myVar == 5) {; print("My var is 5"); }
+        </code>
+
+        <br><h2 id="functions">Functions</h2>
+        Unlike in my previous, horrible, programming language, you can actually define proper functions with methods and return values. Use this example:
+        <code class="fullWidth">
+            func calcAvg(lst) {<br>
+            &emsp;var sum = 0;<br>
+            <br>
+            &emsp;for i = 0 while i &lt; lst.size() step 1 {<br>
+            &emsp;&emsp;sum = sum + lst#i;<br>
+            &emsp;}<br>
+            <br>
+            &emsp;return sum / lst.size();<br>
+            }
+        </code>
+
+        This code will define a new function called <i>calcAvg</i>, which can be called by using calcAvg([3, 2, 6, 2, 4, 0]) or with whatever list you want to use.
+    </div>
+</body>

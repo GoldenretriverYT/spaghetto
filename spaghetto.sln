@@ -5,9 +5,9 @@ VisualStudioVersion = 17.2.32526.322
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "spaghetto", "spaghetto\spaghetto.csproj", "{C38428AD-0F18-4B71-A1B5-EB569B84D945}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinFormsLibNew", "WinFormsLibNew\WinFormsLibNew.csproj", "{77FC54B6-BB16-49CC-9EFE-767F2232055B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinFormsLibNew", "WinFormsLibNew\WinFormsLibNew.csproj", "{77FC54B6-BB16-49CC-9EFE-767F2232055B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spaghettoCLI", "spaghettoCLI\spaghettoCLI.csproj", "{64E44FFD-A8E4-4548-AB1F-43D4B4F0CD7D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "spaghettoCLI", "spaghettoCLI\spaghettoCLI.csproj", "{64E44FFD-A8E4-4548-AB1F-43D4B4F0CD7D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

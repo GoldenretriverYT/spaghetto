@@ -1,0 +1,97 @@
+* {
+    font-family: Arial;
+    color: white;
+    background-color: #161616;
+}
+
+code {
+    background-color: #171931;
+    border-radius: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
+    border-left: rgb(118, 180, 99) 5px solid;
+    color: white;
+    font-family: Consolas;
+    display: inline-block;
+}
+
+li code {
+    margin-right: 1px;
+}
+
+.warning {
+    background-color: #171931;
+    border-radius: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    margin-left: 5px;
+    margin-right: 5px;
+    border-left: rgb(230, 38, 38) 5px solid;
+    color: white;
+    display: inline-block;
+}
+
+.fullWidth {
+    width: 70vw;
+}
+
+.nav {
+    width: 15vw;
+    height: 100vh;
+    background-color: #292d58;
+    overflow-y: auto;
+    border-top-right-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+.navElem {
+    width: calc(100% - 5px);
+    height: 25px;
+    font-size: 18px;
+    line-height: 25px;
+    padding-left: 5px;
+    background-color: #222547;
+    border-radius: 5px;
+    margin-top: 3px;
+}
+
+.navElemIndent {
+    width: calc(100% - 25px);
+    padding-left: 25px;
+}
+
+.navElem:hover {
+    background-color: #1b1d36;
+    cursor: pointer;
+}
+
+.content {
+    width: 70vw;
+}
+
+.sh {
+    background-color: #171931;
+    font-family: Consolas;
+}
+
+.html-tag {
+    color: #a2a2f3;
+}
+
+.html-attr {
+    color: #c54f4f;
+}
+
+.js-keyword {
+    color: #a2a2f3;
+}
+
+.js-class {
+    color: #dddf6b;
+}
+
+.js-string {
+    color: #c54f4f;
+}
