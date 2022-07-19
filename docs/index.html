@@ -4,22 +4,24 @@
     <title>Spaghetto Documentation</title>
 </head>
 <body>
-    <div class="nav" style="position: fixed; top: 0; left: 0;">
+    <div class="nav" style="position: fixed; top: 0; left: 0;" id="nav">
+        <div class="navElem">Welcome</div>
         <div class="navElem" data-goto="welcome">Welcome</div>
         <div class="navElem" data-goto="gettingStarted">Getting Started</div>
         <div class="navElem" data-goto="vt">Value types</div>
         <div class="navElem" data-goto="comments">Comments</div>
         <div class="navElem" data-goto="variables">Variables</div>
-        <div class="navElem" data-goto="semicolons">Semicolons?</div>
+        <div class="navElem" data-goto="semicolons">Semicolons</div>
         <div class="navElem" data-goto="functions">Functions</div>
     </div>
-    <div class="content" style="margin-left: 16vw;">
+    <button class="navElem" style="width: 32px; height: 32px; aspect-ratio: 1/1; position: fixed; top: 0; left: max(200px, 15vw); border: none; margin: 0; background-color: #71994d;" id="navBtn" onclick="toggleNav();">&lt</button>
+    <div class="content" id="content" style="margin-left: max(200px, 16vw); width: calc(100vw - max(200px, 16vw) - 4vw)">
         <div class="warning" style="padding-top: 10px; padding-bottom: 10px; font-size: 16px; font-weight: 800; padding-left: 10px; width: 100%">This documentation is work in progress!</div>
 
         <h1 id="welcome">Welcome</h1>
         <h3>Spaghetto is a simple, interpreted programming language not specialized in anything.</h3>
         Spaghetto files uses the .spag extension, but you can also run code using the CLI. Also, Spaghetto is quite easy to learn.<br><br>
-        <br><br>
+
         <h2 id="gettingStarted">Getting Started</h2>
         To start using Spaghetto, you are gonna have to <a href="https://github.com/GoldenretriverYT/spaghetto/releases/latest">download the latest release</a> or download <a href="https://github.com/GoldenretriverYT/spaghetto/">the repository</a> and build it yourself.
         The downloaded file will be in the zip format, extract to to where you want. Inside your new folder, there should be a spaghettoCLI.exe file. Run it to open the CLI interpreter (run code quickly in the console) or use --file to specify a file to run. If you want to
@@ -54,7 +56,7 @@
             <br>
             &emsp;return sum / lst.size();<br>
             }
-        </code>
+        </code><br><br>
 
         This code will define a new function called <i>calcAvg</i>, which can be called by using calcAvg([3, 2, 6, 2, 4, 0]) or with whatever list you want to use.
     </div>

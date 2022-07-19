@@ -1,18 +1,18 @@
 * {
     font-family: Arial;
-    color: white;
-    background-color: #161616;
+    color: rgb(0, 0, 0);
+    background-color: #c2e0a8;
 }
 
 code {
-    background-color: #171931;
+    background-color: #a7c989;
     border-radius: 5px;
     padding-left: 5px;
     padding-right: 5px;
     margin-left: 5px;
     margin-right: 5px;
     border-left: rgb(118, 180, 99) 5px solid;
-    color: white;
+    color: black;
     font-family: Consolas;
     display: inline-block;
 }
@@ -22,53 +22,54 @@ li code {
 }
 
 .warning {
-    background-color: #171931;
+    background-color: #a7c989;
     border-radius: 5px;
     padding-left: 5px;
     padding-right: 5px;
     margin-left: 5px;
     margin-right: 5px;
-    border-left: rgb(230, 38, 38) 5px solid;
-    color: white;
+    border-left: rgb(230, 38, 38) 10px solid;
+    color: black;
     display: inline-block;
 }
 
 .fullWidth {
     width: 70vw;
+    border-left: rgb(118, 180, 99) 10px solid;
 }
 
 .nav {
     width: 15vw;
+    min-width: 200px;
     height: 100vh;
-    background-color: #292d58;
+    background-color: #71994d;
     overflow-y: auto;
-    border-top-right-radius: 12px;
     border-bottom-right-radius: 12px;
+    color: white;
 }
 
 .navElem {
     width: calc(100% - 5px);
     height: 25px;
-    font-size: 18px;
+    font-size: 1.05rem;
     line-height: 25px;
     padding-left: 5px;
-    background-color: #222547;
-    border-radius: 5px;
+    background-color: #5a7046;
+    border-top-right-radius: 10px;
+    border-bottom-right-radius: 10px;
     margin-top: 3px;
+    color: white;
 }
 
 .navElemIndent {
     width: calc(100% - 25px);
     padding-left: 25px;
+    color: white;
 }
 
 .navElem:hover {
     background-color: #1b1d36;
     cursor: pointer;
-}
-
-.content {
-    width: 70vw;
 }
 
 .sh {
