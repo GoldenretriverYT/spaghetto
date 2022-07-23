@@ -61,6 +61,13 @@ namespace spaghetto {
                 }, new() {}, false)
             },
 
+            {
+                "isDefined",
+                new NativeFunction("isDefined", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
+                    return new Number((ctx.symbolTable.Get((args[0] as StringValue).value) != null) ? 1 : 0);
+                }, new() {"name"}, false)
+            },
+
             { "isType", new NativeFunction("isType", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
                 return (args[1] as StringValue).value switch
                 {
