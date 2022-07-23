@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace spaghetto {
-    public abstract class Value {
+    public abstract class Value /*: IEquatable<Value>*/ {
         public object? value = null;
         public Position posStart = null, posEnd = null;
         public Context context = null;
@@ -93,6 +93,23 @@ namespace spaghetto {
             return new Number(0);
         }
 
+        /*public static bool operator ==(Value a, Value b) {
+            if (a is null) {
+                if (b is null) {
+                    return true;
+                }
+
+                // Only the left side is null.
+                return false;
+            }
+
+            if (b is null) return false;
+
+            return a.Equals(b);
+        }*/
+
+        //public static bool operator !=(Value a, Value b) => !(a == b);
+
         public abstract string Represent();
 
         public virtual bool IsTrue() {
@@ -102,5 +119,9 @@ namespace spaghetto {
         public virtual RuntimeResult Execute(List<Value> args) {
             return new RuntimeResult().Failure(new RuntimeError(posStart, posEnd, "Unable to execute " + this.GetType().Name, context));
         }
+
+        /*public bool Equals(Value? other) {
+            return (value == other.value);
+        }*/
     }
 }
