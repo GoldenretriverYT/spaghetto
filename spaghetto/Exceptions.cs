@@ -24,6 +24,10 @@ namespace spaghetto {
         public override string Message => GetMessage();
 
         public virtual string GetMessage() {
+            //if(posStart == null || posEnd == null) {
+            //    return $"{errorName}: {details}";
+            //}
+
             string result = $"{errorName}: {details}";
             result += @$"
   at {posStart.fileName}:{posStart.ln + 1}

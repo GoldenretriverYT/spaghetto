@@ -81,7 +81,7 @@ namespace spaghetto {
         public override (Value, SpaghettoException) IndexedBy(Value other) {
             foreach (KeyValuePair<Value, Value> vals in value) {
                 (Value val, SpaghettoException err) = vals.Key.IsEqualTo(other);
-                if (err) throw err;
+                if (err) return (null, err);
 
                 if ((val as Number).value == 1) {
                     return (vals.Value, null);
