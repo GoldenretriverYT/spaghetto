@@ -73,7 +73,7 @@ namespace spaghetto {
             if (args.Count > ArgNames.Count) {
                 return res.Failure(new RuntimeError(posStart, posEnd, $"Too many arguments passed into {functionName}, List: " + ArgNames.Join(", ") + ", Provided: " + args.Join(", "), context));
             }else if (args.Count < ArgNames.Count) {
-                return res.Failure(new RuntimeError(posStart, posEnd, $"Too few arguments passed into {functionName}", context));
+                return res.Failure(new RuntimeError(posStart, posEnd, $"Too few arguments passed into {functionName}, List: " + ArgNames.Join(", ") + ", Provided: " + args.Join(", "), context));
             }
 
             Value retValue = null;

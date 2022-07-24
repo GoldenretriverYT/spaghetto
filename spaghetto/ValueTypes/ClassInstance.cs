@@ -17,7 +17,7 @@ namespace spaghetto
             set;
         }
 
-        public ClassInstance(Class clazz, Position posStart, Position posEnd, List<Value> args = null, SymbolTable instanceValues = null, bool construct = true)
+        public ClassInstance(Class clazz, Position posStart, Position posEnd, List<Value> args = null, SymbolTable instanceValues = null, Dictionary<string, object> hiddenValues = null, bool construct = true)
         {
             this.posStart = posStart;
             this.posEnd = posEnd;
@@ -28,6 +28,7 @@ namespace spaghetto
             {
                 { "this", this }
             } : instanceValues);
+            this.hiddenValues = hiddenValues ?? new() { };
             this.instanceValues.parent = this.clazz.instanceTable;
             this.clazz.instanceTable.parent = this.clazz.staticTable;
 
@@ -64,7 +65,7 @@ namespace spaghetto
 
         public override Value Copy()
         {
-            return new ClassInstance(clazz, posStart, posEnd, args.ToList(), (SymbolTable)instanceValues.Clone(), false);
+            return new ClassInstance(clazz, posStart, posEnd, args.ToList(), (SymbolTable)instanceValues.Clone(), hiddenValues, false);
         }
 
         public override string Represent()

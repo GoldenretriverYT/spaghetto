@@ -17,8 +17,18 @@ namespace spaghetto {
             {
                 "set",
                 new NativeFunction("set", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
+                    foreach(KeyValuePair<Value, Value> vals in (args[0] as DictionaryValue).value) {
+                        (Value val, SpaghettoException err) = vals.Key.IsEqualTo(args[1]);
+                        if(err) throw err;
+
+                        if((val as Number).value == 1) {
+                            (args[0] as DictionaryValue).value[vals.Key] = args[2];
+                            return new Number(0);
+                        }
+                    }
+
                     (args[0] as DictionaryValue).value[args[1]] = args[2];
-                    return new Number(1);
+                    return new Number(0);
                 }, new() { "self", "name", "value" }, false)
             },
             {
@@ -39,11 +49,16 @@ namespace spaghetto {
             {
                 "hasKey",
                 new NativeFunction("hasKey", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
-                    if((args[0] as DictionaryValue).value.ContainsKey(args[1])) {
-                        return new Number(1);
-                    }else {
-                        return new Number(0);
+                    foreach(KeyValuePair<Value, Value> vals in (args[0] as DictionaryValue).value) {
+                        (Value val, SpaghettoException err) = vals.Key.IsEqualTo(args[1]);
+                        if(err) throw err;
+
+                        if((val as Number).value == 1) {
+                            return new Number(1);
+                        }
                     }
+
+                    return new Number(0);
                 }, new() { "self", "name" }, false)
             },
             {
