@@ -35,5 +35,9 @@
 
             return res.Success((shouldReturnNull ? new Number(0) : lastValue));
         }
+
+        public override string ToString() {
+            return "while(cond: " + condition + ", func: " + func + ")";
+        }
     }
 }

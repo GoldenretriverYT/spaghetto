@@ -8,6 +8,10 @@
             this.posEnd = posEnd;
         }
 
+        public override string ToString() {
+            return "list(" + elementNodes.Join(", ") + ")";
+        }
+
         public override RuntimeResult Visit(Context context) {
             RuntimeResult res = new();
             List<Value> elements = new();

@@ -35,5 +35,9 @@
 
             return res.Success(funcValue);
         }
+
+        public override string ToString() {
+            return "funcdef(" + bodyNode + ")";
+        }
     }
 }

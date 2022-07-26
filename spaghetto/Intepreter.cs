@@ -43,6 +43,10 @@ namespace spaghetto {
                 return new StringValue(Console.ReadLine());
             }, new(), false) },
 
+            { "readChar", new NativeFunction("readLine", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
+                return new StringValue(((char)Console.Read()).ToString());
+            }, new(), false) },
+
             { "readNumber", new NativeFunction("readNumber", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
                 double result = 0;
 
@@ -226,6 +230,8 @@ namespace spaghetto {
             Parser parser = new(tokens);
             ParseResult ast = parser.Parse();
             if (ast.error != null) return (null, ast.error);
+
+            Debug.WriteLine(ast.node.ToString());
 
             parseTime = sw.ElapsedMilliseconds;
             sw.Restart();

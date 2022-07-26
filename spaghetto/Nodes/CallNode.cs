@@ -16,6 +16,12 @@
             }
         }
 
+        public override string ToString() {
+            string str = "call(toCall: " + nodeToCall.ToString() + ", args: ";
+            str += argNodes.Join(", ");
+            return str + ")";
+        }
+
         public override RuntimeResult Visit(Context context) {
             RuntimeResult res = new();
             List<Value> args = new();

@@ -8,6 +8,16 @@
             this.posEnd = cases.Last().expr.posEnd;
         }
 
+        public override string ToString() {
+            List<string> casesStrings = new();
+
+            foreach((Node cond, Node expr, bool ret) cas in cases) {
+                casesStrings.Add("case[cond=" + cas.cond + "&expr=" + cas.expr + "&ret=" + cas.ret + "]");
+            }
+
+            return "if(" + casesStrings.Join(", ") + ")";
+        }
+
         public override RuntimeResult Visit(Context context) {
             RuntimeResult res = new();
 

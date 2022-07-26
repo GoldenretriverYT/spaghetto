@@ -12,7 +12,7 @@
         }
 
         public override string ToString() {
-            return $"({opToken}, {node})";
+            return $"unaryOp({opToken}, {node})";
         }
 
         public override RuntimeResult Visit(Context context) {

@@ -41,6 +41,18 @@ namespace spaghetto {
                 }, new() { "self", "idx" }, false)
             },
             {
+                "has",
+                new NativeFunction("has", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
+                    foreach(Value entry in (args[0] as ListValue).value) {
+                        if((entry.IsEqualTo(args[1]).Item1 as Number).value == 1) {
+                            return new Number(1);
+                        }
+                    }
+
+                    return new Number(0);
+                }, new() { "self", "value" }, false)
+            },
+            {
                 "remove",
                 new NativeFunction("remove", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
                     if (args[1] is Number)

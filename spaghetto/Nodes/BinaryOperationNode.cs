@@ -13,7 +13,7 @@
         }
 
         public override string ToString() {
-            return $"({leftNode}, {op}, {rightNode})";
+            return $"binop({leftNode}, {op}, {rightNode})";
         }
 
         public override RuntimeResult Visit(Context context) {

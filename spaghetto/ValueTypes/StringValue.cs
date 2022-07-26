@@ -29,6 +29,27 @@ namespace spaghetto {
                     return new ListValue(result);
                 }, new() { "self", "seperator" }, false)
             },
+
+            {
+                "replace",
+                new NativeFunction("replace", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
+                   return new StringValue((args[0] as StringValue).value.Replace((args[1] as StringValue).value, (args[2] as StringValue).value));
+                }, new() { "self", "old", "new" }, false)
+            },
+
+            {
+                "size",
+                new NativeFunction("size", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
+                   return new Number((args[0] as StringValue).value.Length);
+                }, new() { "self" }, false)
+            },
+
+            {
+                "has",
+                new NativeFunction("has", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
+                   return new Number(((args[0] as StringValue).value.Contains((args[1] as StringValue).value) ? 1 : 0));
+                }, new() { "self", "val" }, false)
+            },
         }, new()
         {
             { "empty", new StringValue("") },

@@ -9,6 +9,12 @@
             this.posEnd = baseNode.posEnd;
         }
 
+        public override string ToString() {
+            string str = "call(base: " + baseNode.ToString() + ", nextNodes:";
+            str += nextNodes.Join(", ");
+            return str + ")";
+        }
+
         public override RuntimeResult Visit(Context context) {
             RuntimeResult res = new();
 

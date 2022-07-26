@@ -22,5 +22,9 @@
             context.symbolTable.Set(varName, value);
             return res.Success(value);
         }
+
+        public override string ToString() {
+            return "varAssign(valueNode: " + valueNode + ")";
+        }
     }
 }

@@ -17,6 +17,10 @@
             this.posEnd = func.posEnd;
         }
 
+        public override string ToString() {
+            return "for(varStartExpr: " + varStartExpression + ", cond: " + condition + ", contExpr: " + continuationExpression + ", func:" + func + ")";
+        }
+
         public override RuntimeResult Visit(Context context) {
             System.Diagnostics.Stopwatch sw = new();
 

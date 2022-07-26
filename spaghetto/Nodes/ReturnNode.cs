@@ -19,5 +19,9 @@
 
             return res.SuccessReturn(new Number(0));
         }
+
+        public override string ToString() {
+            return "return(" + nodeToReturn + ")";
+        }
     }
 }

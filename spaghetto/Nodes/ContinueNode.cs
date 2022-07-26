@@ -8,5 +8,9 @@
         public override RuntimeResult Visit(Context context) {
             return new RuntimeResult().SuccessContinue();
         }
+
+        public override string ToString() {
+            return "continue()";
+        }
     }
 }
