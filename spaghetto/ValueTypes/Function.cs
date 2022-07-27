@@ -64,5 +64,10 @@ namespace spaghetto {
         public override string Represent() {
             return $"<function {functionName}>";
         }
+
+        public override BaseFunction SetStatic(bool st) {
+            IsStatic = st;
+            return this;
+        }
     }
 }

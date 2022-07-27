@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Diagnostics;
 using System.Reflection;
+using spaghetto.builtin.classes.reflection;
 
 namespace spaghetto {
     public class Intepreter {
@@ -26,7 +27,8 @@ namespace spaghetto {
             { "TestObject", TestObject.@class },
             { "File", FileClass.@class },
             { "Path", Path.@class },
-
+            { "Reflection", ReflectionClass.@class },
+            { "ClassWrapper", ClassWrapper.@class },
 
             {
                 "printLine", new NativeFunction("printLine", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {

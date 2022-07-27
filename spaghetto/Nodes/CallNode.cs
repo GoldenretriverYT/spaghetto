@@ -1,4 +1,6 @@
-﻿namespace spaghetto {
+﻿using System.Diagnostics;
+
+namespace spaghetto {
     public class CallNode : Node {
         public Node nodeToCall;
         public List<Node> argNodes;
@@ -32,8 +34,11 @@
             valueToCall = valueToCall.Copy().SetPosition(posStart, posEnd).SetContext(context);
 
             if (valueToCall is BaseFunction)
-                if ((valueToCall as BaseFunction).IsStatic)
+                if ((valueToCall as BaseFunction).IsStatic) {
+                    Debug.WriteLine(argNodes.Join("; "));
+                    Debug.WriteLine("Method is static");
                     argNodes.RemoveAt(0);
+                }
 
             foreach (Node argNode in argNodes)
             {

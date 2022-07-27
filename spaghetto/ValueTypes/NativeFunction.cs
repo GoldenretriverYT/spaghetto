@@ -104,5 +104,10 @@ namespace spaghetto {
         public override string Represent() {
             return $"<native {functionName}({ArgNames.Join(", ")})>";
         }
+
+        public override BaseFunction SetStatic(bool st) {
+            IsStatic = st;
+            return this;
+        }
     }
 }
