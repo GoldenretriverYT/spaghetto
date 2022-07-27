@@ -308,11 +308,11 @@ namespace spaghetto {
         }
 
         public IEnumerator<Value> GetEnumerator() {
-            throw new NotImplementedException();
+            return null;
         }
 
         IEnumerator IEnumerable.GetEnumerator() {
-            throw new NotImplementedException();
+            return symbols.GetEnumerator();
         }
 
         public object Clone()
