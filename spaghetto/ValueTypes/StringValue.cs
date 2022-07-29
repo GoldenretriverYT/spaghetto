@@ -15,6 +15,14 @@ namespace spaghetto {
                     return new Number(result);
                 }, new() { "self" }, false)
             },
+
+            {
+                "toString",
+                new NativeFunction("toString", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
+                    return args[0];
+                }, new() { "self" }, false)
+            },
+
             {
                 "split",
                 new NativeFunction("split", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
