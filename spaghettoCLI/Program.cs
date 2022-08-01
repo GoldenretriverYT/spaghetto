@@ -28,7 +28,7 @@ namespace spaghettoCLI
             {
                 if(!opts.ContainsKey("file"))
                 {
-                    Console.WriteLine("Missing option --file <path>");
+                    Console.WriteLine("Missing option --file <path>\nOptions can not directly be used in CLI mode, which is why the file option is required.");
                     Environment.Exit(0);
                 }
 

@@ -16,6 +16,13 @@ namespace spaghetto.builtin.classes.reflection {
                 {
                     return new Class("empty", new(), new());
                 }, new() { }, true)
+            },
+            {
+                "createInstance",
+                new NativeFunction("createInstance", (args, posStart, posEnd, ctx) =>
+                {
+                    return new ClassInstance(args[0] as Class, posStart, posEnd, construct: false);
+                }, new() { "class" }, true)
             }
         }, new NativeFunction("ctor", (args, posStart, posEnd, ctx) => {
             return ctx.symbolTable.Get("this");
