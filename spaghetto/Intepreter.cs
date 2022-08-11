@@ -172,7 +172,7 @@ namespace spaghetto {
 
                         foreach(AssemblyName refAsm in dll.GetReferencedAssemblies())
                         {
-                            Debug.WriteLine("Loading " + refAsm.FullName);
+                            //Debug.WriteLine("Loading " + refAsm.FullName);
                             Assembly.Load(refAsm);
                         }
 
@@ -245,7 +245,7 @@ namespace spaghetto {
             interpretTime = sw.ElapsedMilliseconds;
             sw.Stop();
 
-            System.Diagnostics.Debug.WriteLine("[ -> TIMINGS] Lexing took: " + lexTime + "ms\n[ -> TIMINGS] Parsing took: " + parseTime + "ms\n[ -> TIMINGS] Interpreting took: " + interpretTime + "ms");
+            Debug.WriteLine("[ -> TIMINGS] Lexing took: " + lexTime + "ms\n[ -> TIMINGS] Parsing took: " + parseTime + "ms\n[ -> TIMINGS] Interpreting took: " + interpretTime + "ms");
 
             return (result, result.error);
         }

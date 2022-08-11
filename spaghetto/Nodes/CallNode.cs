@@ -35,8 +35,8 @@ namespace spaghetto {
 
             if (valueToCall is BaseFunction)
                 if ((valueToCall as BaseFunction).IsStatic) {
-                    Debug.WriteLine(argNodes.Join("; "));
-                    Debug.WriteLine("Method is static");
+                    //Debug.WriteLine(argNodes.Join("; "));
+                    //Debug.WriteLine("Method is static");
                     argNodes.RemoveAt(0);
                 }
 

@@ -63,7 +63,7 @@ namespace spaghetto.builtin.classes.reflection {
 
                     if(targetValue is Function || targetValue is NativeFunction) {
                         targetValue = (targetValue.Copy() as BaseFunction).SetStatic(true);
-                        Debug.WriteLine("Making static");
+                        //Debug.WriteLine("Making static");
                     }
 
                     cl.staticTable.Set(targetName, targetValue);
