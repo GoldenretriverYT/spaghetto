@@ -1,0 +1,14 @@
+var MyClass = Reflection.getEmptyClass(); // Get an empty class. Classes are also just objects.
+var cw = ClassWrapper.new(MyClass); // You can not do anything with the class itself, so get the ClassWrapper
+
+cw.setStatic("new", func(clazz) { // Define a new static method called "new", which will be our constructor
+	printLine("Wow, a new instance of MyClass was created!");
+	return Reflection.createInstance(MyClass); // Creates a new, empty instance without calling the constructor
+});
+
+cw.setInstance("log", func(self) { // Define a new instance method called "log", which will be a test function
+	printLine("Hello World from a MyClass instance!");
+});
+
+var myObj = MyClass.new();
+myObj.log();

@@ -24,7 +24,7 @@ namespace spaghetto
         }, new() {}, new NativeFunction("ctor", (List<Value> args, Position posStart, Position posEnd, Context ctx) =>
         {
             (ctx.symbolTable.Get("this") as ClassInstance).instanceValues.Set("str", args[0]);
-            System.Diagnostics.Debug.WriteLine((ctx.symbolTable.Get("this") as ClassInstance).instanceValues.Get("str"));
+            //System.Diagnostics.Debug.WriteLine((ctx.symbolTable.Get("this") as ClassInstance).instanceValues.Get("str"));
             return ctx.symbolTable.Get("this");
         }, new() { "str" }, true));
 

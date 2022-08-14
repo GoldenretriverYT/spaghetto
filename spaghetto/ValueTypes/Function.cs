@@ -38,9 +38,9 @@ namespace spaghetto {
             newContext.symbolTable = new((SymbolTable)newContext.parentContext.symbolTable.Clone());
 
             if (args.Count > ArgNames.Count) {
-                return res.Failure(new RuntimeError(posStart, posEnd, $"Too many arguments passed into {functionName}", context));
+                return res.Failure(new RuntimeError(posStart, posEnd, $"Too many arguments passed into {functionName} | Got {args.Count} but expected {ArgNames.Count}", context));
             }else if (args.Count < ArgNames.Count) {
-                return res.Failure(new RuntimeError(posStart, posEnd, $"Too few arguments passed into {functionName}", context));
+                return res.Failure(new RuntimeError(posStart, posEnd, $"Too few arguments passed into {functionName} | Got {args.Count} but expected {ArgNames.Count}", context));
             }
 
             for(int i = 0; i < args.Count; i++) {
