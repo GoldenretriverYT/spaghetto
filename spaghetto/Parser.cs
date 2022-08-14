@@ -150,6 +150,8 @@ namespace spaghetto {
                         return res.Failure(new IllegalSyntaxError(currentToken.posStart, currentToken.posEnd, "Expected identifier"));
                     }
                 }
+            }else {
+                return res.Success(atom);
             }
 
             return res.Success(accessStack);
