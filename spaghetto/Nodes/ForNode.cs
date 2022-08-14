@@ -42,6 +42,7 @@
 
             while(res.Register(condition.Visit(context)).IsTrue()) {
                 lastValue = res.Register(func.Visit(context));
+                if (res.ShouldReturn()) return res;
 
                 if (isStepMode) {
                     double stepResValue = 0;

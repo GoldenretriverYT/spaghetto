@@ -759,6 +759,8 @@ namespace spaghetto {
 
                 if (res.error != null) return res;
 
+                //var tempBinop = new BinaryOperationNode(left, opToken, right);
+                //left = (tempBinop.cache != null ? new ValueNode(tempBinop.cache, tempBinop.posStart, tempBinop.posEnd) : tempBinop); // even slower?
                 left = new BinaryOperationNode(left, opToken, right);
             }
 
