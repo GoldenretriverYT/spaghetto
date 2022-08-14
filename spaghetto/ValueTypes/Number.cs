@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -38,10 +39,12 @@ namespace spaghetto {
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public override Value Copy() {
             return new Number(value);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public override (Value, SpaghettoException) AddedTo(Value other) {
             if (other is Number) {
                 return (new Number(value + (other as Number).value).SetContext(context), null);
@@ -50,6 +53,7 @@ namespace spaghetto {
             return (null, new TypeError(posStart, posEnd, "Can not add number to " + other.GetType().Name));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public override (Value, SpaghettoException) SubtractedBy(Value other) {
             if (other is Number) {
                 return (new Number(value - (other as Number).value).SetContext(context), null);
@@ -57,6 +61,8 @@ namespace spaghetto {
 
             return (null, new TypeError(posStart, posEnd, "Can not add number to " + other.GetType().Name));
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public override (Value, SpaghettoException) MultipliedBy(Value other) {
             if (other is Number) {
                 return (new Number(value * (other as Number).value).SetContext(context), null);
@@ -64,6 +70,8 @@ namespace spaghetto {
 
             return (null, new TypeError(posStart, posEnd, "Can not add number to " + other.GetType().Name));
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public override (Value, SpaghettoException) DividedBy(Value other) {
             if (other is Number) {
                 if ((other as Number).value == 0) {

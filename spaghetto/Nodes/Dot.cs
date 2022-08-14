@@ -10,7 +10,7 @@
         }
 
         public override string ToString() {
-            string str = "call(base: " + baseNode.ToString() + ", nextNodes:";
+            string str = "dot(base: " + baseNode.ToString() + ", nextNodes:";
             str += nextNodes.Join(", ");
             return str + ")";
         }
@@ -20,6 +20,8 @@
 
             Value value = res.Register(baseNode.Visit(context));
             if (res.error) return res;
+
+            if (nextNodes.Count == 0) return res.Success(value);
 
             foreach(Node node in nextNodes.Select(node => node.Clone()).ToList())
             {
