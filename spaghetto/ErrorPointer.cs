@@ -42,6 +42,8 @@ namespace spaghetto {
 
     public static class StringExtensions {
         public static string Substr(this string str, int start, int end) {
+            start = Math.Max(0, start);
+            end = Math.Min(str.Length, end);
             return str[start..end];
         }
 

@@ -23,7 +23,7 @@
 
             if (nextNodes.Count == 0) return res.Success(value);
 
-            foreach(Node node in nextNodes.Select(node => node.Clone()).ToList())
+            foreach(Node node in nextNodes)
             {
                 if(node is VariableAccessNode)
                 {

@@ -27,7 +27,7 @@
             sw.Start();
 
             RuntimeResult res = new();
-            string varName = (string)varNameToken.value;
+            string varName = varNameToken.value as string;
             Value value = res.Register(varStartExpression.Visit(context));
             Value lastValue = null;
 
