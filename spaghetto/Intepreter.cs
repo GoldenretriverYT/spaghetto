@@ -277,7 +277,12 @@ namespace spaghetto {
             interpretTime = sw.ElapsedMilliseconds;
             sw.Stop();
 
-            Debug.WriteLine("[ -> TIMINGS] Lexing took: " + lexTime + "ms\n[ -> TIMINGS] Parsing took: " + parseTime + "ms\n[ -> TIMINGS] Interpreting took: " + interpretTime + "ms");
+            //foreach(KeyValuePair<string, string> kvp in runtimeOptions)
+            //{
+            //    Console.WriteLine(kvp.Key + " = " + kvp.Value);
+            //}
+            if (GetOpt("show-timings", "false") == "true") Console.WriteLine("[ -> TIMINGS] Lexing took: " + lexTime + "ms\n[ -> TIMINGS] Parsing took: " + parseTime + "ms\n[ -> TIMINGS] Interpreting took: " + interpretTime + "ms");
+            if (GetOpt("is-in-cli", "false") == "true") Debug.WriteLine("[ -> TIMINGS] Lexing took: " + lexTime + "ms\n[ -> TIMINGS] Parsing took: " + parseTime + "ms\n[ -> TIMINGS] Interpreting took: " + interpretTime + "ms");
 
             return (result, result.error);
         }

@@ -50,6 +50,7 @@ namespace spaghettoCLI
                 return;
             }
 
+            Intepreter.runtimeOptions.Add("is-in-cli", "true");
             Thread t = new(() => {
                 while (true)
                 {
