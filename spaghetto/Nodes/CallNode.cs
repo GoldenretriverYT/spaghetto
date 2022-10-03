@@ -30,11 +30,13 @@ namespace spaghetto {
 
             Value valueToCall = res.Register(nodeToCall.Visit(context));
             if (res.ShouldReturn()) return res;
-            if (valueToCall is Number && (valueToCall as Number).value == 0) return res.Failure(new RuntimeError(posStart, posEnd, "Can not execute NULL", context));
+            // Is this really needed?
+            // if (valueToCall is Number valueToCallNmb && valueToCallNmb.value == 0) return res.Failure(new RuntimeError(posStart, posEnd, "Can not execute NULL", context));
+            
             valueToCall = valueToCall.Copy().SetPosition(posStart, posEnd).SetContext(context);
 
-            if (valueToCall is BaseFunction)
-                if ((valueToCall as BaseFunction).IsStatic) {
+            if (valueToCall is BaseFunction valueToCallBF)
+                if (valueToCallBF.IsStatic) {
                     //Debug.WriteLine(argNodes.Join("; "));
                     //Debug.WriteLine("Method is static");
                     argNodes.RemoveAt(0);
@@ -53,10 +55,12 @@ namespace spaghetto {
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("[WARN] A method seems to have returned nothing (NULL) - this is not supported. Crashes caused by null are not an issue. See https://github.com/GoldenretriverYT/spaghetto/wiki/Warning-about-NULL-return-value for more details");
                 Console.ResetColor();
+            }else
+            {
+                retValue = retValue.Copy().SetPosition(posStart, posEnd).SetContext(context);
             }
 
             if (res.ShouldReturn()) return res;
-            if (retValue != null) retValue = retValue.Copy().SetPosition(posStart, posEnd).SetContext(context);
 
             return res.Success(retValue);
         }

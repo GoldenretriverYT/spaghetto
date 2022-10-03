@@ -156,6 +156,38 @@ namespace spaghetto {
                     }
                 }, new() { "path" }, false)
             },
+
+            {
+                "eval",
+                new NativeFunction("eval", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {
+                    try
+                    {
+                        if (args[0] is not StringValue) throw new RuntimeError(posStart, posEnd, "Argument code must be of type String", ctx);
+
+
+                        string code = (args[0] as StringValue).value;
+
+                        (RuntimeResult res, SpaghettoException err) = Run("<evaluation at " + ctx.displayName + ">", code);
+
+                        if (err != null)
+                        {
+                            throw err;
+                        }
+
+                        return (res.value?.Copy());
+                    }
+                    catch (Exception ex)
+                    {
+                        if (ex is SpaghettoException || ex is IOException)
+                        {
+                            Console.WriteLine("Error: " + ex.Message);
+                            return new Number(0);
+                        }
+                        else throw;
+                    }
+                }, new() { "code" }, false)
+            },
+
             {
                 "loadcslib",
                 new NativeFunction("loadcslib", (List<Value> args, Position posStart, Position posEnd, Context ctx) => {

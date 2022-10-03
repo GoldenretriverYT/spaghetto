@@ -13,14 +13,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="bin\Debug\net6.0\bench.spag" />
-    <None Include="bin\Debug\net6.0\hangman.spag" />
-    <None Include="bin\Debug\net6.0\reflect.spag" />
-    <None Include="bin\Debug\net6.0\test.spag" />
+    <ProjectReference Include="..\spaghetto\spaghetto.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\spaghetto\spaghetto.csproj" />
+    <Folder Include="bin\Debug\" />
   </ItemGroup>
 
 </Project>

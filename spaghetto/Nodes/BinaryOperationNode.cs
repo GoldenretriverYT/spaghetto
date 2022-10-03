@@ -12,9 +12,9 @@
             this.posStart = leftNode.posStart;
             this.posEnd = rightNode.posEnd;
 
-            if((leftNode is NumberNode && rightNode is NumberNode)) { // Static nodes, why not optimize?
-                var l = (leftNode as NumberNode).cache as Number;
-                var r = (rightNode as NumberNode).cache as Number;
+            if((leftNode is NumberNode lftNumberNode && rightNode is NumberNode rghtNumberNode)) { // Static nodes, why not optimize?
+                var l = lftNumberNode.cache as Number;
+                var r = rghtNumberNode.cache as Number;
 
                 CacheBinop(l, r);
             } else if((leftNode is BinaryOperationNode && rightNode is NumberNode) || (rightNode is BinaryOperationNode && leftNode is NumberNode)) {
@@ -27,10 +27,7 @@
 
                     CacheBinop(l, r);
                 }
-            }else if ((leftNode is BinaryOperationNode && rightNode is BinaryOperationNode)) { // If both are binop nodes and cached, you can cache them too!
-                var bLeft = leftNode as BinaryOperationNode;
-                var bRight = rightNode as BinaryOperationNode;
-
+            }else if ((leftNode is BinaryOperationNode bLeft && rightNode is BinaryOperationNode bRight)) { // If both are binop nodes and cached, you can cache them too!
                 if(bLeft.cache != null && bRight.cache != null) {
                     var l = bLeft.cache as Number;
                     var r = bRight.cache as Number;

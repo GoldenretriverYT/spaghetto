@@ -25,25 +25,24 @@
 
             foreach(Node node in nextNodes)
             {
-                if(node is VariableAccessNode)
+                if(node is VariableAccessNode nodeVarAccess)
                 {
-                    value = value.Get((node as VariableAccessNode).varNameToken.value.ToString());
+                    value = value.Get(nodeVarAccess.varNameToken.value.ToString());
                 }else
                 {
-                    if (node is CallNode)
+                    if (node is CallNode temp)
                     {
-                        CallNode temp = node as CallNode;
                         temp.argNodes.Insert(0, new ValueNode(value, value.posStart, value.posEnd));
-                        if (temp.nodeToCall is VariableAccessNode) temp.nodeToCall = new ValueNode(value.Get((temp.nodeToCall as VariableAccessNode).varNameToken.value.ToString()), temp.nodeToCall.posStart, temp.nodeToCall.posEnd);
+                        if (temp.nodeToCall is VariableAccessNode nodeToCallVarAccess) temp.nodeToCall = new ValueNode(value.Get(nodeToCallVarAccess.varNameToken.value.ToString()), temp.nodeToCall.posStart, temp.nodeToCall.posEnd);
                     }
 
                     Value v = res.Register((node as CallNode).Visit(context));
 
-                    if(node is CallNode)
+                    if(node is CallNode temp2)
                     {
-                        CallNode temp = node as CallNode;
-                        if(temp.argNodes.Count > 0) temp.argNodes.RemoveAt(0);
+                        if(temp2.argNodes.Count > 0) temp2.argNodes.RemoveAt(0);
                     }
+
                     if (res.error) return res;
                     value = v;
                 }

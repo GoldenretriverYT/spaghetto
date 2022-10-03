@@ -25,20 +25,6 @@ namespace spaghetto {
             this.value = value;
         }
 
-        public Number(object value) {
-            if (value is double) {
-                this.value = (double)value;
-            } else if(value is float) {
-                this.value = (float)value;
-            } else if(value is short) {
-                this.value = (short)value;
-            } else if (value is byte) {
-                this.value = (byte)value;
-            } else if (value is int) {
-                this.value = (int)value;
-            }
-        }
-
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public override Value Copy() {
             return new Number(value);

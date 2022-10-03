@@ -18,9 +18,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Include="bin\Debug\net6.0\bench.spag" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="bin\Debug\net6.0\ex2.spag" />
     <None Include="bin\Debug\net6.0\hangman.spag" />
-    <None Include="bin\Debug\net6.0\bench.spag" />
     <None Include="bin\Debug\net6.0\bf.spag" />
     <None Include="bin\Debug\net6.0\test.spag" />
   </ItemGroup>
