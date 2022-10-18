@@ -32,8 +32,8 @@ namespace spaghetto {
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public override (Value, SpaghettoException) AddedTo(Value other) {
-            if (other is Number) {
-                return (new Number(value + (other as Number).value).SetContext(context), null);
+            if (other is Number num) {
+                return (new Number(value + (num).value).SetContext(context), null);
             }
 
             return (null, new TypeError(posStart, posEnd, "Can not add number to " + other.GetType().Name));
@@ -41,8 +41,8 @@ namespace spaghetto {
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public override (Value, SpaghettoException) SubtractedBy(Value other) {
-            if (other is Number) {
-                return (new Number(value - (other as Number).value).SetContext(context), null);
+            if (other is Number num) {
+                return (new Number(value - (num).value).SetContext(context), null);
             }
 
             return (null, new TypeError(posStart, posEnd, "Can not add number to " + other.GetType().Name));
@@ -50,8 +50,8 @@ namespace spaghetto {
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public override (Value, SpaghettoException) MultipliedBy(Value other) {
-            if (other is Number) {
-                return (new Number(value * (other as Number).value).SetContext(context), null);
+            if (other is Number num) {
+                return (new Number(value * (num).value).SetContext(context), null);
             }
 
             return (null, new TypeError(posStart, posEnd, "Can not add number to " + other.GetType().Name));
@@ -59,92 +59,92 @@ namespace spaghetto {
 
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public override (Value, SpaghettoException) DividedBy(Value other) {
-            if (other is Number) {
-                if ((other as Number).value == 0) {
+            if (other is Number num) {
+                if ((num).value == 0) {
                     return (null, new RuntimeError(other.posStart, other.posEnd, "Division by zero is not permitted", context));
                 }
 
-                return (new Number(value / (other as Number).value).SetContext(context), null);
+                return (new Number(value / (num).value).SetContext(context), null);
             }
 
             return (null, new TypeError(posStart, posEnd, "Can not add number to " + other.GetType().Name));
         }
 
         public override (Value, SpaghettoException) PoweredBy(Value other) {
-            if (other is Number) {
-                return (new Number(Math.Pow(value, (other as Number).value)).SetContext(context), null);
+            if (other is Number num) {
+                return (new Number(Math.Pow(value, (num).value)).SetContext(context), null);
             }
 
             return (null, new TypeError(posStart, posEnd, "Can not power number to " + other.GetType().Name));
         }
 
         public override (Value, SpaghettoException) Modulo(Value other) {
-            if (other is Number) {
-                return (new Number(value % (other as Number).value).SetContext(context), null);
+            if (other is Number num) {
+                return (new Number(value % (num).value).SetContext(context), null);
             }
 
             return (null, new TypeError(posStart, posEnd, "Can not perform modulo with number to " + other.GetType().Name));
         }
 
         public override (Value, SpaghettoException) IsEqualTo(Value other) {
-            if (other is Number) {
-                return (new Number(value == (other as Number).value ? 1 : 0).SetContext(context), null);
+            if (other is Number num) {
+                return (new Number(value == (num).value ? 1 : 0).SetContext(context), null);
             }
 
             return (null, new TypeError(posStart, posEnd, "Can not perform IsEqualTo with number to " + other.GetType().Name));
         }
 
         public override (Value, SpaghettoException) IsNotEqualTo(Value other) {
-            if (other is Number) {
-                return (new Number((value == (other as Number).value) ? 0 : 1).SetContext(context), null);
+            if (other is Number num) {
+                return (new Number((value == (num).value) ? 0 : 1).SetContext(context), null);
             }
 
             return (null, new TypeError(posStart, posEnd, "Can not perform IsNotEqualTo with number to " + other.GetType().Name));
         }
 
         public override (Value, SpaghettoException) IsLessThan(Value other) {
-            if (other is Number) {
-                return (new Number(value < (other as Number).value ? 1 : 0).SetContext(context), null);
+            if (other is Number num) {
+                return (new Number(value < (num).value ? 1 : 0).SetContext(context), null);
             }
 
             return (null, new TypeError(posStart, posEnd, "Can not perform IsLessThan with number to " + other.GetType().Name));
         }
 
         public override (Value, SpaghettoException) IsLessThanOrEquals(Value other) {
-            if (other is Number) {
-                return (new Number(value <= (other as Number).value ? 1 : 0).SetContext(context), null);
+            if (other is Number num) {
+                return (new Number(value <= (num).value ? 1 : 0).SetContext(context), null);
             }
 
             return (null, new TypeError(posStart, posEnd, "Can not perform IsLessThanOrEquals with number to " + other.GetType().Name));
         }
 
         public override (Value, SpaghettoException) IsGreaterThan(Value other) {
-            if (other is Number) {
-                return (new Number(value > (other as Number).value ? 1 : 0).SetContext(context), null);
+            if (other is Number num) {
+                return (new Number(value > (num).value ? 1 : 0).SetContext(context), null);
             }
 
             return (null, new TypeError(posStart, posEnd, "Can not perform IsGreaterThan with number to " + other.GetType().Name));
         }
 
         public override (Value, SpaghettoException) IsGreaterThanOrEquals(Value other) {
-            if (other is Number) {
-                return (new Number(value >= (other as Number).value ? 1 : 0).SetContext(context), null);
+            if (other is Number num) {
+                return (new Number(value >= (num).value ? 1 : 0).SetContext(context), null);
             }
 
             return (null, new TypeError(posStart, posEnd, "Can not perform IsGreaterThanOrEquals with number to " + other.GetType().Name));
         }
 
         public override (Value, SpaghettoException) AndBy(Value other) {
-            if (other is Number) {
-                return (new Number((value != 0) && ((other as Number).value != 0) ? 1 : 0).SetContext(context), null);
+            if (other is Number num) {
+                return (new Number((value != 0) && ((num).value != 0) ? 1 : 0).SetContext(context), null);
             }
 
             return (null, new TypeError(posStart, posEnd, "Can not perform AndBy with number to " + other.GetType().Name));
         }
 
         public override (Value, SpaghettoException) OrBy(Value other) {
-            if (other is Number) {
-                return (new Number((value != 0) || ((other as Number).value != 0) ? 1 : 0).SetContext(context), null);
+            if (other is Number num) {
+                return (new Number((value != 0) || ((num).value != 0) ? 1 : 0).SetContext(context), null);
             }
 
             return (null, new TypeError(posStart, posEnd, "Can not perform OrBy with number to " + other.GetType().Name));
