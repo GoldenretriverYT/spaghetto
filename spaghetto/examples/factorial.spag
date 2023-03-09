@@ -1,9 +1,0 @@
-﻿print("Please enter your factorial: ")
-var x = readLine().toNumber()
-var num = 1
-
-for i = 0 while i < x step 1 {
-	var num = num * i
-}
-
-printLine("Result: " + num.toString())
