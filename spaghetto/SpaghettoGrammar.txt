@@ -1,14 +1,60 @@
-﻿statements    : NEWLINE* statement (NEWLINE+ statement)* NEWLINE*
+﻿SyntaxTokens:
+  Semicolon ;
+  Keyword <dyn>
+  Identifier <dyn>
+  Equals =
+  EqualsEquals ==
+  AndAnd &&
+  OrOr ||
+  LessThan <
+  GreaterThan >
+  GreaterThanEqu >=
+  LessThanEqu <=
+  Plus +
+  Minus -
+  Mod %
+  Mul *
+  Div /
+  Idx #
+  Pow ^
+  Dot .
+  LParen (
+  RParen )
+  Comma ,
+  Int <dyn>
+  Float <dyn> 
+  String <dyn>
+  LSqBracket [
+  RSqBracket ]
+  LBraces {
+  RBraces }
+  Bang !
+  EOF
+  
+Keywords:
+  return
+  continue
+  break
+  if
+  elseif
+  else
+  for
+  while
+  func
+
+statements    : (statement)*
+scoped-statements: LBRACE (statement)* RBRACE
 
 statement     : KEYWORD:return expr?
               : KEYWORD:continue|break
               : expr
+              : SEMICOLON
               
 expression    : KEYWORD:var IDENTIFIER (EQUALS expression)?
               : IDENTIFIER EQUALS expression
-              : comp-expr ((KEYWORD:AND|KEYWORD) comp-expr)*
+              : comp-expr ((&& | ||) comp-expr)*
               
-comp-expr     : NOT comp-expr
+comp-expr     : !comp-expr
               : arith-expr ((==|<|>|<=|>=) aright-expr)*
               
 arith-expr    : term ((PLUS|MINUS) term)*
@@ -32,29 +78,18 @@ atom          : INT|FLOAT|STRING|IDENTIFIER
               
 list-expr     : LSQBRACKET (expr (COMMA expr)*)? RSQBRACKET
               
-if-expr       : KEYWORD:if expr LEFTBRACES
-                (statement if-expr-elseif?|if-expr-else?)
-               | (NEWLINE statements RIGHTBRACES|if-expr-elseif|if-expr-else)
-              
-if-expr-elseif: KEYWORD:elseif expr LEFTBRACES
-                (statement if-expr-elseif?|if-expr-else?)
-               | (NEWLINE statements RIGHTBRACES|if-expr-elseif|if-expr-else)
-              
-if-expr-else  : KEYWORD:else
-                statement
-              | (NEWLINE statements RIGHTBRACES)
+if-expr       : KEYWORD:if expr scoped-statements
+                (KEYWORD:elseif scoped-statements)*?
+                (KEYWORD:else scoped-statements)?
               
               
               
-for-expr      : KEYWORD:for IDENTIFIER = expr KEYWORD:until cond KEYWORD:also|step expr LEFTBRACES
-                statement
-              | (NEWLINE statements RIGHTBRACES)
+for-expr      : KEYWORD:for LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN
+                scoped-statements
               
-while-expr    : KEYWORD:while expr LEFTBRACES
-                statement
-              | (NEWLINE statements RIGHTBRACES)
+while-expr    : KEYWORD:while expr
+                scoped-statements
               
 func-def      : KEYWORD:func IDENTIFIER?
                 LPAREN (IDENTIFIER(COMMA IDENTIFIER)*)? RPAREN
-                (ARROW expr)
-              | LEFTBRACES (NEWLINE statements RIGHTBRACES)
+                scoped-statements
