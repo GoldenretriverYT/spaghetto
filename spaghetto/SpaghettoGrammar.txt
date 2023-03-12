@@ -64,7 +64,7 @@ term          : factor ((MOD|MUL|DIV|IDX) factor)*
 factor        : (PLUS|MINUS) factor
               : power
               
-power         : dot ((POW) factor)*
+power         : call ((POW) factor)*
 
 call          : atom (DOT IDENTIFIER|call)*? (LPAREN (expr (COMMA expr)*)? RPAREN)?
               

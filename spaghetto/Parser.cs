@@ -100,11 +100,143 @@ namespace spaghetto {
             }
         }
 
-        public SyntaxToken ParseCompExpression() {
+        public SyntaxNode ParseCompExpression() {
             if(Current.Type == SyntaxType.Bang) {
                 Position++;
                 return new UnaryExpressionNode(SyntaxType.Bang, ParseCompExpression());
+            }else {
+                return BinaryOperation(() => { return ParseArithmeticExpression() },
+                    new List<SyntaxType>() {
+                        SyntaxType.EqualsEquals, SyntaxType.LessThan, SyntaxType.LessThanEqu, SyntaxType.GreaterThan, SyntaxType.GreatherThanEqu
+                    });
             }
+        }
+
+        public SyntaxNode ParseArithmeticExpression() {
+            return BinaryOperation(() => { return ParseTermExpression(); }, new() { SyntaxType.Plus, SyntaxType.Minus });
+        }
+
+        public SyntaxNode ParseTermExpression() {
+            return BinaryOperation(() => { return ParseFactorExpression(); }, new() { SyntaxType.Mul, SyntaxType.Div, SyntaxType.Mod, SyntaxType.Index });
+        }
+
+        public SyntaxNode ParseFactorExpression() {
+            if(Current.Type is SyntaxType.Plus or SyntaxType.Minus) {
+                Position++;
+                var factor = ParseFactorExpression();
+                return new UnaryExpressionNode(Peek(-1).Type, factor);
+            }
+
+            return ParsePowerExpression();
+        }
+
+        public SyntaxNode ParsePowerExpression() {
+            return BinaryOperation(() => { return ParseDotExpression(); }, new() { SyntaxType.Pow }, () => { return ParseFactorExpression(); });
+        }
+
+        public SyntaxNode ParseDotExpression() {
+            var callNode = ParseCallExpression();
+            DotNode accessStack = new(callNode);
+
+            if(Current.Type is SyntaxType.Dot) {
+                while(Current.Type is SyntaxType.Dot) {
+                    Position++;
+
+                    if(Current.Type is SyntaxType.Identifier) {
+                        var n = ParseCallExpression();
+
+                        accessStack.NextNodes.Add(n);
+                    }
+                }
+            }
+
+            return accessStack;
+        }
+
+        public SyntaxNode ParseCallExpression() {
+            var atomNode = ParseAtomExpression();
+
+            if(Current.Type is SyntaxType.LParen) {
+                Position++;
+
+                List<SyntaxNode> argumentNodes = new();
+
+                if(Current.Type is SyntaxType.RParen) {
+                    Position++;
+                }else {
+                    argumentNodes.Add(ParseExpression());
+
+                    while(Current.Type is SyntaxType.Comma) {
+                        Position++;
+
+                        argumentNodes.Add(ParseExpression());
+                    }
+
+                    MatchToken(SyntaxType.RParen);
+                }
+
+                return new CallNode(atomNode, argumentNodes);
+            }
+
+            return atomNode;
+        }
+
+        public SyntaxNode ParseAtomExpression() {
+            if(Current.Type is SyntaxType.Int or SyntaxType.Float or SyntaxType.String or SyntaxType.Identifier) {
+                Position++;
+                return new LiteralNode(Peek(-1));
+            }else if(Current.Type is SyntaxType.LParen) {
+                var expr = ParseExpression();
+
+                MatchToken(SyntaxType.RParen);
+            } else if (Current.Type is SyntaxType.LSqBracket) {
+                return ParseListExpression();
+            } else if (Current.Type is SyntaxType.Keyword && Current.Value == "if") {
+                return ParseIfExpression();
+            } else if (Current.Type is SyntaxType.Keyword && Current.Value == "for") {
+                return ParseForExpression();
+            } else if (Current.Type is SyntaxType.Keyword && Current.Value == "while") {
+                return ParseWhileExpression();
+            } else if (Current.Type is SyntaxType.Keyword && Current.Value == "func") {
+                return ParseFuncExpression();
+            }
+        }
+
+        public SyntaxNode ParseListExpression() {
+            var lsqTok = MatchToken(SyntaxType.LSqBracket);
+
+            List<SyntaxNode> list = new();
+
+            do {
+                var expr = ParseExpression();
+                list.Add(expr);
+
+                Position++;
+            } while (Current.Type == SyntaxType.Comma);
+
+            MatchToken(SyntaxType.RSqBracket);
+
+            return new ListNode(list);
+        }
+
+        public SyntaxNode ParseIfExpression() {
+
+        }
+
+        public SyntaxNode BinaryOperation(Func<SyntaxNode> leftParse, List<SyntaxType> allowedTypes, Func<SyntaxNode> rightParse) {
+            var left = leftParse();
+            SyntaxNode right;
+            SyntaxToken operatorToken = default;
+
+            while(allowedTypes.Contains(Current.Type)) {
+                operatorToken = Current;
+                Position++;
+                right = (rightParse ?? leftParse)();
+
+                left = new BinaryExpressionNode(left, operatorToken, right);
+            }
+
+            return left;
         }
     }
 }
