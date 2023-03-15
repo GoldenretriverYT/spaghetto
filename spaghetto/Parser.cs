@@ -51,6 +51,8 @@ namespace spaghetto {
             while(Current.Type != SyntaxType.EOF) {
                 nodes.Add(ParseStatement());
             }
+
+            return new BlockNode(nodes);
         }
 
         public SyntaxNode ParseScopedStatements() {
@@ -64,6 +66,8 @@ namespace spaghetto {
             }
 
             MatchToken(SyntaxType.RBraces);
+
+            return new BlockNode(nodes);
         }
 
         public SyntaxNode ParseStatement() {
@@ -115,9 +119,9 @@ namespace spaghetto {
         public SyntaxNode ParseCompExpression() {
             if(Current.Type == SyntaxType.Bang) {
                 Position++;
-                return new UnaryExpressionNode(SyntaxType.Bang, ParseCompExpression());
+                return new UnaryExpressionNode(Peek(-1), ParseCompExpression());
             }else {
-                return BinaryOperation(() => { return ParseArithmeticExpression() },
+                return BinaryOperation(() => { return ParseArithmeticExpression(); },
                     new List<SyntaxType>() {
                         SyntaxType.EqualsEquals, SyntaxType.LessThan, SyntaxType.LessThanEqu, SyntaxType.GreaterThan, SyntaxType.GreatherThanEqu
                     });
@@ -129,14 +133,14 @@ namespace spaghetto {
         }
 
         public SyntaxNode ParseTermExpression() {
-            return BinaryOperation(() => { return ParseFactorExpression(); }, new() { SyntaxType.Mul, SyntaxType.Div, SyntaxType.Mod, SyntaxType.Index });
+            return BinaryOperation(() => { return ParseFactorExpression(); }, new() { SyntaxType.Mul, SyntaxType.Div, SyntaxType.Mod, SyntaxType.Idx });
         }
 
         public SyntaxNode ParseFactorExpression() {
-            if(Current.Type is SyntaxType.Plus or SyntaxType.Minus) {
+            if(Current.Type is SyntaxType.Plus or SyntaxType.Minus or SyntaxType.Bang) {
                 Position++;
                 var factor = ParseFactorExpression();
-                return new UnaryExpressionNode(Peek(-1).Type, factor);
+                return new UnaryExpressionNode(Peek(-1), factor);
             }
 
             return ParsePowerExpression();
@@ -194,10 +198,19 @@ namespace spaghetto {
         }
 
         public SyntaxNode ParseAtomExpression() {
-            if(Current.Type is SyntaxType.Int or SyntaxType.Float or SyntaxType.String or SyntaxType.Identifier) {
+            if (Current.Type is SyntaxType.Int) {
                 Position++;
-                return new LiteralNode(Peek(-1));
-            }else if(Current.Type is SyntaxType.LParen) {
+                return new IntLiteralNode(Peek(-1));
+            } else if (Current.Type is SyntaxType.Float) {
+                Position++;
+                return new FloatLiteralNode(Peek(-1));
+            } else if (Current.Type is SyntaxType.String) {
+                Position++;
+                return new StringLiteralNode(Peek(-1));
+            } else if (Current.Type is SyntaxType.Identifier) {
+                Position++;
+                return new ReadVariableNode(Peek(-1));
+            } else if(Current.Type is SyntaxType.LParen) {
                 var expr = ParseExpression();
 
                 MatchToken(SyntaxType.RParen);
@@ -266,7 +279,7 @@ namespace spaghetto {
             }
         }
 
-        public SyntaxNode BinaryOperation(Func<SyntaxNode> leftParse, List<SyntaxType> allowedTypes, Func<SyntaxNode> rightParse) {
+        public SyntaxNode BinaryOperation(Func<SyntaxNode> leftParse, List<SyntaxType> allowedTypes, Func<SyntaxNode> rightParse = null) {
             var left = leftParse();
             SyntaxNode right;
             SyntaxToken operatorToken = default;
@@ -283,9 +296,230 @@ namespace spaghetto {
         }
     }
 
+    internal class DotNode : SyntaxNode
+    {
+        public DotNode(SyntaxNode callNode)
+        {
+            CallNode = callNode;
+        }
+
+        public SyntaxNode CallNode { get; }
+        public List<SyntaxNode> NextNodes { get; internal set; }
+
+        public override NodeType Type => NodeType.Dot;
+
+        public override SValue Evaluate(Scope scope)
+        {
+            var currentNode = CallNode.Evaluate(scope);
+
+            foreach(var node in NextNodes) {
+
+            }
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    internal class UnaryExpressionNode : SyntaxNode
+    {
+        private SyntaxToken token;
+        private SyntaxNode rhs;
+
+        public UnaryExpressionNode(SyntaxToken token, SyntaxNode rhs)
+        {
+            this.token = token;
+            this.rhs = rhs;
+        }
+
+        public override NodeType Type => NodeType.UnaryExpression;
+
+        public override SValue Evaluate(Scope scope)
+        {
+            switch(token.Type) {
+                case SyntaxType.Bang: return rhs.Evaluate(scope).Not();
+                case SyntaxType.Minus: return rhs.Evaluate(scope).ArithNot();
+                case SyntaxType.Plus: return rhs.Evaluate(scope);
+                default: throw new InvalidOperationException();
+            }
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren()
+        {
+            yield return new TokenNode(token);
+            yield return rhs;
+        }
+    }
+
+    internal class AssignVariableNode : SyntaxNode
+    {
+        private SyntaxToken ident;
+        private SyntaxNode expr;
+
+        public AssignVariableNode(SyntaxToken ident, SyntaxNode expr)
+        {
+            this.ident = ident;
+            this.expr = expr;
+        }
+
+        public override NodeType Type => NodeType.AssignVariable;
+
+        public override SValue Evaluate(Scope scope)
+        {
+            if(scope.Get(ident.Value.ToString()) == null) {
+                throw new InvalidOperationException("Can not assign to a non-existant identifier");
+            }
+
+            var val = expr.Evaluate(scope);
+            scope.Set(ident.Value.ToString(), val);
+            return val;
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren()
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    internal class InitVariableNode : SyntaxNode
+    {
+        private SyntaxToken ident;
+        private SyntaxNode expr;
+
+        public InitVariableNode(SyntaxToken ident)
+        {
+            this.ident = ident;
+        }
+
+        public InitVariableNode(SyntaxToken ident, SyntaxNode expr)
+        {
+            this.ident = ident;
+            this.expr = expr;
+        }
+
+        public override NodeType Type => NodeType.InitVariable;
+
+        public override SValue Evaluate(Scope scope)
+        {
+            if(scope.Get(ident.Value.ToString()) != null) {
+                throw new InvalidOperationException("Can not initiliaze the same variable twice!");
+            }
+
+            var val = expr.Evaluate(scope);
+
+            scope.Set(ident.Value.ToString(), val);
+            return val;
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren()
+        {
+            yield return new TokenNode(ident);
+            yield return expr;
+        }
+    }
+
+    internal class BreakNode : SyntaxNode
+    {
+        public override NodeType Type => NodeType.Break;
+
+        public override SValue Evaluate(Scope scope)
+        {
+            scope.State = ScopeState.ShouldBreak;
+            return SValue.Null;
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren()
+        {
+            return Enumerable.Empty<SyntaxNode>();
+        }
+    }
+
+    internal class ContinueNode : SyntaxNode
+    {
+        public override NodeType Type => NodeType.Continue;
+
+        public override SValue Evaluate(Scope scope)
+        {
+            scope.State = ScopeState.ShouldContinue;
+            return SValue.Null;
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren()
+        {
+            return Enumerable.Empty<SyntaxNode>();
+        }
+    }
+
+    internal class ReturnNode : SyntaxNode
+    {
+        public ReturnNode()
+        {
+        }
+
+        public ReturnNode(SyntaxNode returnValueNode)
+        {
+            ReturnValueNode = returnValueNode;
+        }
+
+        public SyntaxNode ReturnValueNode { get; }
+
+        public override NodeType Type => NodeType.Return;
+
+        public override SValue Evaluate(Scope scope)
+        {
+            scope.State = ScopeState.ShouldReturn;
+
+            if(ReturnValueNode != null) {
+                scope.ReturnValue = ReturnValueNode.Evaluate(scope);
+            }
+
+            return SValue.Null;
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren()
+        {
+            return Enumerable.Empty<SyntaxNode>();
+        }
+    }
+
+    internal class BlockNode : SyntaxNode
+    {
+        private List<SyntaxNode> nodes;
+
+        public BlockNode(List<SyntaxNode> nodes)
+        {
+            this.nodes = nodes;
+        }
+
+        public override NodeType Type => NodeType.Block;
+
+        public override SValue Evaluate(Scope scope)
+        {
+            var lastVal = SValue.Null;
+            var newScope = new Scope(scope);
+
+            foreach (var node in nodes) {
+                var res = node.Evaluate(newScope);
+
+                if(res != SValue.Null) {
+                    lastVal = res;
+                }
+            }
+
+            return lastVal;
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren()
+        {
+            foreach(var node in nodes) yield return node;
+        }
+    }
+
     public abstract class SyntaxNode
     {
-        public abstract NodeType NodeType { get; }
+        public abstract NodeType Type { get; }
 
         public abstract SValue Evaluate(Scope scope);
         public abstract IEnumerable<SyntaxNode> GetChildren();
@@ -304,7 +538,7 @@ namespace spaghetto {
             this.right = right;
         }
 
-        public override NodeType NodeType => NodeType.BinaryExpression;
+        public override NodeType Type => NodeType.BinaryExpression;
 
         public override SValue Evaluate(Scope scope)
         {
@@ -337,13 +571,30 @@ namespace spaghetto {
 
     public class BoolNode : SyntaxNode
     {
+        public override NodeType Type => NodeType.BooleanLiteral;
 
+        public bool Value { get; set; }
+
+        public BoolNode(bool value)
+        {
+            Value = value;
+        }
+
+        public override SValue Evaluate(Scope scope)
+        {
+            return new SInt(Value ? 1 : 0);
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren()
+        {
+            return Enumerable.Empty<SyntaxNode>();
+        }
     }
 
     // dummy node for tree view
     public class TokenNode : SyntaxNode
     {
-        public override NodeType NodeType => NodeType.Token;
+        public override NodeType Type => NodeType.Token;
         public SyntaxToken Token { get; set; }
 
         public TokenNode(SyntaxToken token)
@@ -393,6 +644,16 @@ namespace spaghetto {
         }
 
         public virtual SValue Idx(SValue other)
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual SValue Not()
+        {
+            throw new NotImplementedException();
+        }
+
+        public virtual SValue ArithNot()
         {
             throw new NotImplementedException();
         }
@@ -552,7 +813,15 @@ namespace spaghetto {
     {
         Return,
         BinaryExpression,
-        Token
+        Token,
+        BooleanLiteral,
+        Block,
+        Continue,
+        Break,
+        InitVariable,
+        AssignVariable,
+        UnaryExpression,
+        Dot
     }
 
     public enum SBuiltinType
