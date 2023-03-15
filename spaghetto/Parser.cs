@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -260,7 +262,7 @@ namespace spaghetto {
                 Position++;
                 var block = ParseScopedStatements();
 
-                node.AddCase(new LiteralNode(true), block);
+                node.AddCase(new BoolNode(true), block);
             }
         }
 
@@ -281,6 +283,14 @@ namespace spaghetto {
         }
     }
 
+    public abstract class SyntaxNode
+    {
+        public abstract NodeType NodeType { get; }
+
+        public abstract SValue Evaluate(Scope scope);
+        public abstract IEnumerable<SyntaxNode> GetChildren();
+    }
+
     internal class BinaryExpressionNode : SyntaxNode
     {
         private SyntaxNode left;
@@ -298,7 +308,23 @@ namespace spaghetto {
 
         public override SValue Evaluate(Scope scope)
         {
-            throw new NotImplementedException();
+            var leftRes = left.Evaluate(scope);
+            var rightRes = right.Evaluate(scope);
+
+            switch(operatorToken.Type) {
+                case SyntaxType.Plus:
+                    return leftRes.Add(rightRes);
+                case SyntaxType.Minus:
+                    return leftRes.Sub(rightRes);
+                case SyntaxType.Div:
+                    return leftRes.Div(rightRes);
+                case SyntaxType.Mul:
+                    return leftRes.Mul(rightRes);
+                case SyntaxType.Mod:
+                    return leftRes.Mod(rightRes);
+                default:
+                    throw new NotImplementedException();
+            }
         }
 
         public override IEnumerable<SyntaxNode> GetChildren()
@@ -309,99 +335,212 @@ namespace spaghetto {
         }
     }
 
+    public class BoolNode : SyntaxNode
+    {
+
+    }
+
+    // dummy node for tree view
+    public class TokenNode : SyntaxNode
+    {
+        public override NodeType NodeType => NodeType.Token;
+        public SyntaxToken Token { get; set; }
+
+        public TokenNode(SyntaxToken token)
+        {
+            Token = token;
+        }
+
+        public override SValue Evaluate(Scope scope)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren()
+        {
+            return Enumerable.Empty<SyntaxNode>();
+        }
+    }
+
     public abstract class SValue
     {
-        private static List<PrimitiveCompatibility> primitiveCompatibilities = new()
-        {
-            new(SPrimitiveType.Int, SyntaxType.Plus, SPrimitiveType.Int),
-            new(SPrimitiveType.Int, SyntaxType.Minus, SPrimitiveType.Int),
-            new(SPrimitiveType.Int, SyntaxType.Mul, SPrimitiveType.Int),
-            new(SPrimitiveType.Int, SyntaxType.Div, SPrimitiveType.Int),
-            new(SPrimitiveType.Int, SyntaxType.Mod, SPrimitiveType.Int),
-
-            new(SPrimitiveType.Float, SyntaxType.Plus, SPrimitiveType.Float),
-            new(SPrimitiveType.Float, SyntaxType.Minus, SPrimitiveType.Float),
-            new(SPrimitiveType.Float, SyntaxType.Mul, SPrimitiveType.Float),
-            new(SPrimitiveType.Float, SyntaxType.Div, SPrimitiveType.Float),
-            new(SPrimitiveType.Float, SyntaxType.Mod, SPrimitiveType.Float),
-
-            new(SPrimitiveType.String, SyntaxType.Plus, SPrimitiveType.String),
-            new(SPrimitiveType.String, SyntaxType.Idx, SPrimitiveType.Int),
-        };
-
-        public static SValue Null => new SNumber(0);
-
-        public abstract bool IsPrimitive { get; }
-        public abstract SPrimitiveType PrimitiveType { get; }
-
-        public bool DoPrimitiveActions = false;
+        public static SValue Null => new SInt(0);
+        public abstract SBuiltinType BuiltinName { get; }
 
         public virtual SValue Add(SValue other)
         {
-            CheckCompatibility(SyntaxType.Plus, other);
-            return SValue.Null;
+            throw new NotImplementedException();
         }
 
         public virtual SValue Sub(SValue other)
         {
-            CheckCompatibility(SyntaxType.Minus, other);
-            return SValue.Null;
+            throw new NotImplementedException();
         }
 
         public virtual SValue Mul(SValue other)
         {
-            CheckCompatibility(SyntaxType.Mul, other);
-            return SValue.Null;
+            throw new NotImplementedException();
         }
 
         public virtual SValue Div(SValue other)
         {
-            CheckCompatibility(SyntaxType.Div, other);
-            return SValue.Null;
+            throw new NotImplementedException();
         }
 
         public virtual SValue Mod(SValue other)
         {
-            CheckCompatibility(SyntaxType.Mod, other);
-            return SValue.Null;
+            throw new NotImplementedException();
         }
 
         public virtual SValue Idx(SValue other)
         {
-            CheckCompatibility(SyntaxType.Idx, other);
-            return SValue.Null;
+            throw new NotImplementedException();
         }
 
-
-
-        protected void CheckCompatibility(SyntaxType type, SValue other)
+        public override string ToString()
         {
-            if (this.IsPrimitive && other.IsPrimitive) {
-                DoPrimitiveActions = true;
+            return BuiltinName.ToString();
+        }
 
-                if (!primitiveCompatibilities.Contains(new(PrimitiveType, SyntaxType.Plus, other.PrimitiveType))) {
-                    throw new Exception($"Unsupported binary operator + on primitives of type {PrimitiveType} and {other.PrimitiveType}");
-                }
-            }else {
-                // FIXME: Fix when non-primitives are added
-            }
+        public virtual SString ToSpagString()
+        {
+            return new SString("<unknown of type " + BuiltinName.ToString() + ">");
         }
     }
 
-    public abstract class SyntaxNode
+    public abstract class SNumber<T, TSelf> : SValue
+        where T : IAdditionOperators<T, T, T>, ISubtractionOperators<T, T, T>, IMultiplyOperators<T, T, T>, IDivisionOperators<T, T, T>, IModulusOperators<T, T, T>, new()
+        where TSelf : SNumber<T, TSelf>, new()
     {
-        public abstract NodeType NodeType { get; }
+        public T Value { get; set; }
 
-        public abstract object Evaluate(Scope scope);
-        public abstract IEnumerable<SyntaxNode> GetChildren();
+        public virtual SValue Add(SValue other)
+        {
+            if (other is not SNumber<T, TSelf> otherNumber) throw new NotImplementedException();
+            var res = otherNumber.Value + Value;
+
+            var resSVal = new TSelf();
+            resSVal.Value = res;
+
+            return resSVal;
+        }
+
+        public virtual SValue Sub(SValue other)
+        {
+            if (other is not SNumber<T, TSelf> otherNumber) throw new NotImplementedException();
+            var res = otherNumber.Value - Value;
+
+            var resSVal = new TSelf();
+            resSVal.Value = res;
+
+            return resSVal;
+        }
+
+        public virtual SValue Div(SValue other)
+        {
+            if (other is not SNumber<T, TSelf> otherNumber) throw new NotImplementedException();
+            var res = otherNumber.Value / Value;
+
+            var resSVal = new TSelf();
+            resSVal.Value = res;
+
+            return resSVal;
+        }
+
+        public virtual SValue Mul(SValue other)
+        {
+            if (other is not SNumber<T, TSelf> otherNumber) throw new NotImplementedException();
+            var res = otherNumber.Value * Value;
+
+            var resSVal = new TSelf();
+            resSVal.Value = res;
+
+            return resSVal;
+        }
+
+        public virtual SValue Mod(SValue other)
+        {
+            if (other is not SNumber<T, TSelf> otherNumber) throw new NotImplementedException();
+            var res = otherNumber.Value % Value;
+
+            var resSVal = new TSelf();
+            resSVal.Value = res;
+
+            return resSVal;
+        }
+
+        public override string ToString()
+        {
+            return $"<{GetType().Name} value={Value}>";
+        }
+
+        public override SString ToSpagString()
+        {
+            return new SString(Value.ToString());
+        }
     }
+
+    public class SInt : SNumber<int, SInt>
+    {
+        public override SBuiltinType BuiltinName => SBuiltinType.Int;
+        public new int Value { get; set; } = 0;
+
+        public SInt() { }
+
+        public SInt(int value)
+        {
+            Value = value;
+        }
+    }
+
+    public class SFloat : SNumber<float, SFloat>
+    {
+        public override SBuiltinType BuiltinName => SBuiltinType.Float;
+        public new float Value { get; set; } = 0;
+
+        public SFloat() { }
+
+        public SFloat(float value)
+        {
+            Value = value;
+        }
+    }
+
+    public class SString : SValue
+    {
+        public string Value { get; set; }
+        public override SBuiltinType BuiltinName => SBuiltinType.String;
+
+        public SString() { }
+        public SString(string value)
+        {
+            Value = value;
+        }
+
+        public override SString ToSpagString()
+        {
+            return new SString(Value);
+        }
+
+        public override string ToString()
+        {
+            return $"<SString Value={Value}>";
+        }
+
+        public override SValue Add(SValue other)
+        {
+            if (other is not SString @string) throw new NotImplementedException();
+            return new SString(Value + @string.Value);
+        }
+    }
+
 
     public struct PrimitiveCompatibility
     {
-        public SPrimitiveType LHS, RHS;
+        public SBuiltinType LHS, RHS;
         public SyntaxType Operator;
 
-        public PrimitiveCompatibility(SPrimitiveType lhs, SyntaxType op, SPrimitiveType rhs)
+        public PrimitiveCompatibility(SBuiltinType lhs, SyntaxType op, SBuiltinType rhs)
         {
             LHS = lhs;
             Operator = op;
@@ -412,10 +551,11 @@ namespace spaghetto {
     public enum NodeType
     {
         Return,
-        BinaryExpression
+        BinaryExpression,
+        Token
     }
 
-    public enum SPrimitiveType
+    public enum SBuiltinType
     {
         String,
         Int,
