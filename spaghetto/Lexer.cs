@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -173,11 +174,11 @@ namespace spaghetto {
             string numStr = "";
             bool isDecimal = false;
 
-            while(char.IsDigit(Current) && Current != '\0') {
+            while((char.IsDigit(Current) || Current == '.') && Current != '\0') {
                 numStr += Current;
 
                 if(Current == '.') {
-                    if (isDecimal) throw new Exception("Invalid number!");
+                    if (isDecimal) throw new Exception("Invalid number (contained too many dots)!");
                     isDecimal = true;
                 }
 
@@ -185,7 +186,7 @@ namespace spaghetto {
             }
 
             if(isDecimal) {
-                if (!float.TryParse(numStr, out float floatVal)) throw new Exception("Invalid number!");
+                if (!float.TryParse(numStr, CultureInfo.InvariantCulture, out float floatVal)) throw new Exception("Invalid number (tried to parse " + numStr + " as float)");
                 return new(SyntaxType.Float, Position-1, floatVal, numStr);
             }else {
                 if (!int.TryParse(numStr, out int intVal)) throw new Exception("Invalid number!");
