@@ -82,7 +82,7 @@ namespace spaghetto {
         }
 
         public SyntaxNode ParseStatement() {
-            if(Current.Type == SyntaxType.Keyword && Current.Value == "return") {
+            if(Current.Type == SyntaxType.Keyword && Current.Text == "return") {
                 if(Peek(1).Type == SyntaxType.Semicolon) {
                     Position++;
                     return new ReturnNode();
@@ -90,10 +90,10 @@ namespace spaghetto {
                     Position++;
                     return new ReturnNode(ParseExpression());
                 }
-            }else if(Current.Type == SyntaxType.Keyword && Current.Value == "continue") {
+            }else if(Current.Type == SyntaxType.Keyword && Current.Text == "continue") {
                 Position++;
                 return new ContinueNode();
-            } else if (Current.Type == SyntaxType.Keyword && Current.Value == "break") {
+            } else if (Current.Type == SyntaxType.Keyword && Current.Text == "break") {
                 Position++;
                 return new BreakNode();
             }else {
@@ -105,7 +105,7 @@ namespace spaghetto {
         }
 
         public SyntaxNode ParseExpression() {
-            if(Current.Type == SyntaxType.Keyword && Current.Value == "var") {
+            if(Current.Type == SyntaxType.Keyword && Current.Text == "var") {
                 Position++;
                 var ident = MatchToken(SyntaxType.Identifier);
 
@@ -116,7 +116,7 @@ namespace spaghetto {
                 }else {
                     return new InitVariableNode(ident);
                 }
-            }else if(Current.Type == SyntaxType.Identifier) {
+            }else if(Current.Type == SyntaxType.Identifier && Peek(1).Type == SyntaxType.Equals) {
                 var ident = MatchToken(SyntaxType.Identifier);
                 MatchToken(SyntaxType.Equals);
                 var expr = ParseExpression();
