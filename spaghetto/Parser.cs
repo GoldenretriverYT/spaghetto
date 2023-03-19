@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -27,7 +29,7 @@ namespace spaghetto {
             throw new Exception("Unexpected token " + Current.Type + "; expected " + type);
         }
 
-        public SyntaxToken MatchToken(SyntaxType type, object value)
+        public SyntaxToken MatchTokenWithValue(SyntaxType type, object value)
         {
             if (Current.Type == type && Current.Value == value) {
                 Position++;
@@ -35,6 +37,15 @@ namespace spaghetto {
             }
 
             throw new Exception("Unexpected token " + Current.Type + "; expected " + type + " with value " + value);
+        }
+
+        public SyntaxToken MatchKeyword(string value) {
+            if (Current.Type == SyntaxType.Keyword && Current.Text == value) {
+                Position++;
+                return Peek(-1);
+            }
+
+            throw new Exception("Unexpected token " + Current.Type + "; expected Keyword with value " + value);
         }
 
         public Parser(List<SyntaxToken> tokens) {
@@ -86,7 +97,6 @@ namespace spaghetto {
                 Position++;
                 return new BreakNode();
             }else {
-                Position++;
                 var exprNode = ParseExpression();
                 MatchToken(SyntaxType.Semicolon);
 
@@ -154,17 +164,17 @@ namespace spaghetto {
             var callNode = ParseCallExpression();
             DotNode accessStack = new(callNode);
 
-            if(Current.Type is SyntaxType.Dot) {
-                while(Current.Type is SyntaxType.Dot) {
+            if (Current.Type is SyntaxType.Dot) {
+                while (Current.Type is SyntaxType.Dot) {
                     Position++;
 
-                    if(Current.Type is SyntaxType.Identifier) {
+                    if (Current.Type is SyntaxType.Identifier) {
                         var n = ParseCallExpression();
 
                         accessStack.NextNodes.Add(n);
                     }
                 }
-            }
+            } else return callNode;
 
             return accessStack;
         }
@@ -209,24 +219,29 @@ namespace spaghetto {
                 return new StringLiteralNode(Peek(-1));
             } else if (Current.Type is SyntaxType.Identifier) {
                 Position++;
-                return new ReadVariableNode(Peek(-1));
+                return new IdentifierNode(Peek(-1));
             } else if(Current.Type is SyntaxType.LParen) {
+                Position++;
                 var expr = ParseExpression();
 
                 MatchToken(SyntaxType.RParen);
+
+                return expr; // TODO: Do we have to create a ParenthisizedExpr? (probably not, but what if we do?)
             } else if (Current.Type is SyntaxType.LSqBracket) {
                 return ParseListExpression();
-            } else if (Current.Type is SyntaxType.Keyword && Current.Value == "if") {
+            } else if (Current.Type is SyntaxType.Keyword && Current.Text == "if") {
                 return ParseIfExpression();
-            } else if (Current.Type is SyntaxType.Keyword && Current.Value == "for") {
+            } else if (Current.Type is SyntaxType.Keyword && Current.Text == "for") {
                 throw new NotImplementedException();
                 //return ParseForExpression();
-            } else if (Current.Type is SyntaxType.Keyword && Current.Value == "while") {
+            } else if (Current.Type is SyntaxType.Keyword && Current.Text == "while") {
                 throw new NotImplementedException();
                 //return ParseWhileExpression();
-            } else if (Current.Type is SyntaxType.Keyword && Current.Value == "func") {
+            } else if (Current.Type is SyntaxType.Keyword && Current.Text == "func") {
                 throw new NotImplementedException();
                 //return ParseFuncExpression();
+            }else {
+                throw new Exception("Unexpected token in atom expression!");
             }
         }
 
@@ -248,7 +263,7 @@ namespace spaghetto {
         }
 
         public SyntaxNode ParseIfExpression() {
-            MatchToken(SyntaxType.Keyword, "if");
+            MatchKeyword("if");
 
             IfNode node = new();
 
@@ -260,7 +275,7 @@ namespace spaghetto {
 
             node.AddCase(initialCond, initialBlock);
 
-            do {
+            while (Current.Type == SyntaxType.Keyword && (string)Current.Value == "elseif") {
                 Position++;
 
                 MatchToken(SyntaxType.LParen);
@@ -269,14 +284,16 @@ namespace spaghetto {
                 var block = ParseScopedStatements();
 
                 node.AddCase(cond, block);
-            } while (Current.Type == SyntaxType.Keyword && (string)Current.Value == "elseif");
+            }
 
-            if(Current.Type == SyntaxType.Keyword && Current.Value == "else") {
+            if(Current.Type == SyntaxType.Keyword && Current.Text == "else") {
                 Position++;
                 var block = ParseScopedStatements();
 
                 node.AddCase(new BoolNode(true), block);
             }
+
+            return node;
         }
 
         public SyntaxNode BinaryOperation(Func<SyntaxNode> leftParse, List<SyntaxType> allowedTypes, Func<SyntaxNode> rightParse = null) {
@@ -296,6 +313,185 @@ namespace spaghetto {
         }
     }
 
+    internal class IfNode : SyntaxNode {
+        public List<(SyntaxNode cond, SyntaxNode block)> Conditions { get; private set; } = new();
+
+        public override NodeType Type => NodeType.If;
+
+        public override SValue Evaluate(Scope scope) {
+            foreach((SyntaxNode cond, SyntaxNode block) in Conditions) {
+                var condRes = cond.Evaluate(scope);
+
+                if(condRes.IsTruthy()) {
+                    return block.Evaluate(new Scope(scope));
+                }
+            }
+
+            return SValue.Null;
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren() {
+            foreach(var n in Conditions) {
+                yield return n.cond;
+                yield return n.block;
+            }
+        }
+
+        internal void AddCase(SyntaxNode cond, SyntaxNode block) {
+            Conditions.Add((cond, block));
+        }
+
+        public override string ToString() {
+            return "IfNode:";
+        }
+    }
+
+    internal class ListNode : SyntaxNode {
+        private List<SyntaxNode> list;
+
+        public ListNode(List<SyntaxNode> list) {
+            this.list = list;
+        }
+
+        public override NodeType Type => NodeType.List;
+
+        public override SValue Evaluate(Scope scope) {
+            throw new Exception("Implementation pending.");
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren() {
+            foreach (var n in list) yield return n;
+        }
+
+        public override string ToString() {
+            return "ListNode:";
+        }
+    }
+
+    internal class IdentifierNode : SyntaxNode {
+        public SyntaxToken Token { get; private set; }
+
+        public IdentifierNode(SyntaxToken syntaxToken) {
+            this.Token = syntaxToken;
+        }
+
+        public override NodeType Type => NodeType.Identifier;
+
+        public override SValue Evaluate(Scope scope) {
+            return scope.Get((string)Token.Value);
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren() {
+            yield return new TokenNode(Token);
+        }
+
+        public override string ToString() {
+            return "IdentNode:";
+        }
+    }
+
+    internal class IntLiteralNode : SyntaxNode {
+        private SyntaxToken syntaxToken;
+
+        public IntLiteralNode(SyntaxToken syntaxToken) {
+            this.syntaxToken = syntaxToken;
+        }
+
+        public override NodeType Type => NodeType.IntLiteral;
+
+        public override SValue Evaluate(Scope scope) {
+            var sint = new SInt((int)syntaxToken.Value);
+            return sint;
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren() {
+            yield return new TokenNode(syntaxToken);
+        }
+
+        public override string ToString() {
+            return "IntLitNode:";
+        }
+    }
+
+    internal class FloatLiteralNode : SyntaxNode {
+        private SyntaxToken syntaxToken;
+
+        public FloatLiteralNode(SyntaxToken syntaxToken) {
+            this.syntaxToken = syntaxToken;
+        }
+
+        public override NodeType Type => NodeType.FloatLiteral;
+
+        public override SValue Evaluate(Scope scope) {
+            return new SFloat((float)syntaxToken.Value);
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren() {
+            yield return new TokenNode(syntaxToken);
+        }
+
+        public override string ToString() {
+            return "FloatLitNode:";
+        }
+    }
+
+    internal class StringLiteralNode : SyntaxNode {
+        private SyntaxToken syntaxToken;
+
+        public StringLiteralNode(SyntaxToken syntaxToken) {
+            this.syntaxToken = syntaxToken;
+        }
+
+        public override NodeType Type => NodeType.StringLiteral;
+
+        public override SValue Evaluate(Scope scope) {
+            return new SString((string)syntaxToken.Value);
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren() {
+            yield return new TokenNode(syntaxToken);
+        }
+
+        public override string ToString() {
+            return "StringLitNode:";
+        }
+    }
+
+    internal class CallNode : SyntaxNode {
+        public SyntaxNode ToCallNode { get; set; }
+        private List<SyntaxNode> argumentNodes;
+
+        public CallNode(SyntaxNode atomNode, List<SyntaxNode> argumentNodes) {
+            ToCallNode = atomNode;
+            this.argumentNodes = argumentNodes;
+        }
+
+        public override NodeType Type => NodeType.Call;
+
+        public override SValue Evaluate(Scope scope) {
+            var toCall = ToCallNode.Evaluate(scope);
+            var args = EvaluateArgs(scope);
+
+            return toCall.Call(args);
+        }
+
+        public List<SValue> EvaluateArgs(Scope scope) {
+            var args = new List<SValue>();
+
+            foreach (var n in argumentNodes) args.Add(n.Evaluate(scope));
+            return args;
+        }
+            
+        public override IEnumerable<SyntaxNode> GetChildren() {
+            yield return ToCallNode;
+            foreach (var n in argumentNodes) yield return n;
+        }
+
+        public override string ToString() {
+            return "CallNode:";
+        }
+    }
+
     internal class DotNode : SyntaxNode
     {
         public DotNode(SyntaxNode callNode)
@@ -304,22 +500,42 @@ namespace spaghetto {
         }
 
         public SyntaxNode CallNode { get; }
-        public List<SyntaxNode> NextNodes { get; internal set; }
+        public List<SyntaxNode> NextNodes { get; internal set; } = new();
 
         public override NodeType Type => NodeType.Dot;
 
         public override SValue Evaluate(Scope scope)
         {
-            var currentNode = CallNode.Evaluate(scope);
+            var currentValue = CallNode.Evaluate(scope);
 
             foreach(var node in NextNodes) {
-
+                if(node is IdentifierNode rvn) {
+                    var ident = rvn.Token;
+                    currentValue = currentValue.Dot(new SString((string)ident.Value));
+                }else if(node is CallNode cn) {
+                    if(cn.ToCallNode is IdentifierNode cnIdentNode) {
+                        var ident = cnIdentNode.Token;
+                        currentValue = currentValue.Dot(new SString((string)ident.Value)).Call(cn.EvaluateArgs(scope));
+                    }else {
+                        throw new Exception("Tried to call a non identifier in dot not stack.");
+                    }
+                }else {
+                    throw new Exception("Unexpected node in dot node stack!");
+                }
             }
+
+            return currentValue;
         }
 
         public override IEnumerable<SyntaxNode> GetChildren()
         {
-            throw new NotImplementedException();
+            yield return CallNode;
+
+            foreach (var node in NextNodes) yield return node;
+        }
+
+        public override string ToString() {
+            return "DotNode:";
         }
     }
 
@@ -351,6 +567,10 @@ namespace spaghetto {
             yield return new TokenNode(token);
             yield return rhs;
         }
+
+        public override string ToString() {
+            return "UnaryExpressionNode:";
+        }
     }
 
     internal class AssignVariableNode : SyntaxNode
@@ -373,13 +593,22 @@ namespace spaghetto {
             }
 
             var val = expr.Evaluate(scope);
-            scope.Set(ident.Value.ToString(), val);
+            var key = ident.Value.ToString();
+            var prevVal = scope.Get(key);
+            if (prevVal.BuiltinName != val.BuiltinName)
+                throw new InvalidOperationException("A variables type may not change after initilization (Tried to assign " + val.BuiltinName + " to " + prevVal.BuiltinName + ")");
+            scope.Set(key, val);
             return val;
         }
 
         public override IEnumerable<SyntaxNode> GetChildren()
         {
-            throw new NotImplementedException();
+            yield return new TokenNode(ident);
+            yield return expr;
+        }
+
+        public override string ToString() {
+            return "AssignVariableNode:";
         }
     }
 
@@ -418,6 +647,10 @@ namespace spaghetto {
             yield return new TokenNode(ident);
             yield return expr;
         }
+
+        public override string ToString() {
+            return "InitVariableNode:";
+        }
     }
 
     internal class BreakNode : SyntaxNode
@@ -434,6 +667,10 @@ namespace spaghetto {
         {
             return Enumerable.Empty<SyntaxNode>();
         }
+
+        public override string ToString() {
+            return "BreakNode:";
+        }
     }
 
     internal class ContinueNode : SyntaxNode
@@ -449,6 +686,10 @@ namespace spaghetto {
         public override IEnumerable<SyntaxNode> GetChildren()
         {
             return Enumerable.Empty<SyntaxNode>();
+        }
+
+        public override string ToString() {
+            return "ContinueNode:";
         }
     }
 
@@ -482,6 +723,10 @@ namespace spaghetto {
         {
             return Enumerable.Empty<SyntaxNode>();
         }
+
+        public override string ToString() {
+            return "ReturnNode:";
+        }
     }
 
     internal class BlockNode : SyntaxNode
@@ -514,6 +759,10 @@ namespace spaghetto {
         public override IEnumerable<SyntaxNode> GetChildren()
         {
             foreach(var node in nodes) yield return node;
+        }
+
+        public override string ToString() {
+            return "BlockNode:";
         }
     }
 
@@ -556,6 +805,8 @@ namespace spaghetto {
                     return leftRes.Mul(rightRes);
                 case SyntaxType.Mod:
                     return leftRes.Mod(rightRes);
+                case SyntaxType.EqualsEquals:
+                    return leftRes.Equals(rightRes);
                 default:
                     throw new NotImplementedException();
             }
@@ -566,6 +817,10 @@ namespace spaghetto {
             yield return left;
             yield return new TokenNode(operatorToken);
             yield return right;
+        }
+
+        public override string ToString() {
+            return "BinaryExprNode: op=" + operatorToken.Type;
         }
     }
 
@@ -589,6 +844,10 @@ namespace spaghetto {
         {
             return Enumerable.Empty<SyntaxNode>();
         }
+
+        public override string ToString() {
+            return "BoolNode: " + Value;
+        }
     }
 
     // dummy node for tree view
@@ -610,6 +869,10 @@ namespace spaghetto {
         public override IEnumerable<SyntaxNode> GetChildren()
         {
             return Enumerable.Empty<SyntaxNode>();
+        }
+
+        public override string ToString() {
+            return "TokenNode: " + Token.Type.ToString() + " val=" + Token.Value?.ToString() + " text=" + Token.Text.ToString();
         }
     }
 
@@ -648,6 +911,18 @@ namespace spaghetto {
             throw new NotImplementedException();
         }
 
+        public virtual SValue Dot(SValue other) {
+            throw new NotImplementedException();
+        }
+
+        public virtual SValue Equals(SValue other) {
+            throw new NotImplementedException();
+        }
+
+        public virtual SValue Call(List<SValue> args) {
+            throw new NotImplementedException();
+        }
+
         public virtual SValue Not()
         {
             throw new NotImplementedException();
@@ -657,6 +932,8 @@ namespace spaghetto {
         {
             throw new NotImplementedException();
         }
+
+        public abstract bool IsTruthy();
 
         public override string ToString()
         {
@@ -675,9 +952,9 @@ namespace spaghetto {
     {
         public T Value { get; set; }
 
-        public virtual SValue Add(SValue other)
+        public override SValue Add(SValue other)
         {
-            if (other is not SNumber<T, TSelf> otherNumber) throw new NotImplementedException();
+            if (other is not SNumber<T, TSelf> otherNumber) throw new NotImplementedException("Can not add SNumber to " + other.GetType().Name);
             var res = otherNumber.Value + Value;
 
             var resSVal = new TSelf();
@@ -686,7 +963,7 @@ namespace spaghetto {
             return resSVal;
         }
 
-        public virtual SValue Sub(SValue other)
+        public override SValue Sub(SValue other)
         {
             if (other is not SNumber<T, TSelf> otherNumber) throw new NotImplementedException();
             var res = otherNumber.Value - Value;
@@ -697,7 +974,7 @@ namespace spaghetto {
             return resSVal;
         }
 
-        public virtual SValue Div(SValue other)
+        public override SValue Div(SValue other)
         {
             if (other is not SNumber<T, TSelf> otherNumber) throw new NotImplementedException();
             var res = otherNumber.Value / Value;
@@ -708,7 +985,7 @@ namespace spaghetto {
             return resSVal;
         }
 
-        public virtual SValue Mul(SValue other)
+        public override SValue Mul(SValue other)
         {
             if (other is not SNumber<T, TSelf> otherNumber) throw new NotImplementedException();
             var res = otherNumber.Value * Value;
@@ -719,7 +996,7 @@ namespace spaghetto {
             return resSVal;
         }
 
-        public virtual SValue Mod(SValue other)
+        public override SValue Mod(SValue other)
         {
             if (other is not SNumber<T, TSelf> otherNumber) throw new NotImplementedException();
             var res = otherNumber.Value % Value;
@@ -741,16 +1018,62 @@ namespace spaghetto {
         }
     }
 
-    public class SInt : SNumber<int, SInt>
+    public class SInt : SValue
     {
         public override SBuiltinType BuiltinName => SBuiltinType.Int;
-        public new int Value { get; set; } = 0;
+        public int Value { get; set; }
 
-        public SInt() { }
+        public SInt() {
+            Value = 0;
+        }
 
         public SInt(int value)
         {
+            Debug.WriteLine("Setting to " + value);
             Value = value;
+            Debug.WriteLine("Set to " + Value);
+        }
+
+        public override SValue Add(SValue other) {
+            if (other is not SInt otherInt) throw new Exception("Can not perform Add on SInt and " + other.GetType().Name);
+            return new SInt(Value + otherInt.Value);
+        }
+
+        public override SValue Sub(SValue other) {
+            if (other is not SInt otherInt) throw new Exception("Can not perform Sub on SInt and " + other.GetType().Name);
+            return new SInt(Value - otherInt.Value);
+        }
+
+        public override SValue Mul(SValue other) {
+            if (other is not SInt otherInt) throw new Exception("Can not perform Mul on SInt and " + other.GetType().Name);
+            return new SInt(Value * otherInt.Value);
+        }
+
+        public override SValue Div(SValue other) {
+            if (other is not SInt otherInt) throw new Exception("Can not perform Div on SInt and " + other.GetType().Name);
+            return new SInt(Value / otherInt.Value);
+        }
+
+        public override SValue Mod(SValue other) {
+            if (other is not SInt otherInt) throw new Exception("Can not perform Mod on SInt and " + other.GetType().Name);
+            return new SInt(Value % otherInt.Value);
+        }
+
+        public override SValue Equals(SValue other) {
+            if (other is not SInt otherInt) throw new Exception("Can not perform EqualsCheck on SInt and " + other.GetType().Name);
+            return new SInt(Value == otherInt.Value ? 1 : 0);
+        }
+
+        public override bool IsTruthy() {
+            return Value == 1;
+        }
+
+        public override string ToString() {
+            return $"<{GetType().Name} value={Value}>";
+        }
+
+        public override SString ToSpagString() {
+            return new SString(Value.ToString());
         }
     }
 
@@ -764,6 +1087,10 @@ namespace spaghetto {
         public SFloat(float value)
         {
             Value = value;
+        }
+
+        public override bool IsTruthy() {
+            return Value == 1;
         }
     }
 
@@ -793,6 +1120,10 @@ namespace spaghetto {
             if (other is not SString @string) throw new NotImplementedException();
             return new SString(Value + @string.Value);
         }
+
+        public override bool IsTruthy() {
+            return Value != null;
+        }
     }
 
 
@@ -821,7 +1152,14 @@ namespace spaghetto {
         InitVariable,
         AssignVariable,
         UnaryExpression,
-        Dot
+        Dot,
+        Call,
+        IntLiteral,
+        FloatLiteral,
+        StringLiteral,
+        Identifier,
+        List,
+        If
     }
 
     public enum SBuiltinType
