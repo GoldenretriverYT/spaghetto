@@ -90,7 +90,7 @@ namespace spaghetto {
                         insertToken = (new(SyntaxType.Div, Position, null, Current.ToString()));
                         break;
                     case '#':
-                        insertToken = (new(SyntaxType.Div, Position, null, Current.ToString()));
+                        insertToken = (new(SyntaxType.Idx, Position, null, Current.ToString()));
                         break;
                     case '.':
                         insertToken = (new(SyntaxType.Dot, Position, null, Current.ToString()));

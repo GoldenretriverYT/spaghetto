@@ -250,14 +250,20 @@ namespace spaghetto {
 
             List<SyntaxNode> list = new();
 
-            do {
+            if (Current.Type == SyntaxType.RSqBracket) {
+                MatchToken(SyntaxType.RSqBracket);
+            } else {
                 var expr = ParseExpression();
                 list.Add(expr);
 
-                Position++;
-            } while (Current.Type == SyntaxType.Comma);
+                while (Current.Type == SyntaxType.Comma) {
+                    Position++;
+                    expr = ParseExpression();
+                    list.Add(expr);
+                }
 
-            MatchToken(SyntaxType.RSqBracket);
+                MatchToken(SyntaxType.RSqBracket);
+            }
 
             return new ListNode(list);
         }
@@ -356,7 +362,13 @@ namespace spaghetto {
         public override NodeType Type => NodeType.List;
 
         public override SValue Evaluate(Scope scope) {
-            throw new Exception("Implementation pending.");
+            SList sList = new();
+
+            foreach(var n in list) {
+                sList.Value.Add(n.Evaluate(scope));
+            }
+
+            return sList;
         }
 
         public override IEnumerable<SyntaxNode> GetChildren() {
@@ -807,6 +819,8 @@ namespace spaghetto {
                     return leftRes.Mod(rightRes);
                 case SyntaxType.EqualsEquals:
                     return leftRes.Equals(rightRes);
+                case SyntaxType.Idx:
+                    return leftRes.Idx(rightRes);
                 default:
                     throw new NotImplementedException();
             }
@@ -946,78 +960,6 @@ namespace spaghetto {
         }
     }
 
-    public abstract class SNumber<T, TSelf> : SValue
-        where T : IAdditionOperators<T, T, T>, ISubtractionOperators<T, T, T>, IMultiplyOperators<T, T, T>, IDivisionOperators<T, T, T>, IModulusOperators<T, T, T>, new()
-        where TSelf : SNumber<T, TSelf>, new()
-    {
-        public T Value { get; set; }
-
-        public override SValue Add(SValue other)
-        {
-            if (other is not SNumber<T, TSelf> otherNumber) throw new NotImplementedException("Can not add SNumber to " + other.GetType().Name);
-            var res = otherNumber.Value + Value;
-
-            var resSVal = new TSelf();
-            resSVal.Value = res;
-
-            return resSVal;
-        }
-
-        public override SValue Sub(SValue other)
-        {
-            if (other is not SNumber<T, TSelf> otherNumber) throw new NotImplementedException();
-            var res = otherNumber.Value - Value;
-
-            var resSVal = new TSelf();
-            resSVal.Value = res;
-
-            return resSVal;
-        }
-
-        public override SValue Div(SValue other)
-        {
-            if (other is not SNumber<T, TSelf> otherNumber) throw new NotImplementedException();
-            var res = otherNumber.Value / Value;
-
-            var resSVal = new TSelf();
-            resSVal.Value = res;
-
-            return resSVal;
-        }
-
-        public override SValue Mul(SValue other)
-        {
-            if (other is not SNumber<T, TSelf> otherNumber) throw new NotImplementedException();
-            var res = otherNumber.Value * Value;
-
-            var resSVal = new TSelf();
-            resSVal.Value = res;
-
-            return resSVal;
-        }
-
-        public override SValue Mod(SValue other)
-        {
-            if (other is not SNumber<T, TSelf> otherNumber) throw new NotImplementedException();
-            var res = otherNumber.Value % Value;
-
-            var resSVal = new TSelf();
-            resSVal.Value = res;
-
-            return resSVal;
-        }
-
-        public override string ToString()
-        {
-            return $"<{GetType().Name} value={Value}>";
-        }
-
-        public override SString ToSpagString()
-        {
-            return new SString(Value.ToString());
-        }
-    }
-
     public class SInt : SValue
     {
         public override SBuiltinType BuiltinName => SBuiltinType.Int;
@@ -1077,20 +1019,60 @@ namespace spaghetto {
         }
     }
 
-    public class SFloat : SNumber<float, SFloat>
-    {
+    public class SFloat : SValue {
         public override SBuiltinType BuiltinName => SBuiltinType.Float;
-        public new float Value { get; set; } = 0;
+        public float Value { get; set; }
 
-        public SFloat() { }
+        public SFloat() {
+            Value = 0;
+        }
 
-        public SFloat(float value)
-        {
+        public SFloat(float value) {
+            Debug.WriteLine("Setting to " + value);
             Value = value;
+            Debug.WriteLine("Set to " + Value);
+        }
+
+        public override SValue Add(SValue other) {
+            if (other is not SFloat otherInt) throw new Exception("Can not perform Add on SFloat and " + other.GetType().Name);
+            return new SFloat(Value + otherInt.Value);
+        }
+
+        public override SValue Sub(SValue other) {
+            if (other is not SFloat otherInt) throw new Exception("Can not perform Sub on SFloat and " + other.GetType().Name);
+            return new SFloat(Value - otherInt.Value);
+        }
+
+        public override SValue Mul(SValue other) {
+            if (other is not SFloat otherInt) throw new Exception("Can not perform Mul on SFloat and " + other.GetType().Name);
+            return new SFloat(Value * otherInt.Value);
+        }
+
+        public override SValue Div(SValue other) {
+            if (other is not SFloat otherInt) throw new Exception("Can not perform Div on SFloat and " + other.GetType().Name);
+            return new SFloat(Value / otherInt.Value);
+        }
+
+        public override SValue Mod(SValue other) {
+            if (other is not SFloat otherInt) throw new Exception("Can not perform Mod on SFloat and " + other.GetType().Name);
+            return new SFloat(Value % otherInt.Value);
+        }
+
+        public override SValue Equals(SValue other) {
+            if (other is not SFloat otherInt) throw new Exception("Can not perform EqualsCheck on SFloat and " + other.GetType().Name);
+            return new SInt(Value == otherInt.Value ? 1 : 0);
         }
 
         public override bool IsTruthy() {
             return Value == 1;
+        }
+
+        public override string ToString() {
+            return $"<{GetType().Name} value={Value}>";
+        }
+
+        public override SString ToSpagString() {
+            return new SString(Value.ToString());
         }
     }
 
@@ -1126,6 +1108,31 @@ namespace spaghetto {
         }
     }
 
+    public class SList : SValue {
+        public List<SValue> Value { get; set; } = new();
+        public override SBuiltinType BuiltinName => SBuiltinType.List;
+
+        public SList() { }
+
+        public override SString ToSpagString() {
+            return new SString(string.Join(", ", Value));
+        }
+
+        public override string ToString() {
+            return $"<SString Value={string.Join(", ", Value)}>";
+        }
+
+        public override SValue Idx(SValue other) {
+            if (other is not SInt otherInt) throw new Exception("Can only index SList with integers, got " + other.GetType().Name);
+
+            if (otherInt.Value < 0 || otherInt.Value > Value.Count - 1) throw new Exception("Out of bounds access. SList had " + Value.Count + " elements, but index " + otherInt.Value + " was accessed");
+            return Value[otherInt.Value];
+        }
+
+        public override bool IsTruthy() {
+            return Value != null;
+        }
+    }
 
     public struct PrimitiveCompatibility
     {
@@ -1167,5 +1174,6 @@ namespace spaghetto {
         String,
         Int,
         Float,
+        List,
     }
 }

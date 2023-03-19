@@ -4,7 +4,7 @@ using System.Text;
 namespace spaghettoCLI
 {
     public class Program {
-        static bool showLexOutput = false, showParseOutput = false;
+        static bool showLexOutput = false, showParseOutput = true;
 
         static void Main(string[] args) {
             while (true) {
@@ -32,7 +32,7 @@ namespace spaghettoCLI
         }
 
         public static void RunCode(string text) {
-            //try {
+            try {
                 Lexer lexer = new(text);
                 List<SyntaxToken> tokens = lexer.Lex();
 
@@ -43,12 +43,12 @@ namespace spaghettoCLI
                 Parser p = new(tokens);
                 SyntaxNode parsed = p.Parse();
 
-                PrintTree(parsed);
+                if(showParseOutput) PrintTree(parsed);
 
                 Console.WriteLine(parsed.Evaluate(new Scope()).ToString());
-            //} catch (Exception ex) {
-            //    Console.WriteLine("Error: " + ex.Message);
-            //}
+            } catch (Exception ex) {
+                Console.WriteLine("Error: " + ex.Message);
+            }
         }
 
         public static void PrintTree(SyntaxNode node, int ident = 0) {
