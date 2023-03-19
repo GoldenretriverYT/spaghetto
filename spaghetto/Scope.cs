@@ -5,7 +5,7 @@
         public Dictionary<string, SValue> Table { get; set; } = new();
         public Scope ParentScope { get; set; }
 
-        public ScopeState State { get; set; } = ScopeState.None;
+        public ScopeState State { get; private set; } = ScopeState.None;
         public SValue ReturnValue { get; set; } = SValue.Null;
 
         public Scope() { }
@@ -25,6 +25,11 @@
         public void Set(string key, SValue value)
         {
             Table[key] = value;
+        }
+
+        public void SetState(ScopeState state) {
+            State = state;
+            if (ParentScope != null) ParentScope.SetState(state);
         }
     }
 

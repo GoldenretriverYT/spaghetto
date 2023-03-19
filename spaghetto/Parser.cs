@@ -84,7 +84,7 @@ namespace spaghetto {
         public SyntaxNode ParseStatement() {
             if(Current.Type == SyntaxType.Keyword && Current.Text == "return") {
                 if(Peek(1).Type == SyntaxType.Semicolon) {
-                    Position++;
+                    Position += 2;
                     return new ReturnNode();
                 }else {
                     Position++;
@@ -92,9 +92,11 @@ namespace spaghetto {
                 }
             }else if(Current.Type == SyntaxType.Keyword && Current.Text == "continue") {
                 Position++;
+                MatchToken(SyntaxType.Semicolon);
                 return new ContinueNode();
             } else if (Current.Type == SyntaxType.Keyword && Current.Text == "break") {
                 Position++;
+                MatchToken(SyntaxType.Semicolon);
                 return new BreakNode();
             }else {
                 var exprNode = ParseExpression();
@@ -133,7 +135,7 @@ namespace spaghetto {
             }else {
                 return BinaryOperation(() => { return ParseArithmeticExpression(); },
                     new List<SyntaxType>() {
-                        SyntaxType.EqualsEquals, SyntaxType.LessThan, SyntaxType.LessThanEqu, SyntaxType.GreaterThan, SyntaxType.GreatherThanEqu
+                        SyntaxType.EqualsEquals, SyntaxType.LessThan, SyntaxType.LessThanEqu, SyntaxType.GreaterThan, SyntaxType.GreaterThanEqu
                     });
             }
         }
@@ -232,8 +234,7 @@ namespace spaghetto {
             } else if (Current.Type is SyntaxType.Keyword && Current.Text == "if") {
                 return ParseIfExpression();
             } else if (Current.Type is SyntaxType.Keyword && Current.Text == "for") {
-                throw new NotImplementedException();
-                //return ParseForExpression();
+                return ParseForExpression();
             } else if (Current.Type is SyntaxType.Keyword && Current.Text == "while") {
                 throw new NotImplementedException();
                 //return ParseWhileExpression();
@@ -302,6 +303,21 @@ namespace spaghetto {
             return node;
         }
 
+        public SyntaxNode ParseForExpression() {
+            MatchKeyword("for");
+
+            MatchToken(SyntaxType.LParen);
+            var initialExpressionNode = ParseExpression();
+            MatchToken(SyntaxType.Semicolon);
+            var condNode = ParseExpression();
+            MatchToken(SyntaxType.Semicolon);
+            var stepNode = ParseExpression();
+            MatchToken(SyntaxType.RParen);
+            var block = ParseScopedStatements();
+
+            return new ForNode(initialExpressionNode, condNode, stepNode, block);
+        }
+
         public SyntaxNode BinaryOperation(Func<SyntaxNode> leftParse, List<SyntaxType> allowedTypes, Func<SyntaxNode> rightParse = null) {
             var left = leftParse();
             SyntaxNode right;
@@ -316,6 +332,48 @@ namespace spaghetto {
             }
 
             return left;
+        }
+    }
+
+    internal class ForNode : SyntaxNode {
+        private SyntaxNode initialExpressionNode;
+        private SyntaxNode condNode;
+        private SyntaxNode stepNode;
+        private SyntaxNode block;
+
+        public ForNode(SyntaxNode initialExpressionNode, SyntaxNode condNode, SyntaxNode stepNode, SyntaxNode block) {
+            this.initialExpressionNode = initialExpressionNode;
+            this.condNode = condNode;
+            this.stepNode = stepNode;
+            this.block = block;
+        }
+
+        public override NodeType Type => NodeType.For;
+
+        public override SValue Evaluate(Scope scope) {
+            Scope forScope = new Scope(scope);
+            SValue lastVal = SValue.Null;
+            initialExpressionNode.Evaluate(forScope);
+
+            while(true) {
+                if (!condNode.Evaluate(forScope).IsTruthy()) break;
+                var forBlockRes = block.Evaluate(forScope);
+                if (!forBlockRes.IsNull()) lastVal = forBlockRes;
+
+                if (forScope.State == ScopeState.ShouldBreak) break;
+                forScope.SetState(ScopeState.None);
+
+                stepNode.Evaluate(forScope);
+            }
+
+            return lastVal;
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren() {
+            yield return initialExpressionNode;
+            yield return condNode;
+            yield return stepNode;
+            yield return block;
         }
     }
 
@@ -671,7 +729,7 @@ namespace spaghetto {
 
         public override SValue Evaluate(Scope scope)
         {
-            scope.State = ScopeState.ShouldBreak;
+            scope.SetState(ScopeState.ShouldBreak);
             return SValue.Null;
         }
 
@@ -691,7 +749,7 @@ namespace spaghetto {
 
         public override SValue Evaluate(Scope scope)
         {
-            scope.State = ScopeState.ShouldContinue;
+            scope.SetState(ScopeState.ShouldContinue);
             return SValue.Null;
         }
 
@@ -722,7 +780,7 @@ namespace spaghetto {
 
         public override SValue Evaluate(Scope scope)
         {
-            scope.State = ScopeState.ShouldReturn;
+            scope.SetState(ScopeState.ShouldReturn);
 
             if(ReturnValueNode != null) {
                 scope.ReturnValue = ReturnValueNode.Evaluate(scope);
@@ -760,9 +818,11 @@ namespace spaghetto {
             foreach (var node in nodes) {
                 var res = node.Evaluate(newScope);
 
-                if(res != SValue.Null) {
+                if (!res.IsNull()) {
                     lastVal = res;
                 }
+
+                if (scope.State == ScopeState.ShouldBreak || scope.State == ScopeState.ShouldContinue) return lastVal;
             }
 
             return lastVal;
@@ -821,6 +881,15 @@ namespace spaghetto {
                     return leftRes.Equals(rightRes);
                 case SyntaxType.Idx:
                     return leftRes.Idx(rightRes);
+                case SyntaxType.LessThan:
+                    return leftRes.LessThan(rightRes);
+                case SyntaxType.LessThanEqu:
+                    return leftRes.LessThanEqu(rightRes);
+                case SyntaxType.GreaterThan:
+                    return leftRes.GreaterThan(rightRes);
+                case SyntaxType.GreaterThanEqu:
+                    return leftRes.GreaterThanEqu(rightRes);
+
                 default:
                     throw new NotImplementedException();
             }
@@ -892,7 +961,7 @@ namespace spaghetto {
 
     public abstract class SValue
     {
-        public static SValue Null => new SInt(0);
+        public static SValue Null => new SNull();
         public abstract SBuiltinType BuiltinName { get; }
 
         public virtual SValue Add(SValue other)
@@ -933,8 +1002,28 @@ namespace spaghetto {
             throw new NotImplementedException();
         }
 
+        public virtual SValue LessThan(SValue other) {
+            throw new NotImplementedException();
+        }
+
+        public virtual SValue LessThanEqu(SValue other) {
+            throw new NotImplementedException();
+        }
+
+        public virtual SValue GreaterThan(SValue other) {
+            throw new NotImplementedException();
+        }
+
+        public virtual SValue GreaterThanEqu(SValue other) {
+            throw new NotImplementedException();
+        }
+
         public virtual SValue Call(List<SValue> args) {
             throw new NotImplementedException();
+        }
+
+        public virtual bool IsNull() {
+            return false;
         }
 
         public virtual SValue Not()
@@ -960,6 +1049,35 @@ namespace spaghetto {
         }
     }
 
+    public class SNativeFunction : SValue {
+        public override SBuiltinType BuiltinName => SBuiltinType.NativeFunc;
+        public Func<List<SValue>, SValue> Impl { get; set; }
+
+        public SNativeFunction(Func<List<SValue>, SValue> impl) {
+            Impl = impl;
+        }
+
+        public override SValue Call(List<SValue> args) {
+            return Impl(args);
+        }
+
+        public override bool IsTruthy() {
+            return true;
+        }
+    }
+
+    public class SNull : SValue {
+        public override SBuiltinType BuiltinName => SBuiltinType.Null;
+
+        public override bool IsNull() {
+            return true;
+        }
+
+        public override bool IsTruthy() {
+            return false;
+        }
+    }
+
     public class SInt : SValue
     {
         public override SBuiltinType BuiltinName => SBuiltinType.Int;
@@ -971,9 +1089,7 @@ namespace spaghetto {
 
         public SInt(int value)
         {
-            Debug.WriteLine("Setting to " + value);
             Value = value;
-            Debug.WriteLine("Set to " + Value);
         }
 
         public override SValue Add(SValue other) {
@@ -1004,6 +1120,26 @@ namespace spaghetto {
         public override SValue Equals(SValue other) {
             if (other is not SInt otherInt) throw new Exception("Can not perform EqualsCheck on SInt and " + other.GetType().Name);
             return new SInt(Value == otherInt.Value ? 1 : 0);
+        }
+
+        public override SValue LessThan(SValue other) {
+            if (other is not SInt otherInt) throw new Exception("Can not perform LessThanCheck on SInt and " + other.GetType().Name);
+            return new SInt(Value < otherInt.Value ? 1 : 0);
+        }
+
+        public override SValue LessThanEqu(SValue other) {
+            if (other is not SInt otherInt) throw new Exception("Can not perform LessThanEquCheck on SInt and " + other.GetType().Name);
+            return new SInt(Value <= otherInt.Value ? 1 : 0);
+        }
+
+        public override SValue GreaterThan(SValue other) {
+            if (other is not SInt otherInt) throw new Exception("Can not perform GreaterThanCheck on SInt and " + other.GetType().Name);
+            return new SInt(Value > otherInt.Value ? 1 : 0);
+        }
+
+        public override SValue GreaterThanEqu(SValue other) {
+            if (other is not SInt otherInt) throw new Exception("Can not perform GreaterThanEquCheck on SInt and " + other.GetType().Name);
+            return new SInt(Value >= otherInt.Value ? 1 : 0);
         }
 
         public override bool IsTruthy() {
@@ -1166,7 +1302,8 @@ namespace spaghetto {
         StringLiteral,
         Identifier,
         List,
-        If
+        If,
+        For
     }
 
     public enum SBuiltinType
@@ -1175,5 +1312,7 @@ namespace spaghetto {
         Int,
         Float,
         List,
+        Null,
+        NativeFunc,
     }
 }

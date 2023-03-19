@@ -51,7 +51,7 @@ namespace spaghetto {
                     case '>':
                         if (Peek(1) == '=') {
                             Position++;
-                            insertToken = (new(SyntaxType.GreatherThanEqu, Position, null, ">="));
+                            insertToken = (new(SyntaxType.GreaterThanEqu, Position, null, ">="));
                         } else {
                             insertToken = (new(SyntaxType.GreaterThan, Position, null, Current.ToString()));
                         }
@@ -222,7 +222,7 @@ namespace spaghetto {
         OrOr,
         LessThan,
         GreaterThan,
-        GreatherThanEqu,
+        GreaterThanEqu,
         LessThanEqu,
         Plus, Minus,
         Mod, Mul, Div, Idx,

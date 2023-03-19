@@ -1,4 +1,5 @@
 ﻿using spaghetto;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace spaghettoCLI
@@ -32,7 +33,7 @@ namespace spaghettoCLI
         }
 
         public static void RunCode(string text) {
-            try {
+            //try {
                 Lexer lexer = new(text);
                 List<SyntaxToken> tokens = lexer.Lex();
 
@@ -45,10 +46,17 @@ namespace spaghettoCLI
 
                 if(showParseOutput) PrintTree(parsed);
 
-                Console.WriteLine(parsed.Evaluate(new Scope()).ToString());
-            } catch (Exception ex) {
-                Console.WriteLine("Error: " + ex.Message);
-            }
+                var globalScope = new Scope();
+                globalScope.Set("print", new SNativeFunction((List<SValue> args) => {
+                    if (args.Count == 0) throw new Exception("Expected 1 argument on print call");
+                    //if (args[0] is not SString str) throw new Exception("Argument 0 was expected to be a SString");
+                    Console.WriteLine(args[0].ToString());
+                    return args[0];
+                }));
+                Console.WriteLine(parsed.Evaluate(globalScope).ToString());
+            //} catch (Exception ex) {
+            //    Console.WriteLine("Error: " + ex.Message);
+            //}
         }
 
         public static void PrintTree(SyntaxNode node, int ident = 0) {
