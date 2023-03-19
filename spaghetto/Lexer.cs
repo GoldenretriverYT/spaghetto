@@ -174,11 +174,10 @@ namespace spaghetto {
             string numStr = "";
             bool isDecimal = false;
 
-            while((char.IsDigit(Current) || Current == '.') && Current != '\0') {
+            while((char.IsDigit(Current) || Current == '.' || Current == 'e' || Current == '+' || Current == '-') && Current != '\0') {
                 numStr += Current;
 
                 if(Current == '.') {
-                    if (isDecimal) throw new Exception("Invalid number (contained too many dots)!");
                     isDecimal = true;
                 }
 
