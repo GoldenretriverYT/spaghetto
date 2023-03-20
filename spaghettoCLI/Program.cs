@@ -14,6 +14,12 @@ namespace spaghettoCLI
             spaghetto.Stdlib.Lang.Lib.Mount(interpreter.GlobalScope);
             spaghetto.Stdlib.IO.Lib.Mount(interpreter.GlobalScope);
 
+            var tdict = new SDictionary();
+            tdict.Value.Add((new SString("ok"), new SString("works string key")));
+            tdict.Value.Add((new SInt(0), new SString("works int key")));
+
+            interpreter.GlobalScope.Set("test", tdict);
+
             while (true) {
                 Console.Write("spaghetto > ");
                 string text = Console.ReadLine();
@@ -44,8 +50,9 @@ namespace spaghettoCLI
         }
 
         public static void RunCode(Interpreter interpreter, string text) {
+            TimingInterpreterResult res = new();
+
             try {
-                TimingInterpreterResult res = new();
 
                 interpreter.Interpret(text, ref res);
 
@@ -75,6 +82,10 @@ namespace spaghettoCLI
                 Console.ResetColor();
             } catch (Exception ex) {
                 Console.WriteLine("Error: " + ex.Message);
+            }
+
+            if(showParseOutput && res.Result.AST != null) {
+                PrintTree(res.Result.AST);
             }
         }
 

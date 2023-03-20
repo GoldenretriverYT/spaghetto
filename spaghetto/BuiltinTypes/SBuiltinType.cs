@@ -9,5 +9,6 @@
         NativeFunc,
         Function,
         NativeLibraryImporter,
+        Dictionary,
     }
 }

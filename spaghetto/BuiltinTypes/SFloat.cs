@@ -12,32 +12,32 @@
         }
 
         public override SValue Add(SValue other) {
-            if (other is not SFloat otherInt) throw new Exception("Can not perform Add on SFloat and " + other.GetType().Name);
+            if (other is not SFloat otherInt) throw new Exception("Can not perform Add on SFloat and " + other.BuiltinName.ToString());
             return new SFloat(Value + otherInt.Value);
         }
 
         public override SValue Sub(SValue other) {
-            if (other is not SFloat otherInt) throw new Exception("Can not perform Sub on SFloat and " + other.GetType().Name);
+            if (other is not SFloat otherInt) throw new Exception("Can not perform Sub on SFloat and " + other.BuiltinName.ToString());
             return new SFloat(Value - otherInt.Value);
         }
 
         public override SValue Mul(SValue other) {
-            if (other is not SFloat otherInt) throw new Exception("Can not perform Mul on SFloat and " + other.GetType().Name);
+            if (other is not SFloat otherInt) throw new Exception("Can not perform Mul on SFloat and " + other.BuiltinName.ToString());
             return new SFloat(Value * otherInt.Value);
         }
 
         public override SValue Div(SValue other) {
-            if (other is not SFloat otherInt) throw new Exception("Can not perform Div on SFloat and " + other.GetType().Name);
+            if (other is not SFloat otherInt) throw new Exception("Can not perform Div on SFloat and " + other.BuiltinName.ToString());
             return new SFloat(Value / otherInt.Value);
         }
 
         public override SValue Mod(SValue other) {
-            if (other is not SFloat otherInt) throw new Exception("Can not perform Mod on SFloat and " + other.GetType().Name);
+            if (other is not SFloat otherInt) throw new Exception("Can not perform Mod on SFloat and " + other.BuiltinName.ToString());
             return new SFloat(Value % otherInt.Value);
         }
 
         public override SValue Equals(SValue other) {
-            if (other is not SFloat otherInt) throw new Exception("Can not perform EqualsCheck on SFloat and " + other.GetType().Name);
+            if (other is not SFloat otherInt) throw new Exception("Can not perform EqualsCheck on SFloat and " + other.BuiltinName.ToString());
             return new SInt(Value == otherInt.Value ? 1 : 0);
         }
 
@@ -56,7 +56,7 @@
         }
 
         public override string ToString() {
-            return $"<{GetType().Name} value={Value}>";
+            return $"<{BuiltinName.ToString()} value={Value}>";
         }
 
         public override SString ToSpagString() {

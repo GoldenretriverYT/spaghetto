@@ -20,6 +20,7 @@
         <TraceMode>All</TraceMode>
         <StackCorruptionDetectionLevel>MethodFooters</StackCorruptionDetectionLevel>
         <ExtractMapFile>True</ExtractMapFile>
+        <DebugEnabled>False</DebugEnabled>
     </PropertyGroup>
 
     <ItemGroup>

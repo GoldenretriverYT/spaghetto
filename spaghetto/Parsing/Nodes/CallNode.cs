@@ -15,7 +15,7 @@
 
         public override SValue Evaluate(Scope scope)
         {
-            var toCall = ToCallNode.Evaluate(scope);
+            var toCall = ToCallNode.Evaluate(scope) ?? SValue.Null;
             var args = EvaluateArgs(scope);
 
             return toCall.Call(scope, args);

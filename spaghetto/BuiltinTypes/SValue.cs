@@ -2,6 +2,7 @@
     public abstract class SValue
     {
         public static SValue Null => new SNull();
+
         public abstract SBuiltinType BuiltinName { get; }
 
         #region Metadata
@@ -42,6 +43,7 @@
             throw NotSupportedOn("Dot");
         }
 
+        // TODO: Maybe force equals to be implemented?
         public virtual SValue Equals(SValue other) {
             throw NotSupportedOn("Equals");
         }
@@ -97,15 +99,15 @@
         }
 
         protected NotImplementedException NotSupportedBetween(SValue other, string type) {
-            return new NotImplementedException(type + " not supported between " + GetType().Name + " and " + other.GetType().Name);
+            return new NotImplementedException(type + " not supported between " + BuiltinName.ToString() + " and " + other.BuiltinName.ToString());
         }
 
         protected NotImplementedException NotSupportedOn(string type) {
-            return new NotImplementedException(type + " is not supported on " + GetType().Name);
+            return new NotImplementedException(type + " is not supported on " + BuiltinName.ToString());
         }
 
         protected ArgumentException CastInvalid(string type) {
-            return new ArgumentException(GetType().Name + " can not be cast to " + type);
+            return new ArgumentException(BuiltinName.ToString() + " can not be cast to " + type);
         }
 
         internal void CopyMeta(ref SValue other) {

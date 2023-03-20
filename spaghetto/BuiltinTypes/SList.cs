@@ -14,7 +14,7 @@
         }
 
         public override SValue Idx(SValue other) {
-            if (other is not SInt otherInt) throw new Exception("Can only index SList with integers, got " + other.GetType().Name);
+            if (other is not SInt otherInt) throw new Exception("Can only index SList with integers, got " + other.BuiltinName.ToString());
 
             if (otherInt.Value < 0 || otherInt.Value > Value.Count - 1) throw new Exception("Out of bounds access. SList had " + Value.Count + " elements, but index " + otherInt.Value + " was accessed");
             return Value[otherInt.Value];

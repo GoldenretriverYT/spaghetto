@@ -26,6 +26,11 @@
             return new SString(Value + @string.Value);
         }
 
+        public override SValue Equals(SValue other) {
+            if (other is not SString otherString) return SInt.Zero;
+            return Value == otherString.Value ? SInt.One : SInt.Zero;
+        }
+
         public override bool IsTruthy() {
             return Value != null;
         }

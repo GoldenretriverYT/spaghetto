@@ -17,19 +17,13 @@ namespace spaghetto
         }
 
         public void Interpret(string text, ref InterpreterResult res) {
-            Stopwatch sw = new();
-
-            sw.Start();
             Lexer lexer = new(text);
             res.LexedTokens = lexer.Lex();
-            sw.Restart();
 
             Parser p = new(res.LexedTokens);
             res.AST = p.Parse();
-            sw.Restart();
 
             res.LastValue = res.AST.Evaluate(GlobalScope);
-            sw.Stop();
         }
 
         public void Interpret(string text, ref TimingInterpreterResult res) {

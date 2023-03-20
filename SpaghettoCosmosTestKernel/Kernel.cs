@@ -1,5 +1,6 @@
 ﻿using Cosmos.System;
 using Cosmos.System.ScanMaps;
+using EtorumOS.Utils.KeyboardLayouts;
 using spaghetto;
 using spaghetto.Parsing.Nodes;
 using System;
@@ -20,7 +21,7 @@ namespace SpaghettoCosmosTestKernel
             if(sel == "1") {
                 KeyboardManager.SetKeyLayout(new US_Standard());
             }else if(sel == "2") {
-                KeyboardManager.SetKeyLayout(new DE_Standard());
+                KeyboardManager.SetKeyLayout(new DE_Fixed());
             }
 
             interpreter = new Interpreter();
@@ -53,21 +54,20 @@ namespace SpaghettoCosmosTestKernel
                 return;
             }
 
-            mDebugger.SendMessageBox("ok");
             RunCode(interpreter, text);
         }
 
 
         public static void RunCode(Interpreter interpreter, string text) {
             try {
-                TimingInterpreterResult res = new();
+                InterpreterResult res = new();
 
                 interpreter.Interpret(text, ref res);
 
                 Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.WriteLine(res.Result.LastValue.ToString());
+                Console.WriteLine((res.LastValue ?? SValue.Null).ToString());
 
-                if (timings) {
+                /*if (timings) {
                     Console.ForegroundColor = ConsoleColor.Blue;
                     Console.WriteLine("Timings:");
 
@@ -85,12 +85,12 @@ namespace SpaghettoCosmosTestKernel
                     Console.Write("  Eval: ");
                     Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.WriteLine(res.EvalTime + "ms");
-                }
+                }*/
 
                 Console.ResetColor();
             } catch (Exception ex) {
                 Console.WriteLine("Error: " + ex.Message);
-                Trace.DoTrace();
+                //Trace.DoTrace();
             }
         }
 

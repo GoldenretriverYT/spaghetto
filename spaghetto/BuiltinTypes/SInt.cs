@@ -4,6 +4,9 @@
         public override SBuiltinType BuiltinName => SBuiltinType.Int;
         public int Value { get; set; }
 
+        public static SInt Zero => new SInt(0);
+        public static SInt One => new SInt(1);
+
         public SInt() {
             Value = 0;
         }
@@ -14,54 +17,54 @@
         }
 
         public override SValue Add(SValue other) {
-            if (other is not SInt otherInt) throw new Exception("Can not perform Add on SInt and " + other.GetType().Name);
+            if (other is not SInt otherInt) throw new Exception("Can not perform Add on SInt and " + other.BuiltinName.ToString());
 
             return new SInt(Value + otherInt.Value);
         }
 
         public override SValue Sub(SValue other) {
-            if (other is not SInt otherInt) throw new Exception("Can not perform Sub on SInt and " + other.GetType().Name);
+            if (other is not SInt otherInt) throw new Exception("Can not perform Sub on SInt and " + other.BuiltinName.ToString());
             return new SInt(Value - otherInt.Value);
         }
 
         public override SValue Mul(SValue other) {
-            if (other is not SInt otherInt) throw new Exception("Can not perform Mul on SInt and " + other.GetType().Name);
+            if (other is not SInt otherInt) throw new Exception("Can not perform Mul on SInt and " + other.BuiltinName.ToString());
             return new SInt(Value * otherInt.Value);
         }
 
         public override SValue Div(SValue other) {
-            if (other is not SInt otherInt) throw new Exception("Can not perform Div on SInt and " + other.GetType().Name);
+            if (other is not SInt otherInt) throw new Exception("Can not perform Div on SInt and " + other.BuiltinName.ToString());
             return new SInt(Value / otherInt.Value);
         }
 
         public override SValue Mod(SValue other) {
-            if (other is not SInt otherInt) throw new Exception("Can not perform Mod on SInt and " + other.GetType().Name);
+            if (other is not SInt otherInt) throw new Exception("Can not perform Mod on SInt and " + other.BuiltinName.ToString());
             return new SInt(Value % otherInt.Value);
         }
 
         public override SValue Equals(SValue other) {
-            if (other is not SInt otherInt) throw new Exception("Can not perform EqualsCheck on SInt and " + other.GetType().Name);
-            return new SInt(Value == otherInt.Value ? 1 : 0);
+            if (other is not SInt otherInt) return SInt.Zero;
+            return Value == otherInt.Value ? SInt.One : SInt.Zero;
         }
 
         public override SValue LessThan(SValue other) {
-            if (other is not SInt otherInt) throw new Exception("Can not perform LessThanCheck on SInt and " + other.GetType().Name);
-            return new SInt(Value < otherInt.Value ? 1 : 0);
+            if (other is not SInt otherInt) return SInt.Zero;
+            return Value < otherInt.Value ? SInt.One : SInt.Zero;
         }
 
         public override SValue LessThanEqu(SValue other) {
-            if (other is not SInt otherInt) throw new Exception("Can not perform LessThanEquCheck on SInt and " + other.GetType().Name);
-            return new SInt(Value <= otherInt.Value ? 1 : 0);
+            if (other is not SInt otherInt) return SInt.Zero;
+            return Value <= otherInt.Value ? SInt.One : SInt.Zero;
         }
 
         public override SValue GreaterThan(SValue other) {
-            if (other is not SInt otherInt) throw new Exception("Can not perform GreaterThanCheck on SInt and " + other.GetType().Name);
-            return new SInt(Value > otherInt.Value ? 1 : 0);
+            if (other is not SInt otherInt) return SInt.Zero;
+            return Value > otherInt.Value ? SInt.One : SInt.Zero;
         }
 
         public override SValue GreaterThanEqu(SValue other) {
-            if (other is not SInt otherInt) throw new Exception("Can not perform GreaterThanEquCheck on SInt and " + other.GetType().Name);
-            return new SInt(Value >= otherInt.Value ? 1 : 0);
+            if (other is not SInt otherInt) return SInt.Zero;
+            return Value >= otherInt.Value ? SInt.One : SInt.Zero;
         }
 
         public override SValue CastToBuiltin(SBuiltinType other) {
@@ -79,7 +82,7 @@
         }
 
         public override string ToString() {
-            return $"<{GetType().Name} value={Value}>";
+            return $"<{BuiltinName.ToString()} value={Value}>";
         }
 
         public override SString ToSpagString() {
