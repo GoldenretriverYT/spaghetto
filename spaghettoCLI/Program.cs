@@ -1,11 +1,12 @@
 ﻿using spaghetto;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 
 namespace spaghettoCLI
 {
     public class Program {
-        static bool showLexOutput = false, showParseOutput = false;
+        static bool showLexOutput = false, showParseOutput = false, timings = false;
 
         static void Main(string[] args) {
             while (true) {
@@ -25,6 +26,11 @@ namespace spaghettoCLI
                         Console.WriteLine("Showing Parse Output: " + showParseOutput);
                     }
 
+                    if(text.StartsWith("#time")) {
+                        timings = !timings;
+                        Console.WriteLine("Timings: " + timings);
+                    }
+
                     continue;
                 }
 
@@ -34,18 +40,28 @@ namespace spaghettoCLI
 
         public static void RunCode(string text) {
             try {
+                Stopwatch sw = new();
+
+                sw.Start();
                 Lexer lexer = new(text);
                 List<SyntaxToken> tokens = lexer.Lex();
+
+                var lexingTime = sw.Elapsed.TotalMilliseconds;
 
                 if(showLexOutput) {
                     foreach (var tok in tokens) Console.WriteLine(tok.ToString());    
                 }
 
+                sw.Restart();
+
                 Parser p = new(tokens);
                 SyntaxNode parsed = p.Parse();
 
+                var parsingTime = sw.Elapsed.TotalMilliseconds;
+
                 if(showParseOutput) PrintTree(parsed);
 
+                sw.Restart();
                 var globalScope = new Scope();
 
                 #region init scope
@@ -70,8 +86,33 @@ namespace spaghettoCLI
                 #endregion
 
                 var evalRes = parsed.Evaluate(globalScope);
+
+                sw.Stop();
+                var evalTime = sw.Elapsed.TotalMilliseconds;
+
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.WriteLine(evalRes.ToString());
+
+                if(timings) {
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.WriteLine("Timings:");
+
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write("  Lex: ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine(lexingTime + "ms");
+
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write("  Parse: ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine(parsingTime + "ms");
+
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write("  Eval: ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine(evalTime + "ms");
+                }
+
                 Console.ResetColor();
             } catch (Exception ex) {
                 Console.WriteLine("Error: " + ex.Message);
