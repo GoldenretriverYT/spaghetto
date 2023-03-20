@@ -1,13 +1,15 @@
 ﻿using Cosmos.System;
 using Cosmos.System.ScanMaps;
 using spaghetto;
+using spaghetto.Parsing.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Text;
 using Console = System.Console;
 using Sys = Cosmos.System;
 
-namespace SpaghettoCosmosTestKernel {
+namespace SpaghettoCosmosTestKernel
+{
     public class Kernel : Sys.Kernel {
         static bool showLexOutput = false, showParseOutput = false, timings = false;
         static Interpreter interpreter;

@@ -4,9 +4,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using spaghetto.Parsing.Nodes;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace spaghetto {
+namespace spaghetto
+{
     public class Interpreter {
         public Scope GlobalScope { get; private set; }
 

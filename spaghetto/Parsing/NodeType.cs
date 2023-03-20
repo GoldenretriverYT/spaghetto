@@ -1,4 +1,4 @@
-﻿namespace spaghetto {
+﻿namespace spaghetto.Parsing {
     public enum NodeType
     {
         Return,

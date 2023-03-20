@@ -1,4 +1,7 @@
-﻿namespace spaghetto {
+﻿using spaghetto.Parsing.Nodes;
+
+namespace spaghetto
+{
     public class SFunction : SValue {
         public override SBuiltinType BuiltinName => SBuiltinType.Function;
         public string FunctionName { get; set; }

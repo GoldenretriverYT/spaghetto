@@ -1,8 +1,10 @@
 ﻿using spaghetto;
 using static System.Net.Mime.MediaTypeNames;
 using System.Diagnostics;
+using spaghetto.Parsing.Nodes;
 
-namespace PerfTest {
+namespace PerfTest
+{
     internal class Program {
         const string text = @"for(var i = 0; i < 100000; i = i + 1) { var x = i + (i * 2); };";
         static void Main(string[] args) {
