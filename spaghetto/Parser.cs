@@ -218,7 +218,7 @@ namespace spaghetto {
 
                 MatchToken(SyntaxType.GreaterThan);
 
-                var node = ParseAtomExpression();
+                var node = ParseCastExpression();
                 return new CastNode(ident, node);
             }else {
                 return ParseAtomExpression();

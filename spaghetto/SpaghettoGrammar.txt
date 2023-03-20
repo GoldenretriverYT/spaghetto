@@ -68,7 +68,8 @@ power         : call ((POW) factor)*
 
 call          : cast (DOT IDENTIFIER|call)*? (LPAREN (expr (COMMA expr)*)? RPAREN)?
               
-cast          : (LessThan IDENTIFIER:int|float|string|list GreaterThan)? atom
+cast          : (LessThan IDENTIFIER:int|float|string|list GreaterThan) cast
+              : atom
 
 atom          : INT|FLOAT|STRING|IDENTIFIER
               : LPAREN expr RPAREN
