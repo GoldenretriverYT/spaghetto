@@ -667,7 +667,7 @@ namespace spaghetto {
             var prevVal = scope.Get(key);
             if (prevVal.BuiltinName != val.BuiltinName)
                 throw new InvalidOperationException("A variables type may not change after initilization (Tried to assign " + val.BuiltinName + " to " + prevVal.BuiltinName + ")");
-            scope.Set(key, val);
+            scope.Update(key, val);
             return val;
         }
 
@@ -1251,7 +1251,7 @@ namespace spaghetto {
         public SList() { }
 
         public override SString ToSpagString() {
-            return new SString(string.Join(", ", Value));
+            return new SString("[" + string.Join(", ", Value.Select((v) => v.ToSpagString().Value)) + "]");
         }
 
         public override string ToString() {

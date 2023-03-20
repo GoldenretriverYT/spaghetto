@@ -27,6 +27,16 @@
             Table[key] = value;
         }
 
+        public void Update(string key, SValue value) {
+            if (Table.ContainsKey(key)) {
+                Table[key] = value;
+                return;
+            }
+
+            if (ParentScope == null) throw new Exception("Could not update field " + key + ": Not found");
+            ParentScope.Update(key, value);
+        }
+
         public void SetState(ScopeState state) {
             State = state;
             if (ParentScope != null) ParentScope.SetState(state);
