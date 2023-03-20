@@ -1,0 +1,28 @@
+﻿namespace spaghetto {
+    public enum NodeType
+    {
+        Return,
+        BinaryExpression,
+        Token,
+        BooleanLiteral,
+        Block,
+        Continue,
+        Break,
+        InitVariable,
+        AssignVariable,
+        UnaryExpression,
+        Dot,
+        Call,
+        IntLiteral,
+        FloatLiteral,
+        StringLiteral,
+        Identifier,
+        List,
+        If,
+        For,
+        Cast,
+        While,
+        FunctionDefinition,
+        NativeImport
+    }
+}

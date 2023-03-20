@@ -9,13 +9,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "spaghettoCLI", "spaghettoCL
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaghettoIDE", "SpaghettoIDE\SpaghettoIDE.csproj", "{79C444C1-741D-44BA-8F01-CD337A3194E5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerfTest", "PerfTest\PerfTest.csproj", "{F05E9923-11D3-4B86-8EE3-EFC7E35802A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PerfTest", "PerfTest\PerfTest.csproj", "{F05E9923-11D3-4B86-8EE3-EFC7E35802A1}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "stdlib", "stdlib", "{D2C74680-6182-4352-808D-C3AA9AE91E6D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spaghetto.Stdlib.IO", "spaghetto.Stdlib.IO\spaghetto.Stdlib.IO.csproj", "{325C4B51-3AB9-455D-BFA3-A452FE7AD672}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "spaghetto.Stdlib.IO", "spaghetto.Stdlib.IO\spaghetto.Stdlib.IO.csproj", "{325C4B51-3AB9-455D-BFA3-A452FE7AD672}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spaghetto.Stdlib.Lang", "spaghetto.Stdlib.Lang\spaghetto.Stdlib.Lang.csproj", "{47CCCC78-91BE-4C69-B340-725ACB963E58}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "spaghetto.Stdlib.Lang", "spaghetto.Stdlib.Lang\spaghetto.Stdlib.Lang.csproj", "{47CCCC78-91BE-4C69-B340-725ACB963E58}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cosmos", "cosmos", "{4F7301E1-43A3-41F0-8AC4-CD1E39DE4CB4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaghettoCosmosTestKernel", "SpaghettoCosmosTestKernel\SpaghettoCosmosTestKernel.csproj", "{B9093756-EE3F-4265-815E-6DED16CAD141}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpaghettoCosmosTestKernel.Plugs", "SpaghettoCosmosTestKernel.Plugs\SpaghettoCosmosTestKernel.Plugs.csproj", "{A5C7CFE5-21F9-4418-8BB7-81CD8B85DBF8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,6 +53,14 @@ Global
 		{47CCCC78-91BE-4C69-B340-725ACB963E58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{47CCCC78-91BE-4C69-B340-725ACB963E58}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{47CCCC78-91BE-4C69-B340-725ACB963E58}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9093756-EE3F-4265-815E-6DED16CAD141}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9093756-EE3F-4265-815E-6DED16CAD141}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9093756-EE3F-4265-815E-6DED16CAD141}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9093756-EE3F-4265-815E-6DED16CAD141}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5C7CFE5-21F9-4418-8BB7-81CD8B85DBF8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5C7CFE5-21F9-4418-8BB7-81CD8B85DBF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5C7CFE5-21F9-4418-8BB7-81CD8B85DBF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5C7CFE5-21F9-4418-8BB7-81CD8B85DBF8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -54,6 +68,8 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{325C4B51-3AB9-455D-BFA3-A452FE7AD672} = {D2C74680-6182-4352-808D-C3AA9AE91E6D}
 		{47CCCC78-91BE-4C69-B340-725ACB963E58} = {D2C74680-6182-4352-808D-C3AA9AE91E6D}
+		{B9093756-EE3F-4265-815E-6DED16CAD141} = {4F7301E1-43A3-41F0-8AC4-CD1E39DE4CB4}
+		{A5C7CFE5-21F9-4418-8BB7-81CD8B85DBF8} = {4F7301E1-43A3-41F0-8AC4-CD1E39DE4CB4}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EAB579D2-7F8F-4D85-A6AD-CA563DF0667D}

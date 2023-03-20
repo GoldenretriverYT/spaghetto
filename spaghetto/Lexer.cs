@@ -185,7 +185,7 @@ namespace spaghetto {
             }
 
             if(isDecimal) {
-                if (!float.TryParse(numStr, CultureInfo.InvariantCulture, out float floatVal)) throw new Exception("Invalid number (tried to parse " + numStr + " as float)");
+                if (!float.TryParse(numStr, NumberStyles.Float, CultureInfo.InvariantCulture, out float floatVal)) throw new Exception("Invalid number (tried to parse " + numStr + " as float)");
                 return new(SyntaxType.Float, Position-1, floatVal, numStr);
             }else {
                 if (!int.TryParse(numStr, out int intVal)) throw new Exception("Invalid number!");
