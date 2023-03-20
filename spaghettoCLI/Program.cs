@@ -10,6 +10,8 @@ namespace spaghettoCLI
 
         static void Main(string[] args) {
             var interpreter = new Interpreter();
+            spaghetto.Stdlib.Lang.Lib.Mount(interpreter.GlobalScope);
+            spaghetto.Stdlib.IO.Lib.Mount(interpreter.GlobalScope);
 
             while (true) {
                 Console.Write("spaghetto > ");

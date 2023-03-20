@@ -4,7 +4,7 @@
     /// </summary>
     public class Lib {
         public static void Mount(Scope scope) {
-            scope.Set("lang", new SNativeLibraryImporter(Import));
+            scope.Set("nlimporter__lang", new SNativeLibraryImporter(Import));
         }
 
         public static void Import(Scope scope) {

@@ -107,6 +107,7 @@ namespace spaghetto {
                 Position++;
                 
                 if(Current.Type == SyntaxType.Keyword && Current.Text == "native") {
+                    Position++;
                     var ident = MatchToken(SyntaxType.Identifier);
                     MatchToken(SyntaxType.Semicolon);
 
@@ -422,7 +423,7 @@ namespace spaghetto {
         public override NodeType Type => NodeType.NativeImport;
 
         public override SValue Evaluate(Scope scope) {
-            var val = scope.Get((string)ident.Value);
+            var val = scope.Get("nlimporter__" + ident.Text);
 
             if(val == null || val is not SNativeLibraryImporter importer) {
                 throw new Exception("Native library " + ident.Text + " not found!");

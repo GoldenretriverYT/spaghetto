@@ -13,6 +13,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\spaghetto.Stdlib.IO\spaghetto.Stdlib.IO.csproj" />
+    <ProjectReference Include="..\spaghetto.Stdlib.Lang\spaghetto.Stdlib.Lang.csproj" />
     <ProjectReference Include="..\spaghetto\spaghetto.csproj" />
   </ItemGroup>
 
