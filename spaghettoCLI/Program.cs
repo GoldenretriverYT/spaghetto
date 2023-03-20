@@ -47,13 +47,22 @@ namespace spaghettoCLI
                 if(showParseOutput) PrintTree(parsed);
 
                 var globalScope = new Scope();
+
+                #region init scope
                 globalScope.Set("print", new SNativeFunction((List<SValue> args) => {
                     if (args.Count == 0) throw new Exception("Expected 1 argument on print call");
                     //if (args[0] is not SString str) throw new Exception("Argument 0 was expected to be a SString");
                     Console.WriteLine(args[0].ToSpagString().Value);
                     return args[0];
                 }));
-                Console.WriteLine(parsed.Evaluate(globalScope).ToString());
+
+                globalScope.Set("typeof", new SNativeFunction((List<SValue> args) => {
+                    if (args.Count == 0) throw new Exception("Expected 1 argument on typeof call");
+
+                    return new SString(args[0].BuiltinName.ToString());
+                }));
+                #endregion
+            Console.WriteLine(parsed.Evaluate(globalScope).ToString());
             //} catch (Exception ex) {
             //    Console.WriteLine("Error: " + ex.Message);
             //}

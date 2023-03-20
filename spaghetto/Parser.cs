@@ -448,7 +448,7 @@ namespace spaghetto {
         public override NodeType Type => NodeType.Identifier;
 
         public override SValue Evaluate(Scope scope) {
-            return scope.Get((string)Token.Value);
+            return scope.Get((string)Token.Value) ?? SValue.Null;
         }
 
         public override IEnumerable<SyntaxNode> GetChildren() {
@@ -1075,6 +1075,14 @@ namespace spaghetto {
 
         public override bool IsTruthy() {
             return false;
+        }
+
+        public override SString ToSpagString() {
+            return new("null");
+        }
+
+        public override string ToString() {
+            return "<SNull>";
         }
     }
 
