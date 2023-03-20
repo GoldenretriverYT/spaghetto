@@ -1,7 +1,7 @@
 ﻿namespace spaghetto.Stdlib.IO {
     public class Lib {
         public static void Mount(Scope scope) {
-            scope.Set("nlimporter__io", new SNativeLibraryImporter(Import));
+            scope.Set("nlimporter$$io", new SNativeLibraryImporter(Import));
         }
 
         public static void Import(Scope scope) {

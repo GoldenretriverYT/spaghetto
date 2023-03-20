@@ -423,7 +423,7 @@ namespace spaghetto {
         public override NodeType Type => NodeType.NativeImport;
 
         public override SValue Evaluate(Scope scope) {
-            var val = scope.Get("nlimporter__" + ident.Text);
+            var val = scope.Get("nlimporter$$" + ident.Text);
 
             if(val == null || val is not SNativeLibraryImporter importer) {
                 throw new Exception("Native library " + ident.Text + " not found!");

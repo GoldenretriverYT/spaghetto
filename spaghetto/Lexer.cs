@@ -146,7 +146,7 @@ namespace spaghetto {
         private SyntaxToken ParseIdentifierOrKeyword() {
             string str = "";
 
-            while (Current != '\0' && Current != ' ' && char.IsLetterOrDigit(Current)) {
+            while (Current != '\0' && Current != ' ' && (char.IsLetterOrDigit(Current) || Current == '_')) {
                 str += Current;
                 Position++;
             }
