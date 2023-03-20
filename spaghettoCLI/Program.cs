@@ -33,7 +33,7 @@ namespace spaghettoCLI
         }
 
         public static void RunCode(string text) {
-            try {
+            //try {
                 Lexer lexer = new(text);
                 List<SyntaxToken> tokens = lexer.Lex();
 
@@ -49,20 +49,20 @@ namespace spaghettoCLI
                 var globalScope = new Scope();
 
                 #region init scope
-                globalScope.Set("print", new SNativeFunction((List<SValue> args) => {
+                globalScope.Set("print", new SNativeFunction((Scope callingScope, List<SValue> args) => {
                     if (args.Count == 0) throw new Exception("Expected 1 argument on print call");
                     //if (args[0] is not SString str) throw new Exception("Argument 0 was expected to be a SString");
                     Console.WriteLine(args[0].ToSpagString().Value);
                     return args[0];
                 }));
 
-                globalScope.Set("typeof", new SNativeFunction((List<SValue> args) => {
+                globalScope.Set("typeof", new SNativeFunction((Scope callingScope, List<SValue> args) => {
                     if (args.Count == 0) throw new Exception("Expected 1 argument on typeof call");
 
                     return new SString(args[0].BuiltinName.ToString());
                 }));
 
-                globalScope.Set("toString", new SNativeFunction((List<SValue> args) => {
+                globalScope.Set("toString", new SNativeFunction((Scope callingScope, List<SValue> args) => {
                     if (args.Count == 0) throw new Exception("Expected 1 argument on typeof toString");
 
                     return args[0].ToSpagString();
@@ -73,9 +73,9 @@ namespace spaghettoCLI
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.WriteLine(evalRes.ToString());
                 Console.ResetColor();
-            } catch (Exception ex) {
-                Console.WriteLine("Error: " + ex.Message);
-            }
+            //} catch (Exception ex) {
+            //    Console.WriteLine("Error: " + ex.Message);
+            //}
         }
 
         public static void PrintTree(SyntaxNode node, int ident = 0) {

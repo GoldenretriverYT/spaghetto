@@ -85,14 +85,12 @@ if-expr       : KEYWORD:if LPAREN expr RPAREN scoped-statements
                 (KEYWORD:elseif LPAREN expr RPAREN scoped-statements)*?
                 (KEYWORD:else scoped-statements)?
               
-              
-              
 for-expr      : KEYWORD:for LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN
                 scoped-statements
               
 while-expr    : KEYWORD:while expr
                 scoped-statements
               
-func-def      : KEYWORD:func IDENTIFIER?
-                LPAREN (IDENTIFIER(COMMA IDENTIFIER)*)? RPAREN
+func-def      : KEYWORD:func IDENTIFIER
+                LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
                 scoped-statements

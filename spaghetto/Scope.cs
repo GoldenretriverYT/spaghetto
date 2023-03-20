@@ -41,6 +41,11 @@
             State = state;
             if (ParentScope != null) ParentScope.SetState(state);
         }
+
+        public void SetReturnValue(SValue val) {
+            ReturnValue = val;
+            if (ParentScope != null) ParentScope.SetReturnValue(val);
+        }
     }
 
     public enum ScopeState

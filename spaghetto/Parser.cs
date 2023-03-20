@@ -85,10 +85,14 @@ namespace spaghetto {
             if(Current.Type == SyntaxType.Keyword && Current.Text == "return") {
                 if(Peek(1).Type == SyntaxType.Semicolon) {
                     Position += 2;
-                    return new ReturnNode();
+                    var ret = new ReturnNode();
+                    MatchToken(SyntaxType.Semicolon);
+                    return ret;
                 }else {
                     Position++;
-                    return new ReturnNode(ParseExpression());
+                    var ret = new ReturnNode(ParseExpression());
+                    MatchToken(SyntaxType.Semicolon);
+                    return ret;
                 }
             }else if(Current.Type == SyntaxType.Keyword && Current.Text == "continue") {
                 Position++;
@@ -254,8 +258,7 @@ namespace spaghetto {
             } else if (Current.Type is SyntaxType.Keyword && Current.Text == "while") {
                 return ParseWhileExpression();
             } else if (Current.Type is SyntaxType.Keyword && Current.Text == "func") {
-                throw new NotImplementedException();
-                //return ParseFuncExpression();
+                return ParseFunctionExpression();
             }else {
                 throw new Exception("Unexpected token in atom expression!");
             }
@@ -344,6 +347,35 @@ namespace spaghetto {
             return new WhileNode(condNode, block);
         }
 
+        public SyntaxNode ParseFunctionExpression() {
+            MatchKeyword("func");
+
+            var nameToken = MatchToken(SyntaxType.Identifier);
+
+            MatchToken(SyntaxType.LParen);
+
+            List<SyntaxToken> args = new();
+
+            if (Current.Type == SyntaxType.RParen) {
+                MatchToken(SyntaxType.RParen);
+            } else {
+                var ident = MatchToken(SyntaxType.Identifier);
+                args.Add(ident);
+
+                while (Current.Type == SyntaxType.Comma) {
+                    Position++;
+                    ident = MatchToken(SyntaxType.Identifier);
+                    args.Add(ident);
+                }
+
+                MatchToken(SyntaxType.RParen);
+            }
+
+            var block = ParseScopedStatements();
+
+            return new FunctionDefinitionNode(nameToken, args, block);
+        }
+
         public SyntaxNode BinaryOperation(Func<SyntaxNode> leftParse, List<SyntaxType> allowedTypes, Func<SyntaxNode> rightParse = null) {
             var left = leftParse();
             SyntaxNode right;
@@ -361,6 +393,32 @@ namespace spaghetto {
         }
     }
 
+    internal class FunctionDefinitionNode : SyntaxNode {
+        private SyntaxToken nameToken;
+        private List<SyntaxToken> args;
+        private SyntaxNode block;
+
+        public FunctionDefinitionNode(SyntaxToken nameToken, List<SyntaxToken> args, SyntaxNode block) {
+            this.nameToken = nameToken;
+            this.args = args;
+            this.block = block;
+        }
+
+        public override NodeType Type => NodeType.FunctionDefinition;
+
+        public override SValue Evaluate(Scope scope) {
+            var f = new SFunction(scope, nameToken.Text, args.Select((v) => v.Text).ToList(), block);
+            scope.Set(nameToken.Text, f);
+            return f;
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren() {
+            yield return new TokenNode(nameToken);
+            foreach (var t in args) yield return new TokenNode(t);
+            yield return block;
+        }
+    }
+
     internal class WhileNode : SyntaxNode {
         private SyntaxNode condNode;
         private SyntaxNode block;
@@ -370,7 +428,7 @@ namespace spaghetto {
             this.block = block;
         }
 
-        public override NodeType Type => throw new NotImplementedException();
+        public override NodeType Type => NodeType.While;
 
         public override SValue Evaluate(Scope scope) {
             Scope whileScope = new Scope(scope);
@@ -633,7 +691,7 @@ namespace spaghetto {
             var toCall = ToCallNode.Evaluate(scope);
             var args = EvaluateArgs(scope);
 
-            return toCall.Call(args);
+            return toCall.Call(scope, args);
         }
 
         public List<SValue> EvaluateArgs(Scope scope) {
@@ -676,7 +734,7 @@ namespace spaghetto {
                 }else if(node is CallNode cn) {
                     if(cn.ToCallNode is IdentifierNode cnIdentNode) {
                         var ident = cnIdentNode.Token;
-                        currentValue = currentValue.Dot(new SString((string)ident.Value)).Call(cn.EvaluateArgs(scope));
+                        currentValue = currentValue.Dot(new SString((string)ident.Value)).Call(scope, cn.EvaluateArgs(scope));
                     }else {
                         throw new Exception("Tried to call a non identifier in dot not stack.");
                     }
@@ -874,7 +932,8 @@ namespace spaghetto {
             scope.SetState(ScopeState.ShouldReturn);
 
             if(ReturnValueNode != null) {
-                scope.ReturnValue = ReturnValueNode.Evaluate(scope);
+                var v = ReturnValueNode.Evaluate(scope);
+                scope.SetReturnValue(v);
             }
 
             return SValue.Null;
@@ -882,7 +941,8 @@ namespace spaghetto {
 
         public override IEnumerable<SyntaxNode> GetChildren()
         {
-            return Enumerable.Empty<SyntaxNode>();
+            if (ReturnValueNode == null) yield break;
+            else yield return ReturnValueNode;
         }
 
         public override string ToString() {
@@ -913,7 +973,13 @@ namespace spaghetto {
                     lastVal = res;
                 }
 
-                if (scope.State == ScopeState.ShouldBreak || scope.State == ScopeState.ShouldContinue) return lastVal;
+                if (scope.State == ScopeState.ShouldBreak
+                    || scope.State == ScopeState.ShouldContinue) return lastVal;
+
+                if (scope.State == ScopeState.ShouldReturn) {
+                    var v = scope.ReturnValue;
+                    return v;
+                }
             }
 
             return lastVal;
@@ -1113,7 +1179,7 @@ namespace spaghetto {
             throw NotSupportedOn("CastToBuiltin");
         }
 
-        public virtual SValue Call(List<SValue> args) {
+        public virtual SValue Call(Scope scope, List<SValue> args) {
             throw NotSupportedOn("Call");
         }
 
@@ -1158,14 +1224,53 @@ namespace spaghetto {
 
     public class SNativeFunction : SValue {
         public override SBuiltinType BuiltinName => SBuiltinType.NativeFunc;
-        public Func<List<SValue>, SValue> Impl { get; set; }
+        public Func<Scope, List<SValue>, SValue> Impl { get; set; }
 
-        public SNativeFunction(Func<List<SValue>, SValue> impl) {
+        public SNativeFunction(Func<Scope, List<SValue>, SValue> impl) {
             Impl = impl;
         }
 
-        public override SValue Call(List<SValue> args) {
-            return Impl(args);
+        /// <summary>
+        /// NOTE: The scope in SNativeFunction is the calling scope, but not in SFunction!
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <param name="args"></param>
+        /// <returns></returns>
+        public override SValue Call(Scope scope, List<SValue> args) {
+            return Impl(scope, args);
+        }
+
+        public override bool IsTruthy() {
+            return true;
+        }
+    }
+
+    public class SFunction : SValue {
+        public override SBuiltinType BuiltinName => SBuiltinType.Function;
+        public string FunctionName { get; set; }
+        public List<string> Args { get; set; }
+        public SyntaxNode Callback { get; set; }
+        public Scope DefiningScope { get; set; }
+
+        public SFunction(Scope definingScope, string functionName, List<string> args, SyntaxNode callback) {
+            DefiningScope = definingScope;
+            FunctionName = functionName;
+            Args = args;
+            Callback = callback;
+        }
+
+        public override SValue Call(Scope scope, List<SValue> args) {
+            if (args.Count != Args.Count) throw new Exception(FunctionName + " expected " + Args.Count + " arguments. (" + string.Join(", ", Args) + ")");
+
+            Scope funcScope = new Scope(DefiningScope);
+            
+            for(int i = 0; i < Args.Count; i++) {
+                funcScope.Set(Args[i], args[i]);
+            }
+
+            Callback.Evaluate(funcScope);
+
+            return funcScope.ReturnValue;
         }
 
         public override bool IsTruthy() {
@@ -1440,7 +1545,9 @@ namespace spaghetto {
         List,
         If,
         For,
-        Cast
+        Cast,
+        While,
+        FunctionDefinition
     }
 
     public enum SBuiltinType
@@ -1451,5 +1558,6 @@ namespace spaghetto {
         List,
         Null,
         NativeFunc,
+        Function,
     }
 }
