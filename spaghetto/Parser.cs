@@ -182,7 +182,7 @@ namespace spaghetto {
         }
 
         public SyntaxNode ParseCallExpression() {
-            var atomNode = ParseAtomExpression();
+            var atomNode = ParseCastExpression();
 
             if(Current.Type is SyntaxType.LParen) {
                 Position++;
@@ -207,6 +207,22 @@ namespace spaghetto {
             }
 
             return atomNode;
+        }
+
+        public SyntaxNode ParseCastExpression() {
+            if(Current.Type is SyntaxType.LessThan) {
+                MatchToken(SyntaxType.LessThan);
+                var ident = MatchToken(SyntaxType.Identifier);
+
+                if (ident.Text is not "int" and not "float" and not "list" and not "string") throw new Exception("Can not cast to " + ident.Text);
+
+                MatchToken(SyntaxType.GreaterThan);
+
+                var node = ParseAtomExpression();
+                return new CastNode(ident, node);
+            }else {
+                return ParseAtomExpression();
+            }
         }
 
         public SyntaxNode ParseAtomExpression() {
@@ -332,6 +348,38 @@ namespace spaghetto {
             }
 
             return left;
+        }
+    }
+
+    internal class CastNode : SyntaxNode {
+        private SyntaxToken ident;
+        private SyntaxNode node;
+
+        public CastNode(SyntaxToken ident, SyntaxNode node) {
+            this.ident = ident;
+            this.node = node;
+        }
+
+        public override NodeType Type => NodeType.Cast;
+
+        public override SValue Evaluate(Scope scope) {
+            // TODO: maybe improve this
+            switch(ident.Text) {
+                case "int":
+                    return node.Evaluate(scope).CastToBuiltin(SBuiltinType.Int);
+                case "float":
+                    return node.Evaluate(scope).CastToBuiltin(SBuiltinType.Float);
+                case "string":
+                    return node.Evaluate(scope).CastToBuiltin(SBuiltinType.String);
+                case "list":
+                    return node.Evaluate(scope).CastToBuiltin(SBuiltinType.List);
+                default: throw new InvalidOperationException("INTERNAL: Cast was parsed successfully, but cast is not implemented for that!");
+            }
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren() {
+            yield return new TokenNode(ident);
+            yield return node;
         }
     }
 
@@ -966,60 +1014,64 @@ namespace spaghetto {
 
         public virtual SValue Add(SValue other)
         {
-            throw new NotImplementedException();
+            throw NotSupportedOn("Add");
         }
 
         public virtual SValue Sub(SValue other)
         {
-            throw new NotImplementedException();
+            throw NotSupportedOn("Sub");
         }
 
         public virtual SValue Mul(SValue other)
         {
-            throw new NotImplementedException();
+            throw NotSupportedOn("Mul");
         }
 
         public virtual SValue Div(SValue other)
         {
-            throw new NotImplementedException();
+            throw NotSupportedOn("Div");
         }
 
         public virtual SValue Mod(SValue other)
         {
-            throw new NotImplementedException();
+            throw NotSupportedOn("Mod");
         }
 
         public virtual SValue Idx(SValue other)
         {
-            throw new NotImplementedException();
+            throw NotSupportedOn("Idx");
         }
 
         public virtual SValue Dot(SValue other) {
-            throw new NotImplementedException();
+            throw NotSupportedOn("Dot");
         }
 
         public virtual SValue Equals(SValue other) {
-            throw new NotImplementedException();
+            throw NotSupportedOn("Equals");
         }
 
         public virtual SValue LessThan(SValue other) {
-            throw new NotImplementedException();
+            throw NotSupportedOn("LessThan");
         }
 
         public virtual SValue LessThanEqu(SValue other) {
-            throw new NotImplementedException();
+            throw NotSupportedOn("LessThanEqu");
         }
 
         public virtual SValue GreaterThan(SValue other) {
-            throw new NotImplementedException();
+            throw NotSupportedOn("GreaterThan");
         }
 
         public virtual SValue GreaterThanEqu(SValue other) {
-            throw new NotImplementedException();
+            throw NotSupportedOn("GreaterThanEqu");
+        }
+
+        public virtual SValue CastToBuiltin(SBuiltinType other) {
+            throw NotSupportedOn("CastToBuiltin");
         }
 
         public virtual SValue Call(List<SValue> args) {
-            throw new NotImplementedException();
+            throw NotSupportedOn("Call");
         }
 
         public virtual bool IsNull() {
@@ -1028,12 +1080,12 @@ namespace spaghetto {
 
         public virtual SValue Not()
         {
-            throw new NotImplementedException();
+            throw NotSupportedOn("Not");
         }
 
         public virtual SValue ArithNot()
         {
-            throw new NotImplementedException();
+            throw NotSupportedOn("ArithNot");
         }
 
         public abstract bool IsTruthy();
@@ -1046,6 +1098,18 @@ namespace spaghetto {
         public virtual SString ToSpagString()
         {
             return new SString("<unknown of type " + BuiltinName.ToString() + ">");
+        }
+
+        protected NotImplementedException NotSupportedBetween(SValue other, string type) {
+            return new NotImplementedException(type + " not supported between " + GetType().Name + " and " + other.GetType().Name);
+        }
+
+        protected NotImplementedException NotSupportedOn(string type) {
+            return new NotImplementedException(type + " is not supported on " + GetType().Name);
+        }
+
+        protected ArgumentException CastInvalid(string type) {
+            return new ArgumentException(GetType().Name + " can not be cast to " + type);
         }
     }
 
@@ -1150,6 +1214,16 @@ namespace spaghetto {
             return new SInt(Value >= otherInt.Value ? 1 : 0);
         }
 
+        public override SValue CastToBuiltin(SBuiltinType other) {
+            switch(other) {
+                case SBuiltinType.Int:
+                    return new SInt(Value);
+                case SBuiltinType.Float:
+                    return new SFloat(Value);
+                default: throw CastInvalid("native " + other.ToString());
+            }
+        }
+
         public override bool IsTruthy() {
             return Value == 1;
         }
@@ -1205,6 +1279,16 @@ namespace spaghetto {
         public override SValue Equals(SValue other) {
             if (other is not SFloat otherInt) throw new Exception("Can not perform EqualsCheck on SFloat and " + other.GetType().Name);
             return new SInt(Value == otherInt.Value ? 1 : 0);
+        }
+
+        public override SValue CastToBuiltin(SBuiltinType other) {
+            switch (other) {
+                case SBuiltinType.Int:
+                    return new SInt((int)Value);
+                case SBuiltinType.Float:
+                    return new SFloat(Value);
+                default: throw CastInvalid("native " + other.ToString());
+            }
         }
 
         public override bool IsTruthy() {
@@ -1311,7 +1395,8 @@ namespace spaghetto {
         Identifier,
         List,
         If,
-        For
+        For,
+        Cast
     }
 
     public enum SBuiltinType
