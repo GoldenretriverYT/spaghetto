@@ -247,7 +247,8 @@ namespace spaghetto {
         public static void ClassifyIdentifier(ref SyntaxToken token) {
             if (token.Text.ToString() is "return" or "continue" or "break"
                                        or "if" or "elseif" or "else"
-                                       or "for" or "while" or "func" or "var") {
+                                       or "for" or "while" or "func" or "var"
+                                       or "import" or "native") {
                 token.Type = SyntaxType.Keyword;
             }
         }

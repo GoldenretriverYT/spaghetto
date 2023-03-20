@@ -41,12 +41,17 @@ Keywords:
   for
   while
   func
+  import
+  native
 
 statements    : (statement)*
 scoped-statements: LBRACE (statement)* RBRACE
 
 statement     : KEYWORD:return expr?
               : KEYWORD:continue|break
+              : KEYWORD:import
+                  KEYWORD:native IDENTIFIER
+                | LITERAL:STRING
               : expr
               : SEMICOLON
               

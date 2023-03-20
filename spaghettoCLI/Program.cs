@@ -9,6 +9,8 @@ namespace spaghettoCLI
         static bool showLexOutput = false, showParseOutput = false, timings = false;
 
         static void Main(string[] args) {
+            var interpreter = new Interpreter();
+
             while (true) {
                 Console.Write("spaghetto > ");
                 string text = Console.ReadLine();
@@ -34,83 +36,37 @@ namespace spaghettoCLI
                     continue;
                 }
 
-                RunCode(text);
+                RunCode(interpreter, text);
             }
         }
 
-        public static void RunCode(string text) {
+        public static void RunCode(Interpreter interpreter, string text) {
             try {
-                Stopwatch sw = new();
+                TimingInterpreterResult res = new();
 
-                sw.Start();
-                Lexer lexer = new(text);
-                List<SyntaxToken> tokens = lexer.Lex();
-
-                var lexingTime = sw.Elapsed.TotalMilliseconds;
-
-                if(showLexOutput) {
-                    foreach (var tok in tokens) Console.WriteLine(tok.ToString());    
-                }
-
-                sw.Restart();
-
-                Parser p = new(tokens);
-                SyntaxNode parsed = p.Parse();
-
-                var parsingTime = sw.Elapsed.TotalMilliseconds;
-
-                if(showParseOutput) PrintTree(parsed);
-
-                sw.Restart();
-                var globalScope = new Scope();
-
-                #region init scope
-                globalScope.Set("print", new SNativeFunction((Scope callingScope, List<SValue> args) => {
-                    if (args.Count == 0) throw new Exception("Expected 1 argument on print call");
-                    //if (args[0] is not SString str) throw new Exception("Argument 0 was expected to be a SString");
-                    Console.WriteLine(args[0].ToSpagString().Value);
-                    return args[0];
-                }));
-
-                globalScope.Set("typeof", new SNativeFunction((Scope callingScope, List<SValue> args) => {
-                    if (args.Count == 0) throw new Exception("Expected 1 argument on typeof call");
-
-                    return new SString(args[0].BuiltinName.ToString());
-                }));
-
-                globalScope.Set("toString", new SNativeFunction((Scope callingScope, List<SValue> args) => {
-                    if (args.Count == 0) throw new Exception("Expected 1 argument on typeof toString");
-
-                    return args[0].ToSpagString();
-                }));
-                #endregion
-
-                var evalRes = parsed.Evaluate(globalScope);
-
-                sw.Stop();
-                var evalTime = sw.Elapsed.TotalMilliseconds;
+                interpreter.Interpret(text, ref res);
 
                 Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.WriteLine(evalRes.ToString());
+                Console.WriteLine(res.Result.LastValue.ToString());
 
-                if(timings) {
+                if (timings) {
                     Console.ForegroundColor = ConsoleColor.Blue;
                     Console.WriteLine("Timings:");
 
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.Write("  Lex: ");
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine(lexingTime + "ms");
+                    Console.WriteLine(res.LexTime + "ms");
 
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.Write("  Parse: ");
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine(parsingTime + "ms");
+                    Console.WriteLine(res.ParseTime + "ms");
 
                     Console.ForegroundColor = ConsoleColor.White;
                     Console.Write("  Eval: ");
                     Console.ForegroundColor = ConsoleColor.Yellow;
-                    Console.WriteLine(evalTime + "ms");
+                    Console.WriteLine(res.EvalTime + "ms");
                 }
 
                 Console.ResetColor();

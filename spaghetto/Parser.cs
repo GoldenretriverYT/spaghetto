@@ -64,7 +64,7 @@ namespace spaghetto {
                 nodes.Add(ParseStatement());
             }
 
-            return new BlockNode(nodes);
+            return new BlockNode(nodes, false);
         }
 
         public SyntaxNode ParseScopedStatements() {
@@ -83,19 +83,19 @@ namespace spaghetto {
         }
 
         public SyntaxNode ParseStatement() {
-            if(Current.Type == SyntaxType.Keyword && Current.Text == "return") {
-                if(Peek(1).Type == SyntaxType.Semicolon) {
+            if (Current.Type == SyntaxType.Keyword && Current.Text == "return") {
+                if (Peek(1).Type == SyntaxType.Semicolon) {
                     Position += 2;
                     var ret = new ReturnNode();
                     MatchToken(SyntaxType.Semicolon);
                     return ret;
-                }else {
+                } else {
                     Position++;
                     var ret = new ReturnNode(ParseExpression());
                     MatchToken(SyntaxType.Semicolon);
                     return ret;
                 }
-            }else if(Current.Type == SyntaxType.Keyword && Current.Text == "continue") {
+            } else if (Current.Type == SyntaxType.Keyword && Current.Text == "continue") {
                 Position++;
                 MatchToken(SyntaxType.Semicolon);
                 return new ContinueNode();
@@ -103,7 +103,18 @@ namespace spaghetto {
                 Position++;
                 MatchToken(SyntaxType.Semicolon);
                 return new BreakNode();
-            }else {
+            } else if (Current.Type == SyntaxType.Keyword && Current.Text == "import") {
+                Position++;
+                
+                if(Current.Type == SyntaxType.Keyword && Current.Text == "native") {
+                    var ident = MatchToken(SyntaxType.Identifier);
+                    MatchToken(SyntaxType.Semicolon);
+
+                    return new NativeImportNode(ident);
+                }else {
+                    throw new NotImplementedException("Importing other files is not supported yet.");
+                }
+            } else {
                 var exprNode = ParseExpression();
                 MatchToken(SyntaxType.Semicolon);
 
@@ -273,7 +284,7 @@ namespace spaghetto {
         }
 
         public SyntaxNode ParseListExpression() {
-            var lsqTok = MatchToken(SyntaxType.LSqBracket);
+            MatchToken(SyntaxType.LSqBracket);
 
             List<SyntaxNode> list = new();
 
@@ -389,10 +400,8 @@ namespace spaghetto {
         public SyntaxNode BinaryOperation(Func<SyntaxNode> leftParse, List<SyntaxType> allowedTypes, Func<SyntaxNode> rightParse = null) {
             var left = leftParse();
             SyntaxNode right;
-            SyntaxToken operatorToken = default;
-
-            while(allowedTypes.Contains(Current.Type)) {
-                operatorToken = Current;
+            while (allowedTypes.Contains(Current.Type)) {
+                SyntaxToken operatorToken = Current;
                 Position++;
                 right = (rightParse ?? leftParse)();
 
@@ -400,6 +409,31 @@ namespace spaghetto {
             }
 
             return left;
+        }
+    }
+
+    internal class NativeImportNode : SyntaxNode {
+        private SyntaxToken ident;
+
+        public NativeImportNode(SyntaxToken ident) {
+            this.ident = ident;
+        }
+
+        public override NodeType Type => NodeType.NativeImport;
+
+        public override SValue Evaluate(Scope scope) {
+            var val = scope.Get((string)ident.Value);
+
+            if(val == null || val is not SNativeLibraryImporter importer) {
+                throw new Exception("Native library " + ident.Text + " not found!");
+            }
+
+            importer.Import(scope);
+            return SValue.Null;
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren() {
+            yield return new TokenNode(ident);
         }
     }
 
@@ -441,7 +475,7 @@ namespace spaghetto {
         public override NodeType Type => NodeType.While;
 
         public override SValue Evaluate(Scope scope) {
-            Scope whileScope = new Scope(scope);
+            Scope whileScope = new(scope);
             SValue lastVal = SValue.Null;
 
             while (true) {
@@ -450,7 +484,7 @@ namespace spaghetto {
                 if (!whileBlockRes.IsNull()) lastVal = whileBlockRes;
 
                 if (whileScope.State == ScopeState.ShouldBreak) break;
-                whileScope.SetState(ScopeState.None);
+                if(whileScope.State != ScopeState.None) whileScope.SetState(ScopeState.None);
             }
 
             return lastVal;
@@ -510,7 +544,7 @@ namespace spaghetto {
         public override NodeType Type => NodeType.For;
 
         public override SValue Evaluate(Scope scope) {
-            Scope forScope = new Scope(scope);
+            Scope forScope = new(scope);
             SValue lastVal = SValue.Null;
             initialExpressionNode.Evaluate(forScope);
 
@@ -520,7 +554,7 @@ namespace spaghetto {
                 if (!forBlockRes.IsNull()) lastVal = forBlockRes;
 
                 if (forScope.State == ScopeState.ShouldBreak) break;
-                forScope.SetState(ScopeState.None);
+                if(forScope.State != ScopeState.None) forScope.SetState(ScopeState.None);
 
                 stepNode.Evaluate(forScope);
             }
@@ -554,9 +588,9 @@ namespace spaghetto {
         }
 
         public override IEnumerable<SyntaxNode> GetChildren() {
-            foreach(var n in Conditions) {
-                yield return n.cond;
-                yield return n.block;
+            foreach(var (cond, block) in Conditions) {
+                yield return cond;
+                yield return block;
             }
         }
 
@@ -972,10 +1006,12 @@ namespace spaghetto {
     internal class BlockNode : SyntaxNode
     {
         private List<SyntaxNode> nodes;
+        private readonly bool createNewScope;
 
-        public BlockNode(List<SyntaxNode> nodes)
+        public BlockNode(List<SyntaxNode> nodes, bool createNewScope = true)
         {
             this.nodes = nodes;
+            this.createNewScope = createNewScope;
         }
 
         public override NodeType Type => NodeType.Block;
@@ -983,10 +1019,12 @@ namespace spaghetto {
         public override SValue Evaluate(Scope scope)
         {
             var lastVal = SValue.Null;
-            var newScope = new Scope(scope);
+            var blockScope = scope;
+            
+            if(createNewScope) blockScope = new Scope(scope);
 
             foreach (var node in nodes) {
-                var res = node.Evaluate(newScope);
+                var res = node.Evaluate(blockScope);
 
                 if (!res.IsNull()) {
                     lastVal = res;
@@ -1249,6 +1287,19 @@ namespace spaghetto {
         }
     }
 
+    public class SNativeLibraryImporter : SValue {
+        public override SBuiltinType BuiltinName => SBuiltinType.NativeLibraryImporter;
+        public Action<Scope> Import { get; set; } = (Scope scope) => { };
+
+        public SNativeLibraryImporter(Action<Scope> import) {
+            Import = import;
+        }
+
+        public override bool IsTruthy() {
+            return true;
+        }
+    }
+
     public class SNativeFunction : SValue {
         public override SBuiltinType BuiltinName => SBuiltinType.NativeFunc;
         public Func<Scope, List<SValue>, SValue> Impl { get; set; }
@@ -1289,7 +1340,7 @@ namespace spaghetto {
         public override SValue Call(Scope scope, List<SValue> args) {
             if (args.Count != Args.Count) throw new Exception(FunctionName + " expected " + Args.Count + " arguments. (" + string.Join(", ", Args) + ")");
 
-            Scope funcScope = new Scope(DefiningScope);
+            Scope funcScope = new(DefiningScope);
             
             for(int i = 0; i < Args.Count; i++) {
                 funcScope.Set(Args[i], args[i]);
@@ -1574,7 +1625,8 @@ namespace spaghetto {
         For,
         Cast,
         While,
-        FunctionDefinition
+        FunctionDefinition,
+        NativeImport
     }
 
     public enum SBuiltinType
@@ -1586,5 +1638,6 @@ namespace spaghetto {
         Null,
         NativeFunc,
         Function,
+        NativeLibraryImporter,
     }
 }

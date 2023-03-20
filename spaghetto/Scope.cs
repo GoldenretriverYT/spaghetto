@@ -18,7 +18,7 @@ namespace spaghetto
 
         public SValue Get(string key)
         {
-            if (Table.ContainsKey(key)) return Table[key];
+            if (Table.TryGetValue(key, out SValue val)) return val;
             
             if(ParentScope == null) return null;
             return ParentScope.Get(key);
@@ -31,12 +31,12 @@ namespace spaghetto
         }
 
         public Exception? Update(string key, SValue value) {
-            if (Table.ContainsKey(key)) {
-                if (Table[key].TypeIsFixed &&
-                    Table[key].BuiltinName != value.BuiltinName)
-                    return new InvalidOperationException("A variables type may not change after initilization (Tried to assign " + value.BuiltinName + " to " + Table[key].BuiltinName + ")");
+            if (Table.TryGetValue(key, out var origVal)) {
+                if (origVal.TypeIsFixed &&
+                    origVal.BuiltinName != value.BuiltinName)
+                    return new InvalidOperationException("A variables type may not change after initilization (Tried to assign " + value.BuiltinName + " to " + origVal.BuiltinName + ")");
 
-                Table[key].CopyMeta(ref value);
+                origVal.CopyMeta(ref value);
                 Table[key] = value;
                 return null;
             }
@@ -59,12 +59,12 @@ namespace spaghetto
 
         public void SetState(ScopeState state) {
             State = state;
-            if (ParentScope != null) ParentScope.SetState(state);
+            ParentScope?.SetState(state);
         }
 
         public void SetReturnValue(SValue val) {
             ReturnValue = val;
-            if (ParentScope != null) ParentScope.SetReturnValue(val);
+            ParentScope?.SetReturnValue(val);
         }
     }
 
