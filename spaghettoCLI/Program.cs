@@ -5,7 +5,7 @@ using System.Text;
 namespace spaghettoCLI
 {
     public class Program {
-        static bool showLexOutput = false, showParseOutput = true;
+        static bool showLexOutput = false, showParseOutput = false;
 
         static void Main(string[] args) {
             while (true) {
@@ -33,7 +33,7 @@ namespace spaghettoCLI
         }
 
         public static void RunCode(string text) {
-            //try {
+            try {
                 Lexer lexer = new(text);
                 List<SyntaxToken> tokens = lexer.Lex();
 
@@ -73,9 +73,9 @@ namespace spaghettoCLI
                 Console.ForegroundColor = ConsoleColor.DarkGray;
                 Console.WriteLine(evalRes.ToString());
                 Console.ResetColor();
-            //} catch (Exception ex) {
-            //    Console.WriteLine("Error: " + ex.Message);
-            //}
+            } catch (Exception ex) {
+                Console.WriteLine("Error: " + ex.Message);
+            }
         }
 
         public static void PrintTree(SyntaxNode node, int ident = 0) {

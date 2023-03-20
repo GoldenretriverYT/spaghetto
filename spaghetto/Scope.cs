@@ -1,4 +1,6 @@
-﻿namespace spaghetto
+﻿using System.Xml;
+
+namespace spaghetto
 {
     public class Scope
     {
@@ -24,17 +26,35 @@
 
         public void Set(string key, SValue value)
         {
+            if (Table.ContainsKey(key)) throw new Exception("Scope.Set can not be used to overwrite values.");
             Table[key] = value;
         }
 
-        public void Update(string key, SValue value) {
+        public Exception? Update(string key, SValue value) {
             if (Table.ContainsKey(key)) {
+                if (Table[key].TypeIsFixed &&
+                    Table[key].BuiltinName != value.BuiltinName)
+                    return new InvalidOperationException("A variables type may not change after initilization (Tried to assign " + value.BuiltinName + " to " + Table[key].BuiltinName + ")");
+
+                Table[key].CopyMeta(ref value);
                 Table[key] = value;
-                return;
+                return null;
             }
 
             if (ParentScope == null) throw new Exception("Could not update field " + key + ": Not found");
-            ParentScope.Update(key, value);
+            return ParentScope.Update(key, value);
+        }
+
+        public bool Update(string key, SValue value, out Exception ex) {
+            var updateEx = Update(key, value);
+
+            if(updateEx == null) {
+                ex = new Exception();
+                return true;
+            }else {
+                ex = updateEx;
+                return false;
+            }
         }
 
         public void SetState(ScopeState state) {

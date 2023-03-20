@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Numerics;
+using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -112,15 +113,22 @@ namespace spaghetto {
 
         public SyntaxNode ParseExpression() {
             if(Current.Type == SyntaxType.Keyword && Current.Text == "var") {
+                bool fixedType = true;
                 Position++;
+
+                if(Current.Type == SyntaxType.Mod) {
+                    fixedType = false;
+                    Position++;
+                }
+
                 var ident = MatchToken(SyntaxType.Identifier);
 
                 if(Current.Type == SyntaxType.Equals) {
                     Position++;
                     var expr = ParseExpression();
-                    return new InitVariableNode(ident, expr);
+                    return new InitVariableNode(ident, expr, fixedType);
                 }else {
-                    return new InitVariableNode(ident);
+                    return new InitVariableNode(ident, fixedType);
                 }
             }else if(Current.Type == SyntaxType.Identifier && Peek(1).Type == SyntaxType.Equals) {
                 var ident = MatchToken(SyntaxType.Identifier);
@@ -815,10 +823,7 @@ namespace spaghetto {
 
             var val = expr.Evaluate(scope);
             var key = ident.Value.ToString();
-            var prevVal = scope.Get(key);
-            if (prevVal.BuiltinName != val.BuiltinName)
-                throw new InvalidOperationException("A variables type may not change after initilization (Tried to assign " + val.BuiltinName + " to " + prevVal.BuiltinName + ")");
-            scope.Update(key, val);
+            if (!scope.Update(key, val, out Exception ex)) throw ex;
             return val;
         }
 
@@ -837,16 +842,19 @@ namespace spaghetto {
     {
         private SyntaxToken ident;
         private SyntaxNode expr;
+        private readonly bool isFixedType = true;
 
-        public InitVariableNode(SyntaxToken ident)
+        public InitVariableNode(SyntaxToken ident, bool isFixedType)
         {
             this.ident = ident;
+            this.isFixedType = isFixedType;
         }
 
-        public InitVariableNode(SyntaxToken ident, SyntaxNode expr)
+        public InitVariableNode(SyntaxToken ident, SyntaxNode expr, bool isFixedType)
         {
             this.ident = ident;
             this.expr = expr;
+            this.isFixedType = isFixedType;
         }
 
         public override NodeType Type => NodeType.InitVariable;
@@ -857,16 +865,25 @@ namespace spaghetto {
                 throw new InvalidOperationException("Can not initiliaze the same variable twice!");
             }
 
-            var val = expr.Evaluate(scope);
+            if (expr != null) {
+                var val = expr.Evaluate(scope);
+                val.TypeIsFixed = isFixedType;
 
-            scope.Set(ident.Value.ToString(), val);
-            return val;
+                scope.Set(ident.Value.ToString(), val);
+                return val;
+            }else {
+                if (isFixedType) throw new InvalidOperationException("Tried to initiliaze a fixed type variable with no value; this is not permitted. Use var% instead.");
+
+                scope.Set(ident.Value.ToString(), SValue.Null);
+                return SValue.Null;
+            }
+
         }
 
         public override IEnumerable<SyntaxNode> GetChildren()
         {
             yield return new TokenNode(ident);
-            yield return expr;
+            if(expr != null) yield return expr;
         }
 
         public override string ToString() {
@@ -1123,6 +1140,10 @@ namespace spaghetto {
         public static SValue Null => new SNull();
         public abstract SBuiltinType BuiltinName { get; }
 
+        #region Metadata
+        internal bool TypeIsFixed { get; set; } = true;
+        #endregion
+
         public virtual SValue Add(SValue other)
         {
             throw NotSupportedOn("Add");
@@ -1221,6 +1242,10 @@ namespace spaghetto {
 
         protected ArgumentException CastInvalid(string type) {
             return new ArgumentException(GetType().Name + " can not be cast to " + type);
+        }
+
+        internal void CopyMeta(ref SValue other) {
+            other.TypeIsFixed = TypeIsFixed;
         }
     }
 
