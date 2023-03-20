@@ -33,7 +33,7 @@ namespace spaghettoCLI
         }
 
         public static void RunCode(string text) {
-            //try {
+            try {
                 Lexer lexer = new(text);
                 List<SyntaxToken> tokens = lexer.Lex();
 
@@ -61,11 +61,21 @@ namespace spaghettoCLI
 
                     return new SString(args[0].BuiltinName.ToString());
                 }));
+
+                globalScope.Set("toString", new SNativeFunction((List<SValue> args) => {
+                    if (args.Count == 0) throw new Exception("Expected 1 argument on typeof toString");
+
+                    return args[0].ToSpagString();
+                }));
                 #endregion
-            Console.WriteLine(parsed.Evaluate(globalScope).ToString());
-            //} catch (Exception ex) {
-            //    Console.WriteLine("Error: " + ex.Message);
-            //}
+
+                var evalRes = parsed.Evaluate(globalScope);
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine(evalRes.ToString());
+                Console.ResetColor();
+            } catch (Exception ex) {
+                Console.WriteLine("Error: " + ex.Message);
+            }
         }
 
         public static void PrintTree(SyntaxNode node, int ident = 0) {

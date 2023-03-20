@@ -252,8 +252,7 @@ namespace spaghetto {
             } else if (Current.Type is SyntaxType.Keyword && Current.Text == "for") {
                 return ParseForExpression();
             } else if (Current.Type is SyntaxType.Keyword && Current.Text == "while") {
-                throw new NotImplementedException();
-                //return ParseWhileExpression();
+                return ParseWhileExpression();
             } else if (Current.Type is SyntaxType.Keyword && Current.Text == "func") {
                 throw new NotImplementedException();
                 //return ParseFuncExpression();
@@ -334,6 +333,17 @@ namespace spaghetto {
             return new ForNode(initialExpressionNode, condNode, stepNode, block);
         }
 
+        public SyntaxNode ParseWhileExpression() {
+            MatchKeyword("while");
+
+            MatchToken(SyntaxType.LParen);
+            var condNode = ParseExpression();
+            MatchToken(SyntaxType.RParen);
+            var block = ParseScopedStatements();
+
+            return new WhileNode(condNode, block);
+        }
+
         public SyntaxNode BinaryOperation(Func<SyntaxNode> leftParse, List<SyntaxType> allowedTypes, Func<SyntaxNode> rightParse = null) {
             var left = leftParse();
             SyntaxNode right;
@@ -348,6 +358,39 @@ namespace spaghetto {
             }
 
             return left;
+        }
+    }
+
+    internal class WhileNode : SyntaxNode {
+        private SyntaxNode condNode;
+        private SyntaxNode block;
+
+        public WhileNode(SyntaxNode condNode, SyntaxNode block) {
+            this.condNode = condNode;
+            this.block = block;
+        }
+
+        public override NodeType Type => throw new NotImplementedException();
+
+        public override SValue Evaluate(Scope scope) {
+            Scope whileScope = new Scope(scope);
+            SValue lastVal = SValue.Null;
+
+            while (true) {
+                if (!condNode.Evaluate(whileScope).IsTruthy()) break;
+                var whileBlockRes = block.Evaluate(whileScope);
+                if (!whileBlockRes.IsNull()) lastVal = whileBlockRes;
+
+                if (whileScope.State == ScopeState.ShouldBreak) break;
+                whileScope.SetState(ScopeState.None);
+            }
+
+            return lastVal;
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren() {
+            yield return condNode;
+            yield return block;
         }
     }
 
@@ -1166,6 +1209,7 @@ namespace spaghetto {
 
         public override SValue Add(SValue other) {
             if (other is not SInt otherInt) throw new Exception("Can not perform Add on SInt and " + other.GetType().Name);
+
             return new SInt(Value + otherInt.Value);
         }
 
