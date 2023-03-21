@@ -178,7 +178,7 @@ namespace spaghetto.Parsing
             if(Current.Type is SyntaxType.Plus or SyntaxType.Minus or SyntaxType.Bang) {
                 Position++;
                 var factor = ParseFactorExpression();
-                return new UnaryExpressionNode(Peek(-1), factor);
+                return new UnaryExpressionNode(Peek(-2), factor);
             }
 
             return ParsePowerExpression();

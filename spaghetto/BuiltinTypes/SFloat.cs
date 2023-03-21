@@ -41,6 +41,10 @@
             return new SInt(Value == otherInt.Value ? 1 : 0);
         }
 
+        public override SValue ArithNot() {
+            return new SFloat(-Value);
+        }
+
         public override SValue CastToBuiltin(SBuiltinType other) {
             switch (other) {
                 case SBuiltinType.Int:

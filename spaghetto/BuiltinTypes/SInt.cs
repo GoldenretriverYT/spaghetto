@@ -67,6 +67,10 @@
             return Value >= otherInt.Value ? SInt.One : SInt.Zero;
         }
 
+        public override SValue ArithNot() {
+            return new SInt(-Value);
+        }
+
         public override SValue CastToBuiltin(SBuiltinType other) {
             switch(other) {
                 case SBuiltinType.Int:

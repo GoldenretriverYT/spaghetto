@@ -52,7 +52,7 @@ namespace spaghettoCLI
         public static void RunCode(Interpreter interpreter, string text) {
             TimingInterpreterResult res = new();
 
-            try {
+            //try {
 
                 interpreter.Interpret(text, ref res);
 
@@ -80,9 +80,9 @@ namespace spaghettoCLI
                 }
 
                 Console.ResetColor();
-            } catch (Exception ex) {
-                Console.WriteLine("Error: " + ex.Message);
-            }
+            //} catch (Exception ex) {
+            //    Console.WriteLine("Error: " + ex.Message);
+            //}
 
             if(showParseOutput && res.Result.AST != null) {
                 PrintTree(res.Result.AST);
