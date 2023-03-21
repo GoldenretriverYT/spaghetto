@@ -10,5 +10,6 @@
         Function,
         NativeLibraryImporter,
         Dictionary,
+        Class,
     }
 }

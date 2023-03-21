@@ -57,6 +57,11 @@ namespace spaghetto
             }
         }
 
+        public Scope GetRoot() {
+            if (ParentScope == null) return this;
+            return ParentScope.GetRoot();
+        }
+
         public void SetState(ScopeState state) {
             State = state;
             ParentScope?.SetState(state);

@@ -2,9 +2,16 @@
     public class SNativeFunction : SValue {
         public override SBuiltinType BuiltinName => SBuiltinType.NativeFunc;
         public Func<Scope, List<SValue>, SValue> Impl { get; set; }
+        public List<string> ExpectedArgs { get; set; }
 
         public SNativeFunction(Func<Scope, List<SValue>, SValue> impl) {
             Impl = impl;
+            ExpectedArgs = new();
+        }
+
+        public SNativeFunction(Func<Scope, List<SValue>, SValue> impl, List<string> expectedArgs) {
+            Impl = impl;
+            ExpectedArgs = expectedArgs;
         }
 
         /// <summary>
@@ -14,6 +21,8 @@
         /// <param name="args"></param>
         /// <returns></returns>
         public override SValue Call(Scope scope, List<SValue> args) {
+            if (args.Count != ExpectedArgs.Count) throw new Exception("Expected " + ExpectedArgs.Count + " arguments. (" + string.Join(", ", ExpectedArgs) + ")");
+
             return Impl(scope, args);
         }
 

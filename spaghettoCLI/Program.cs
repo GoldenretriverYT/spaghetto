@@ -8,17 +8,10 @@ namespace spaghettoCLI
 {
     public class Program {
         static bool showLexOutput = false, showParseOutput = false, timings = false;
+        static Interpreter interpreter;
 
         static void Main(string[] args) {
-            var interpreter = new Interpreter();
-            spaghetto.Stdlib.Lang.Lib.Mount(interpreter.GlobalScope);
-            spaghetto.Stdlib.IO.Lib.Mount(interpreter.GlobalScope);
-
-            var tdict = new SDictionary();
-            tdict.Value.Add((new SString("ok"), new SString("works string key")));
-            tdict.Value.Add((new SInt(0), new SString("works int key")));
-
-            interpreter.GlobalScope.Set("test", tdict);
+            InitInterpreter();
 
             while (true) {
                 Console.Write("spaghetto > ");
@@ -42,11 +35,28 @@ namespace spaghettoCLI
                         Console.WriteLine("Timings: " + timings);
                     }
 
+                    if (text.StartsWith("#reset")) {
+                        InitInterpreter();
+                        Console.WriteLine("Reset interpreter");
+                    }
+
                     continue;
                 }
 
                 RunCode(interpreter, text);
             }
+        }
+
+        public static void InitInterpreter() {
+            interpreter = new Interpreter();
+            spaghetto.Stdlib.Lang.Lib.Mount(interpreter.GlobalScope);
+            spaghetto.Stdlib.IO.Lib.Mount(interpreter.GlobalScope);
+
+            var tdict = new SDictionary();
+            tdict.Value.Add((new SString("ok"), new SString("works string key")));
+            tdict.Value.Add((new SInt(0), new SString("works int key")));
+
+            interpreter.GlobalScope.Set("test", tdict);
         }
 
         public static void RunCode(Interpreter interpreter, string text) {

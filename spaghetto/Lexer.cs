@@ -161,9 +161,22 @@ namespace spaghetto {
             string str = "";
 
             Position++;
-            while(Current != '"' && Current != '\0') {
-                str += Current;
-                Position++;
+            while(!(Current == '"' && Peek(-1) != '\\') && Current != '\0') {
+                if (Current == '\\') {
+                    Position++;
+
+                    switch (Current) {
+                        case '"': str += "\""; break;
+                        case 'n': str += "\n"; break;
+                        case '\\': str += "\\"; break;
+                        default: throw new Exception("Invalid escape sequence");
+                    }
+
+                    Position++;
+                } else {
+                    str += Current;
+                    Position++;
+                }
             }
 
             Position++;
