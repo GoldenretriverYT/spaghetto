@@ -43,6 +43,7 @@ Keywords:
   func
   import
   native
+  new
 
 statements    : (statement)*
 scoped-statements: LBRACE (statement)* RBRACE
@@ -52,6 +53,7 @@ statement     : KEYWORD:return expr?
               : KEYWORD:import
                   KEYWORD:native IDENTIFIER
                 | LITERAL:STRING
+              : KEYWORD:new IDENTIFIER LPAREN ((expr (COMMA expr))*)? RPAREN
               : expr
               : SEMICOLON
               

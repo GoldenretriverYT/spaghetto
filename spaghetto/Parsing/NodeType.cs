@@ -23,6 +23,7 @@
         Cast,
         While,
         FunctionDefinition,
-        NativeImport
+        NativeImport,
+        Instantiate
     }
 }

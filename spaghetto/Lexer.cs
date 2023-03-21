@@ -261,7 +261,7 @@ namespace spaghetto {
             if (token.Text.ToString() is "return" or "continue" or "break"
                                        or "if" or "elseif" or "else"
                                        or "for" or "while" or "func" or "var"
-                                       or "import" or "native") {
+                                       or "import" or "native" or "new") {
                 token.Type = SyntaxType.Keyword;
             }
         }

@@ -28,7 +28,10 @@
                     if (cn.ToCallNode is IdentifierNode cnIdentNode)
                     {
                         var ident = cnIdentNode.Token;
-                        currentValue = currentValue.Dot(new SString((string)ident.Value)).Call(scope, cn.EvaluateArgs(scope));
+                        var lhs = currentValue.Dot(new SString((string)ident.Value));
+                        scope.Set("this", lhs);
+                        currentValue = lhs.Call(scope, cn.EvaluateArgs(scope));
+                        scope.Table.Remove("this");
                     }
                     else
                     {

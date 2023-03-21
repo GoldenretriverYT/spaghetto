@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Numerics;
 using System.Reflection.Metadata;
+using System.Reflection.Metadata.Ecma335;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -117,6 +118,31 @@ namespace spaghetto.Parsing
                 }else {
                     throw new NotImplementedException("Importing other files is not supported yet.");
                 }
+            } else if (Current.Type == SyntaxType.Keyword && Current.Text == "new") {
+                Position++;
+                var ident = MatchToken(SyntaxType.Identifier);
+
+                List<SyntaxNode> argumentNodes = new();
+
+                if (Current.Type is SyntaxType.LParen) {
+                    Position++;
+
+                    if (Current.Type is SyntaxType.RParen) {
+                        Position++;
+                    } else {
+                        argumentNodes.Add(ParseExpression());
+
+                        while (Current.Type is SyntaxType.Comma) {
+                            Position++;
+
+                            argumentNodes.Add(ParseExpression());
+                        }
+
+                        MatchToken(SyntaxType.RParen);
+                    }
+                }
+
+                return new InstantiateNode(ident, argumentNodes);
             } else {
                 var exprNode = ParseExpression();
                 MatchToken(SyntaxType.Semicolon);
@@ -412,6 +438,35 @@ namespace spaghetto.Parsing
             }
 
             return left;
+        }
+    }
+
+    internal class InstantiateNode : SyntaxNode {
+        private SyntaxToken ident;
+        private List<SyntaxNode> argumentNodes;
+
+        public InstantiateNode(SyntaxToken ident, List<SyntaxNode> argumentNodes) {
+            this.ident = ident;
+            this.argumentNodes = argumentNodes;
+        }
+
+        public override NodeType Type => NodeType.Instantiate;
+
+        public override SValue Evaluate(Scope scope) {
+            var @class = scope.Get(ident.Text);
+            if (@class == null || @class is not SClass sclass) throw new Exception("Class not found!");
+
+            List<SValue> args = new();
+            foreach (var n in argumentNodes) args.Add(n.Evaluate(scope));
+
+            var instance = new SClassInstance(sclass);
+            instance.CallConstructor(scope, args);
+
+            return instance;
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren() {
+            throw new NotImplementedException();
         }
     }
 }

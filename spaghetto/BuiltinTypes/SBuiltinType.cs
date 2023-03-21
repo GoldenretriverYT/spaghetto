@@ -11,5 +11,7 @@
         NativeLibraryImporter,
         Dictionary,
         Class,
+        NativeObject,
+        ClassInstance,
     }
 }
