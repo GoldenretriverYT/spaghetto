@@ -174,7 +174,7 @@ namespace spaghetto {
             string numStr = "";
             bool isDecimal = false;
 
-            while((char.IsDigit(Current) || Current == '.' || Current == 'e' || Current == '+' || Current == '-') && Current != '\0') {
+            while((char.IsDigit(Current) || Current == '.') && Current != '\0') {
                 numStr += Current;
 
                 if(Current == '.') {
