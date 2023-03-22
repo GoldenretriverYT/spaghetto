@@ -7,29 +7,32 @@
 
         public AssignVariableNode(SyntaxToken ident, SyntaxNode expr)
         {
-            this.ident = ident;
-            this.expr = expr;
+            this.Ident = ident;
+            this.Expr = expr;
         }
 
         public override NodeType Type => NodeType.AssignVariable;
 
+        public SyntaxToken Ident { get => ident; set => ident = value; }
+        public SyntaxNode Expr { get => expr; set => expr = value; }
+
         public override SValue Evaluate(Scope scope)
         {
-            if (scope.Get(ident.Value.ToString()) == null)
+            if (scope.Get(Ident.Value.ToString()) == null)
             {
                 throw new InvalidOperationException("Can not assign to a non-existant identifier");
             }
 
-            var val = expr.Evaluate(scope);
-            var key = ident.Value.ToString();
+            var val = Expr.Evaluate(scope);
+            var key = Ident.Value.ToString();
             if (!scope.Update(key, val, out Exception ex)) throw ex;
             return val;
         }
 
         public override IEnumerable<SyntaxNode> GetChildren()
         {
-            yield return new TokenNode(ident);
-            yield return expr;
+            yield return new TokenNode(Ident);
+            yield return Expr;
         }
 
         public override string ToString()

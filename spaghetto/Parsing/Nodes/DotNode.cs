@@ -24,6 +24,9 @@ namespace spaghetto.Parsing.Nodes
                 {
                     var ident = rvn.Token;
                     currentValue = currentValue.Dot(new SString((string)ident.Value));
+                }else if(node is AssignVariableNode avn) {
+                    var ident = avn.Ident;
+                    return currentValue.DotAssignment(new SString(ident.Text), avn.Expr.Evaluate(scope));
                 }
                 else if (node is CallNode cn)
                 {

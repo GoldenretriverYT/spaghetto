@@ -235,9 +235,16 @@ namespace spaghetto.Parsing
                     Position++;
 
                     if (Current.Type is SyntaxType.Identifier) {
-                        var n = ParseCallExpression();
+                        if (Peek(1).Type is SyntaxType.Equals) {
+                            var ident = MatchToken(SyntaxType.Identifier);
+                            MatchToken(SyntaxType.Equals);
+                            var expr = ParseExpression();
 
-                        accessStack.NextNodes.Add(n);
+                            accessStack.NextNodes.Add(new AssignVariableNode(ident, expr));
+                        } else {
+                            var n = ParseCallExpression();
+                            accessStack.NextNodes.Add(n);
+                        }
                     }
                 }
             } else return callNode;

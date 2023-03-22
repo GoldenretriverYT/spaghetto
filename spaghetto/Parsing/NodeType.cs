@@ -26,6 +26,7 @@
         NativeImport,
         Instantiate,
         ClassDefinition,
-        ClassFunctionDefinition
+        ClassFunctionDefinition,
+        DotAssign
     }
 }

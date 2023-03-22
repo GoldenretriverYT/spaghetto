@@ -43,6 +43,10 @@
             throw NotSupportedOn("Dot");
         }
 
+        public virtual SValue DotAssignment(SValue key, SValue value) {
+            throw NotSupportedOn("DotAssignment");
+        }
+
         // TODO: Maybe force equals to be implemented?
         public virtual SValue Equals(SValue other) {
             throw NotSupportedOn("Equals");

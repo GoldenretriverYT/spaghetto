@@ -53,6 +53,18 @@ namespace spaghetto {
             return SValue.Null;
         }
 
+        public override SValue DotAssignment(SValue key, SValue other) {
+            foreach (var kvp in InstanceTable) {
+                if (kvp.key.Equals(key).IsTruthy()) {
+                    InstanceTable.Remove(kvp);
+                    break;
+                }
+            }
+
+            InstanceTable.Add((key, other));
+            return other;
+        }
+
         public override bool IsTruthy() {
             return true;
         }
