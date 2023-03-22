@@ -7,7 +7,7 @@ using System.Text;
 namespace spaghettoCLI
 {
     public class Program {
-        static bool showLexOutput = false, showParseOutput = false, timings = false;
+        static bool showLexOutput = false, showParseOutput = false, timings = false, rethrow = false;
         static Interpreter interpreter;
 
         static void Main(string[] args) {
@@ -35,6 +35,11 @@ namespace spaghettoCLI
                         Console.WriteLine("Timings: " + timings);
                     }
 
+                    if (text.StartsWith("#rethrow")) {
+                        rethrow = !rethrow;
+                        Console.WriteLine("Rethrow: " + rethrow);
+                    }
+
                     if (text.StartsWith("#reset")) {
                         InitInterpreter();
                         Console.WriteLine("Reset interpreter");
@@ -56,13 +61,48 @@ namespace spaghettoCLI
             tdict.Value.Add((new SString("ok"), new SString("works string key")));
             tdict.Value.Add((new SInt(0), new SString("works int key")));
 
+            var classInstTest = new SClass("color");
+            classInstTest.InstanceBaseTable.Add((new SString("$$ctor"),
+                new SNativeFunction(
+                    impl: (Scope scope, List<SValue> args) => {
+                        // TODO: Add dot stack assignment; not possible yet
+
+                        // TODO: Remove this code and replace it by safe methods
+                        (args[0] as SClassInstance).InstanceTable.Add((new SString("r"), args[1] as SInt));
+                        (args[0] as SClassInstance).InstanceTable.Add((new SString("g"), args[2] as SInt));
+                        (args[0] as SClassInstance).InstanceTable.Add((new SString("b"), args[3] as SInt));
+
+                        return args[0];
+                    },
+                    expectedArgs: new() { "self", "r", "g", "b" }
+                )
+            ));
+
+            classInstTest.InstanceBaseTable.Add((new SString("mul"),
+                new SNativeFunction(
+                    impl: (Scope scope, List<SValue> args) => {
+                        if (args[1] is not SClassInstance inst || inst.Class.Name != "color") throw new Exception("Expected argument 0 to be of type 'color'");
+
+                        var current = args[0] as SClassInstance;
+
+                        SClassInstance newInst = new(inst.Class);
+                        newInst.CallConstructor(scope, new() { newInst, current.Dot(new SString("r")).Mul(inst.Dot(new SString("r"))), current.Dot(new SString("g")).Mul(inst.Dot(new SString("g"))), current.Dot(new SString("b")).Mul(inst.Dot(new SString("b"))) });
+
+                        return newInst;
+                    },
+                    expectedArgs: new() { "self", "other" },
+                    isClassInstanceFunc: true
+                )
+            ));
+
             interpreter.GlobalScope.Set("test", tdict);
+            interpreter.GlobalScope.Set("color", classInstTest);
         }
 
         public static void RunCode(Interpreter interpreter, string text) {
             TimingInterpreterResult res = new();
 
-            try {
+            //try {
 
                 interpreter.Interpret(text, ref res);
 
@@ -90,9 +130,10 @@ namespace spaghettoCLI
                 }
 
                 Console.ResetColor();
-            } catch (Exception ex) {
-                Console.WriteLine("Error: " + ex.Message);
-            }
+            //} catch (Exception ex) {
+            //    Console.WriteLine("Error: " + ex.Message);
+            //    if (rethrow) throw;
+            //}
 
             if(showParseOutput && res.Result.AST != null) {
                 PrintTree(res.Result.AST);

@@ -53,7 +53,6 @@ statement     : KEYWORD:return expr?
               : KEYWORD:import
                   KEYWORD:native IDENTIFIER
                 | LITERAL:STRING
-              : KEYWORD:new IDENTIFIER LPAREN ((expr (COMMA expr))*)? RPAREN
               : expr
               : SEMICOLON
               
@@ -85,6 +84,7 @@ atom          : INT|FLOAT|STRING|IDENTIFIER
               : for-expr
               : while-expr
               : func-def
+              : instantiate
               
 list-expr     : LSQBRACKET (expr (COMMA expr)*)? RSQBRACKET
               
@@ -101,3 +101,5 @@ while-expr    : KEYWORD:while expr
 func-def      : KEYWORD:func IDENTIFIER
                 LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
                 scoped-statements
+
+instantiate   : KEYWORD:new IDENTIFIER LPAREN ((expr (COMMA expr))*)? RPAREN

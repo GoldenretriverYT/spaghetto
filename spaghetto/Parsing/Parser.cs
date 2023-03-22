@@ -118,31 +118,6 @@ namespace spaghetto.Parsing
                 }else {
                     throw new NotImplementedException("Importing other files is not supported yet.");
                 }
-            } else if (Current.Type == SyntaxType.Keyword && Current.Text == "new") {
-                Position++;
-                var ident = MatchToken(SyntaxType.Identifier);
-
-                List<SyntaxNode> argumentNodes = new();
-
-                if (Current.Type is SyntaxType.LParen) {
-                    Position++;
-
-                    if (Current.Type is SyntaxType.RParen) {
-                        Position++;
-                    } else {
-                        argumentNodes.Add(ParseExpression());
-
-                        while (Current.Type is SyntaxType.Comma) {
-                            Position++;
-
-                            argumentNodes.Add(ParseExpression());
-                        }
-
-                        MatchToken(SyntaxType.RParen);
-                    }
-                }
-
-                return new InstantiateNode(ident, argumentNodes);
             } else {
                 var exprNode = ParseExpression();
                 MatchToken(SyntaxType.Semicolon);
@@ -290,7 +265,7 @@ namespace spaghetto.Parsing
             } else if (Current.Type is SyntaxType.Identifier) {
                 Position++;
                 return new IdentifierNode(Peek(-1));
-            } else if(Current.Type is SyntaxType.LParen) {
+            } else if (Current.Type is SyntaxType.LParen) {
                 Position++;
                 var expr = ParseExpression();
 
@@ -307,7 +282,9 @@ namespace spaghetto.Parsing
                 return ParseWhileExpression();
             } else if (Current.Type is SyntaxType.Keyword && Current.Text == "func") {
                 return ParseFunctionExpression();
-            }else {
+            } else if (Current.Type is SyntaxType.Keyword && Current.Text == "new") {
+                return ParseInstantiateExpression();
+            } else {
                 throw new Exception("Unexpected token in atom expression!");
             }
         }
@@ -426,6 +403,33 @@ namespace spaghetto.Parsing
             return new FunctionDefinitionNode(nameToken, args, block);
         }
 
+        public SyntaxNode ParseInstantiateExpression() {
+            Position++;
+            var ident = MatchToken(SyntaxType.Identifier);
+
+            List<SyntaxNode> argumentNodes = new();
+
+            if (Current.Type is SyntaxType.LParen) {
+                Position++;
+
+                if (Current.Type is SyntaxType.RParen) {
+                    Position++;
+                } else {
+                    argumentNodes.Add(ParseExpression());
+
+                    while (Current.Type is SyntaxType.Comma) {
+                        Position++;
+
+                        argumentNodes.Add(ParseExpression());
+                    }
+
+                    MatchToken(SyntaxType.RParen);
+                }
+            }
+
+            return new InstantiateNode(ident, argumentNodes);
+        }
+
         public SyntaxNode BinaryOperation(Func<SyntaxNode> leftParse, List<SyntaxType> allowedTypes, Func<SyntaxNode> rightParse = null) {
             var left = leftParse();
             SyntaxNode right;
@@ -456,10 +460,12 @@ namespace spaghetto.Parsing
             var @class = scope.Get(ident.Text);
             if (@class == null || @class is not SClass sclass) throw new Exception("Class not found!");
 
-            List<SValue> args = new();
-            foreach (var n in argumentNodes) args.Add(n.Evaluate(scope));
 
             var instance = new SClassInstance(sclass);
+
+            List<SValue> args = new() { instance };
+            foreach (var n in argumentNodes) args.Add(n.Evaluate(scope));
+
             instance.CallConstructor(scope, args);
 
             return instance;

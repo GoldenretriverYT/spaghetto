@@ -1,5 +1,7 @@
-﻿namespace spaghetto {
-    public class SNativeFunction : SValue {
+﻿using spaghetto.BuiltinTypes;
+
+namespace spaghetto {
+    public class SNativeFunction : SBaseFunction {
         public override SBuiltinType BuiltinName => SBuiltinType.NativeFunc;
         public Func<Scope, List<SValue>, SValue> Impl { get; set; }
         public List<string> ExpectedArgs { get; set; }
@@ -9,9 +11,10 @@
             ExpectedArgs = new();
         }
 
-        public SNativeFunction(Func<Scope, List<SValue>, SValue> impl, List<string> expectedArgs) {
+        public SNativeFunction(Func<Scope, List<SValue>, SValue> impl, List<string> expectedArgs, bool isClassInstanceFunc = false) {
             Impl = impl;
             ExpectedArgs = expectedArgs;
+            IsClassInstanceMethod = isClassInstanceFunc;
         }
 
         /// <summary>

@@ -1,13 +1,15 @@
-﻿using spaghetto.Parsing.Nodes;
+﻿using spaghetto.BuiltinTypes;
+using spaghetto.Parsing.Nodes;
 
 namespace spaghetto
 {
-    public class SFunction : SValue {
+    public class SFunction : SBaseFunction {
         public override SBuiltinType BuiltinName => SBuiltinType.Function;
         public string FunctionName { get; set; }
         public List<string> Args { get; set; }
         public SyntaxNode Callback { get; set; }
         public Scope DefiningScope { get; set; }
+
 
         public SFunction(Scope definingScope, string functionName, List<string> args, SyntaxNode callback) {
             DefiningScope = definingScope;

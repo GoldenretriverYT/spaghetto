@@ -1,4 +1,6 @@
-﻿namespace spaghetto.Parsing.Nodes
+﻿using spaghetto.BuiltinTypes;
+
+namespace spaghetto.Parsing.Nodes
 {
     internal class DotNode : SyntaxNode
     {
@@ -29,13 +31,15 @@
                     {
                         var ident = cnIdentNode.Token;
                         var lhs = currentValue.Dot(new SString((string)ident.Value));
-                        scope.Set("this", lhs);
-                        currentValue = lhs.Call(scope, cn.EvaluateArgs(scope));
-                        scope.Table.Remove("this");
+
+                        var args = cn.EvaluateArgs(scope);
+                        if (lhs is SBaseFunction func && func.IsClassInstanceMethod) args.Insert(0, currentValue);
+
+                        currentValue = lhs.Call(scope, args);
                     }
                     else
                     {
-                        throw new Exception("Tried to call a non identifier in dot not stack.");
+                        throw new Exception("Tried to call a non identifier in dot node stack.");
                     }
                 }
                 else
