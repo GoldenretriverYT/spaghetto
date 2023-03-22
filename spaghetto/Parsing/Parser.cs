@@ -11,8 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using spaghetto.Parsing.Nodes;
 
-namespace spaghetto.Parsing
-{
+namespace spaghetto.Parsing {
     public class Parser {
         public List<SyntaxToken> Tokens { get; set; }
         public int Position = 0;
@@ -492,108 +491,6 @@ namespace spaghetto.Parsing
             }
 
             return left;
-        }
-    }
-
-    internal class ClassFunctionDefinitionNode : SyntaxNode {
-        private SyntaxToken name;
-        private List<SyntaxToken> args;
-        private SyntaxNode body;
-        private bool isStatic;
-
-        public ClassFunctionDefinitionNode(SyntaxToken name, List<SyntaxToken> args, SyntaxNode body, bool isStatic) {
-            this.name = name;
-            this.args = args;
-            this.body = body;
-            this.isStatic = isStatic;
-        }
-
-        public override NodeType Type => NodeType.ClassFunctionDefinition;
-
-        public override SValue Evaluate(Scope scope) {
-            var targetName = name.Text;
-
-            if (targetName is "ctor" or "toString") targetName = "$$" + targetName;
-
-            var f = new SFunction(scope, targetName, args.Select((v) => v.Text).ToList(), body);
-            f.IsClassInstanceMethod = !isStatic;
-            return f;
-        }
-
-        public override IEnumerable<SyntaxNode> GetChildren() {
-            yield return new TokenNode(name);
-            foreach (var tok in args) yield return new TokenNode(tok);
-            yield return body;
-        }
-    }
-
-    internal class ClassDefinitionNode : SyntaxNode {
-        private SyntaxToken className;
-        private IEnumerable<SyntaxNode> body;
-
-        public ClassDefinitionNode(SyntaxToken className, IEnumerable<SyntaxNode> body) {
-            this.className = className;
-            this.body = body;
-        }
-
-        public override NodeType Type => NodeType.ClassDefinition;
-
-        public override SValue Evaluate(Scope scope) {
-            var @class = new SClass();
-            @class.Name = className.Text;
-
-            foreach(var bodyNode in body) {
-                if (bodyNode is not ClassFunctionDefinitionNode cfdn) throw new Exception("Unexpected node in class definition");
-
-                var funcRaw = cfdn.Evaluate(scope);
-
-                if (funcRaw is not SFunction func) throw new Exception("Expected ClassFunctionDefinitionNode to return SFunction");
-
-                if(func.IsClassInstanceMethod) {
-                    @class.InstanceBaseTable.Add((new SString(func.FunctionName), func));
-                }else {
-                    @class.StaticTable.Add((new SString(func.FunctionName), func));
-                }
-            }
-
-            scope.Set(className.Text, @class);
-            return @class;
-        }
-
-        public override IEnumerable<SyntaxNode> GetChildren() {
-            yield return new TokenNode(className);
-            foreach (var n in body) yield return n;
-        }
-    }
-
-    internal class InstantiateNode : SyntaxNode {
-        private SyntaxToken ident;
-        private List<SyntaxNode> argumentNodes;
-
-        public InstantiateNode(SyntaxToken ident, List<SyntaxNode> argumentNodes) {
-            this.ident = ident;
-            this.argumentNodes = argumentNodes;
-        }
-
-        public override NodeType Type => NodeType.Instantiate;
-
-        public override SValue Evaluate(Scope scope) {
-            var @class = scope.Get(ident.Text);
-            if (@class == null || @class is not SClass sclass) throw new Exception("Class not found!");
-
-
-            var instance = new SClassInstance(sclass);
-
-            List<SValue> args = new() { instance };
-            foreach (var n in argumentNodes) args.Add(n.Evaluate(scope));
-
-            instance.CallConstructor(scope, args);
-
-            return instance;
-        }
-
-        public override IEnumerable<SyntaxNode> GetChildren() {
-            throw new NotImplementedException();
         }
     }
 }
