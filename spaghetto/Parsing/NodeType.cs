@@ -24,6 +24,8 @@
         While,
         FunctionDefinition,
         NativeImport,
-        Instantiate
+        Instantiate,
+        ClassDefinition,
+        ClassFunctionDefinition
     }
 }

@@ -118,12 +118,49 @@ namespace spaghetto.Parsing
                 }else {
                     throw new NotImplementedException("Importing other files is not supported yet.");
                 }
-            } else {
+            } else if(Current.Type == SyntaxType.Keyword && Current.Text == "class") {
+                return ParseClassDefinition();
+            }
+            
+            else {
                 var exprNode = ParseExpression();
                 MatchToken(SyntaxType.Semicolon);
 
                 return exprNode;
             }
+        }
+
+        private SyntaxNode ParseClassDefinition() {
+            MatchKeyword("class");
+            var className = MatchToken(SyntaxType.Identifier);
+
+            MatchToken(SyntaxType.LBraces);
+            var body = ParseClassBody();
+            MatchToken(SyntaxType.RBraces);
+
+            return new ClassDefinitionNode(className, body);
+        }
+
+        private List<SyntaxNode> ParseClassBody() {
+            List<SyntaxNode> nodes = new();
+
+            while(Current.Type == SyntaxType.Keyword && Current.Text == "func") {
+                Position++;
+                var isStatic = false;
+
+                if(Current.Type == SyntaxType.Keyword && Current.Text == "static") {
+                    Position++;
+                    isStatic = true;
+                }
+
+                var name = MatchToken(SyntaxType.Identifier);
+                var args = ParseFunctionArgs();
+                var body = ParseScopedStatements();
+
+                nodes.Add(new ClassFunctionDefinitionNode(name, args, body, isStatic));
+            }
+
+            return nodes;
         }
 
         public SyntaxNode ParseExpression() {
@@ -379,24 +416,7 @@ namespace spaghetto.Parsing
             if(Current.Type == SyntaxType.Identifier)
                 nameToken = MatchToken(SyntaxType.Identifier);
 
-            MatchToken(SyntaxType.LParen);
-
-            List<SyntaxToken> args = new();
-
-            if (Current.Type == SyntaxType.RParen) {
-                MatchToken(SyntaxType.RParen);
-            } else {
-                var ident = MatchToken(SyntaxType.Identifier);
-                args.Add(ident);
-
-                while (Current.Type == SyntaxType.Comma) {
-                    Position++;
-                    ident = MatchToken(SyntaxType.Identifier);
-                    args.Add(ident);
-                }
-
-                MatchToken(SyntaxType.RParen);
-            }
+            var args = ParseFunctionArgs();
 
             var block = ParseScopedStatements();
 
@@ -430,6 +450,28 @@ namespace spaghetto.Parsing
             return new InstantiateNode(ident, argumentNodes);
         }
 
+        public List<SyntaxToken> ParseFunctionArgs() {
+            MatchToken(SyntaxType.LParen);
+
+            List<SyntaxToken> args = new();
+
+            if (Current.Type == SyntaxType.RParen) {
+                MatchToken(SyntaxType.RParen);
+            } else {
+                var ident = MatchToken(SyntaxType.Identifier);
+                args.Add(ident);
+
+                while (Current.Type == SyntaxType.Comma) {
+                    Position++;
+                    ident = MatchToken(SyntaxType.Identifier);
+                    args.Add(ident);
+                }
+
+                MatchToken(SyntaxType.RParen);
+            }
+
+            return args;
+        }
         public SyntaxNode BinaryOperation(Func<SyntaxNode> leftParse, List<SyntaxType> allowedTypes, Func<SyntaxNode> rightParse = null) {
             var left = leftParse();
             SyntaxNode right;
@@ -442,6 +484,77 @@ namespace spaghetto.Parsing
             }
 
             return left;
+        }
+    }
+
+    internal class ClassFunctionDefinitionNode : SyntaxNode {
+        private SyntaxToken name;
+        private List<SyntaxToken> args;
+        private SyntaxNode body;
+        private bool isStatic;
+
+        public ClassFunctionDefinitionNode(SyntaxToken name, List<SyntaxToken> args, SyntaxNode body, bool isStatic) {
+            this.name = name;
+            this.args = args;
+            this.body = body;
+            this.isStatic = isStatic;
+        }
+
+        public override NodeType Type => NodeType.ClassFunctionDefinition;
+
+        public override SValue Evaluate(Scope scope) {
+            var targetName = name.Text;
+
+            if (targetName is "ctor" or "toString") targetName = "$$" + targetName;
+
+            var f = new SFunction(scope, targetName, args.Select((v) => v.Text).ToList(), body);
+            f.IsClassInstanceMethod = !isStatic;
+            return f;
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren() {
+            yield return new TokenNode(name);
+            foreach (var tok in args) yield return new TokenNode(tok);
+            yield return body;
+        }
+    }
+
+    internal class ClassDefinitionNode : SyntaxNode {
+        private SyntaxToken className;
+        private IEnumerable<SyntaxNode> body;
+
+        public ClassDefinitionNode(SyntaxToken className, IEnumerable<SyntaxNode> body) {
+            this.className = className;
+            this.body = body;
+        }
+
+        public override NodeType Type => NodeType.ClassDefinition;
+
+        public override SValue Evaluate(Scope scope) {
+            var @class = new SClass();
+            @class.Name = className.Text;
+
+            foreach(var bodyNode in body) {
+                if (bodyNode is not ClassFunctionDefinitionNode cfdn) throw new Exception("Unexpected node in class definition");
+
+                var funcRaw = cfdn.Evaluate(scope);
+
+                if (funcRaw is not SFunction func) throw new Exception("Expected ClassFunctionDefinitionNode to return SFunction");
+
+                if(func.IsClassInstanceMethod) {
+                    @class.InstanceBaseTable.Add((new SString(func.FunctionName), func));
+                }else {
+                    @class.StaticTable.Add((new SString(func.FunctionName), func));
+                }
+            }
+
+            scope.Set(className.Text, @class);
+            return @class;
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren() {
+            yield return new TokenNode(className);
+            foreach (var n in body) yield return n;
         }
     }
 

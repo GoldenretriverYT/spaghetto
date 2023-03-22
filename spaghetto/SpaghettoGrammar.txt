@@ -44,6 +44,8 @@ Keywords:
   import
   native
   new
+  class
+  static
 
 statements    : (statement)*
 scoped-statements: LBRACE (statement)* RBRACE
@@ -53,6 +55,7 @@ statement     : KEYWORD:return expr?
               : KEYWORD:import
                   KEYWORD:native IDENTIFIER
                 | LITERAL:STRING
+              : class-def
               : expr
               : SEMICOLON
               
@@ -102,4 +105,11 @@ func-def      : KEYWORD:func IDENTIFIER
                 LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
                 scoped-statements
 
+class-def     : KEYWORD:class IDENTIFIER LBRACE class-body RBRACE
+
+class-body    : (class-funcdef*)?
+
+class-funcdef : KEYWORD:func KEYWORD:static? IDENTIFIER func-args scoped-statements
+
+func-args     : LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
 instantiate   : KEYWORD:new IDENTIFIER LPAREN ((expr (COMMA expr))*)? RPAREN
