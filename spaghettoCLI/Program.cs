@@ -95,6 +95,17 @@ namespace spaghettoCLI
                 )
             ));
 
+            classInstTest.InstanceBaseTable.Add((new SString("$$toString"),
+                new SNativeFunction(
+                    impl: (Scope scope, List<SValue> args) => {
+                        var current = args[0] as SClassInstance;
+                        return new SString("<Color R=" + args[0].Dot(new SString("r")).SpagToCsString() + " G=" + args[0].Dot(new SString("g")).SpagToCsString() + " B=" + args[0].Dot(new SString("b")).SpagToCsString() + ">");
+                    },
+                    expectedArgs: new() { "self" },
+                    isClassInstanceFunc: true
+                )
+            ));
+
             interpreter.GlobalScope.Set("test", tdict);
             interpreter.GlobalScope.Set("color", classInstTest);
         }
@@ -107,7 +118,9 @@ namespace spaghettoCLI
                 interpreter.Interpret(text, ref res);
 
                 Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.WriteLine(res.Result.LastValue.ToString());
+                Console.WriteLine("  C#: " + res.Result.LastValue.ToString());
+                Console.WriteLine("  Spag: " + res.Result.LastValue.ToSpagString().Value);
+
 
                 if (timings) {
                     Console.ForegroundColor = ConsoleColor.Blue;

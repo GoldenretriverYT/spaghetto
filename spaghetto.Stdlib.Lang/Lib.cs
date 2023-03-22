@@ -10,7 +10,15 @@
         public static void Import(Scope scope) {
             scope.Set("typeof", new SNativeFunction(
                 impl: (Scope callingScope, List<SValue> args) => {
-                    return new SString(args[0].BuiltinName.ToString());
+                    var builtinType = args[0].BuiltinName;
+
+                    if(builtinType == SBuiltinType.ClassInstance) {
+                        if (args[0] is not SClassInstance inst) throw new Exception("Unexpected value! BuiltinName was set to ClassInstance but it was not of type SClassInstance!");
+                        return new SString(inst.Class.Name);
+                    }else {
+                        return new SString(builtinType.ToString());
+                    }
+                    
                 },
                 expectedArgs: new() { "value" }
             ));

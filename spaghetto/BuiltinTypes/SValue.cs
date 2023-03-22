@@ -113,5 +113,9 @@
         internal void CopyMeta(ref SValue other) {
             other.TypeIsFixed = TypeIsFixed;
         }
+
+        public string SpagToCsString() {
+            return ToSpagString().Value;
+        }
     }
 }

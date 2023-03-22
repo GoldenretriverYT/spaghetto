@@ -1,4 +1,6 @@
-﻿namespace spaghetto {
+﻿using spaghetto.BuiltinTypes;
+
+namespace spaghetto {
     public class SClassInstance : SValue {
         public SClass Class { get; set; }
         public List<(SValue key, SValue val)> InstanceTable { get; set; } = new();
@@ -22,7 +24,17 @@
         }
 
         public override SString ToSpagString() {
-            return new SString("<instance of class " + Class.Name + ">");
+            var toStringVal = Dot(new SString("$$toString"));
+
+            if (toStringVal is not SBaseFunction toStringFunc) {
+                return new SString("<instance of class " + Class.Name + ">");
+            }else {
+                // TODO: Find a solution to pass the scope; maybe keep a "DefiningScope" on each value?
+                var ret = toStringFunc.Call(null, new() { this });
+
+                if (ret is not SString str) throw new Exception("A classes toString function must return a string!");
+                return str;
+            }
         }
 
         public override string ToString() {
@@ -37,8 +49,6 @@
             foreach (var kvp in InstanceTable) {
                 if (kvp.key.Equals(other).IsTruthy()) return kvp.val;
             }
-
-
 
             return SValue.Null;
         }
