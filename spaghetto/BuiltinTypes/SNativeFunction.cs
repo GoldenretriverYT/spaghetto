@@ -4,7 +4,6 @@ namespace spaghetto {
     public class SNativeFunction : SBaseFunction {
         public override SBuiltinType BuiltinName => SBuiltinType.NativeFunc;
         public Func<Scope, List<SValue>, SValue> Impl { get; set; }
-        public List<string> ExpectedArgs { get; set; }
 
         public SNativeFunction(Func<Scope, List<SValue>, SValue> impl) {
             Impl = impl;

@@ -36,7 +36,10 @@ namespace spaghetto.Parsing.Nodes
                         var lhs = currentValue.Dot(new SString((string)ident.Value));
 
                         var args = cn.EvaluateArgs(scope);
-                        if (lhs is SBaseFunction func && func.IsClassInstanceMethod) args.Insert(0, currentValue);
+                        if (lhs is SBaseFunction func && func.IsClassInstanceMethod) {
+                            var idxOfSelf = func.ExpectedArgs.IndexOf("self");
+                            if(idxOfSelf != -1) args.Insert(idxOfSelf, currentValue);
+                        }
 
                         currentValue = lhs.Call(scope, args);
                     }
