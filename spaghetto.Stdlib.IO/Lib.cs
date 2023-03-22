@@ -15,7 +15,7 @@
 
             scope.Set("print", new SNativeFunction(
                 impl: (Scope callingScope, List<SValue> args) => {
-                    Console.WriteLine(args[0].ToSpagString().Value);
+                    Console.Write(args[0].ToSpagString().Value);
                     return args[0];
                 },
                 expectedArgs: new() { "text" }

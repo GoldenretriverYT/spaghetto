@@ -1,4 +1,6 @@
-﻿namespace spaghetto.Parsing.Nodes
+﻿using System.Diagnostics;
+
+namespace spaghetto.Parsing.Nodes
 {
     internal class BlockNode : SyntaxNode
     {
@@ -34,6 +36,8 @@
 
                 if (scope.State == ScopeState.ShouldReturn)
                 {
+                    Debug.WriteLine("Returning from call node");
+                    scope.SetState(ScopeState.None);
                     var v = scope.ReturnValue;
                     return v;
                 }

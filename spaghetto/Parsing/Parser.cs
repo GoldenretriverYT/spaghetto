@@ -214,9 +214,10 @@ namespace spaghetto.Parsing
 
         public SyntaxNode ParseFactorExpression() {
             if(Current.Type is SyntaxType.Plus or SyntaxType.Minus or SyntaxType.Bang) {
+                var tok = Current;
                 Position++;
                 var factor = ParseFactorExpression();
-                return new UnaryExpressionNode(Peek(-2), factor);
+                return new UnaryExpressionNode(tok, factor);
             }
 
             return ParsePowerExpression();

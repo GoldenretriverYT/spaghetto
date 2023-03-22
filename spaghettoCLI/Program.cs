@@ -118,7 +118,7 @@ namespace spaghettoCLI
                 interpreter.Interpret(text, ref res);
 
                 Console.ForegroundColor = ConsoleColor.DarkGray;
-                Console.WriteLine("  C#: " + res.Result.LastValue.ToString());
+                Console.WriteLine("\n  C#: " + res.Result.LastValue.ToString());
                 Console.WriteLine("  Spag: " + res.Result.LastValue.ToSpagString().Value);
 
 
@@ -150,6 +150,10 @@ namespace spaghettoCLI
 
             if(showParseOutput && res.Result.AST != null) {
                 PrintTree(res.Result.AST);
+            }
+
+            if(showLexOutput && res.Result.LexedTokens != null) {
+                foreach (var tok in res.Result.LexedTokens) Console.WriteLine("  " + tok.ToString());
             }
         }
 

@@ -88,6 +88,10 @@ namespace spaghetto {
                         insertToken = (new(SyntaxType.Mul, Position, null, Current.ToString()));
                         break;
                     case '/':
+                        if(Peek(1) == '/') {
+                            SkipComment();
+                            continue;
+                        }
                         insertToken = (new(SyntaxType.Div, Position, null, Current.ToString()));
                         break;
                     case '#':
@@ -143,6 +147,12 @@ namespace spaghetto {
             return tokens;
         }
 
+        private void SkipComment() {
+            while(Current != '\0' && Current != '\n') {
+                Position++;
+            }
+        }
+
         private SyntaxToken ParseIdentifierOrKeyword() {
             string str = "";
 
@@ -156,6 +166,7 @@ namespace spaghetto {
 
             return token;
         }
+
 
         private SyntaxToken ParseString() {
             string str = "";
