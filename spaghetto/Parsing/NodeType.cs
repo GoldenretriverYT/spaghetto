@@ -27,6 +27,8 @@
         Instantiate,
         ClassDefinition,
         ClassFunctionDefinition,
-        DotAssign
+        DotAssign,
+        Export,
+        Import
     }
 }

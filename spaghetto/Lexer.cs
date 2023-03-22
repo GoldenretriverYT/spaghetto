@@ -273,7 +273,7 @@ namespace spaghetto {
                                        or "if" or "elseif" or "else"
                                        or "for" or "while" or "func" or "var"
                                        or "import" or "native" or "new"
-                                       or "class" or "static") {
+                                       or "class" or "static" or "export") {
                 token.Type = SyntaxType.Keyword;
             }
         }
