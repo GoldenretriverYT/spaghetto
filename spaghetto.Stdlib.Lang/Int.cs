@@ -19,6 +19,9 @@ namespace spaghetto.Stdlib.Lang {
                 expectedArgs: new() { "toParse" }
             )));
 
+            @class.StaticTable.Add((new SString("MIN_VALUE"), new SInt(int.MinValue) { IsConstant = true }));
+            @class.StaticTable.Add((new SString("MAX_VALUE"), new SInt(int.MaxValue) { IsConstant = true }));
+
             return @class;
         }
     }

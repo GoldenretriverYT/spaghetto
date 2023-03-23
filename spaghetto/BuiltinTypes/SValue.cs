@@ -6,7 +6,8 @@
         public abstract SBuiltinType BuiltinName { get; }
 
         #region Metadata
-        internal bool TypeIsFixed { get; set; } = true;
+        public bool TypeIsFixed { get; set; } = true;
+        public bool IsConstant { get; set; } = false;
         #endregion
 
         public virtual SValue Add(SValue other)
@@ -116,6 +117,7 @@
 
         internal void CopyMeta(ref SValue other) {
             other.TypeIsFixed = TypeIsFixed;
+            other.IsConstant = IsConstant;
         }
 
         public string SpagToCsString() {

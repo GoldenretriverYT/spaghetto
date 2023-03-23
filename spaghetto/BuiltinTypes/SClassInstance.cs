@@ -56,6 +56,8 @@ namespace spaghetto {
         public override SValue DotAssignment(SValue key, SValue other) {
             foreach (var kvp in InstanceTable) {
                 if (kvp.key.Equals(key).IsTruthy()) {
+                    if (kvp.val.IsConstant) throw new Exception($"Tried to overwrite constant value {kvp.key}!");
+
                     InstanceTable.Remove(kvp);
                     break;
                 }
