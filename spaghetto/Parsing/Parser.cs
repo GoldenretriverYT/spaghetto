@@ -170,24 +170,9 @@ namespace spaghetto.Parsing {
         }
 
         public SyntaxNode ParseExpression() {
-            if(Current.Type == SyntaxType.Keyword && Current.Text == "var") {
-                bool fixedType = true;
-                Position++;
-
-                if(Current.Type == SyntaxType.Mod) {
-                    fixedType = false;
-                    Position++;
-                }
-
-                var ident = MatchToken(SyntaxType.Identifier);
-
-                if(Current.Type == SyntaxType.Equals) {
-                    Position++;
-                    var expr = ParseExpression();
-                    return new InitVariableNode(ident, expr, fixedType);
-                }else {
-                    return new InitVariableNode(ident, fixedType);
-                }
+            if(Current.Type == SyntaxType.Keyword && Current.Text == "var" ||
+                Current.Type == SyntaxType.Keyword && Current.Text == "const") {
+                return ParseVariableDefinition();
             }else if(Current.Type == SyntaxType.Identifier && Peek(1).Type == SyntaxType.Equals) {
                 var ident = MatchToken(SyntaxType.Identifier);
                 MatchToken(SyntaxType.Equals);
@@ -195,6 +180,33 @@ namespace spaghetto.Parsing {
                 return new AssignVariableNode(ident, expr);
             }else {
                 return ParseCompExpression();
+            }
+        }
+
+        public SyntaxNode ParseVariableDefinition() {
+            bool isConst = false;
+
+            if(Current.Type == SyntaxType.Keyword && Current.Text == "const") {
+                isConst = true;
+                Position++;
+            }
+
+            bool fixedType = true;
+            MatchKeyword("var");
+
+            if (Current.Type == SyntaxType.Mod) {
+                fixedType = false;
+                Position++;
+            }
+
+            var ident = MatchToken(SyntaxType.Identifier);
+
+            if (Current.Type == SyntaxType.Equals) {
+                Position++;
+                var expr = ParseExpression();
+                return new InitVariableNode(ident, expr, fixedType, isConst);
+            } else {
+                return new InitVariableNode(ident, fixedType, isConst);
             }
         }
 

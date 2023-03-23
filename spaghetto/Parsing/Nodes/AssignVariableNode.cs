@@ -25,6 +25,7 @@
 
             var val = Expr.Evaluate(scope);
             var key = Ident.Value.ToString();
+
             if (!scope.Update(key, val, out Exception ex)) throw ex;
             return val;
         }

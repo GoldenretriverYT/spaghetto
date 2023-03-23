@@ -5,18 +5,20 @@
         private SyntaxToken ident;
         private SyntaxNode expr;
         private readonly bool isFixedType = true;
+        private readonly bool isConst = false;
 
-        public InitVariableNode(SyntaxToken ident, bool isFixedType)
-        {
+        public InitVariableNode(SyntaxToken ident, bool isFixedType, bool isConst = false) {
             this.ident = ident;
             this.isFixedType = isFixedType;
+            this.isConst = isConst;
         }
 
-        public InitVariableNode(SyntaxToken ident, SyntaxNode expr, bool isFixedType)
+        public InitVariableNode(SyntaxToken ident, SyntaxNode expr, bool isFixedType, bool isConst = false)
         {
             this.ident = ident;
             this.expr = expr;
             this.isFixedType = isFixedType;
+            this.isConst = isConst;
         }
 
         public override NodeType Type => NodeType.InitVariable;
@@ -32,6 +34,7 @@
             {
                 var val = expr.Evaluate(scope);
                 val.TypeIsFixed = isFixedType;
+                val.IsConstant = isConst;
 
                 scope.Set(ident.Value.ToString(), val);
                 return val;

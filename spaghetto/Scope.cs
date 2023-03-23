@@ -37,6 +37,8 @@ namespace spaghetto
                     origVal.BuiltinName != value.BuiltinName)
                     return new InvalidOperationException("A variables type may not change after initilization (Tried to assign " + value.BuiltinName + " to " + origVal.BuiltinName + ")");
 
+                if (origVal.IsConstant) throw new InvalidOperationException("Tried to assign to constant variable.");
+
                 origVal.CopyMeta(ref value);
                 Table[key] = value;
                 return null;

@@ -47,6 +47,7 @@ Keywords:
   class
   static
   export
+  const
 
 statements    : (statement)*
 scoped-statements: LBRACE (statement)* RBRACE
@@ -61,7 +62,7 @@ statement     : KEYWORD:return expr?
               : expr
               : SEMICOLON
               
-expression    : KEYWORD:var IDENTIFIER (EQUALS expression)?
+expression    : (KEYWORD:const)? KEYWORD:var IDENTIFIER (EQUALS expression)?
               : IDENTIFIER EQUALS expression
               : comp-expr ((&& | ||) comp-expr)*
               
