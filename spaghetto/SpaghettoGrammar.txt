@@ -1,14 +1,72 @@
-﻿statements    : NEWLINE* statement (NEWLINE+ statement)* NEWLINE*
+﻿SyntaxTokens:
+  Semicolon ;
+  Keyword <dyn>
+  Identifier <dyn>
+  Equals =
+  EqualsEquals ==
+  AndAnd &&
+  OrOr ||
+  LessThan <
+  GreaterThan >
+  GreaterThanEqu >=
+  LessThanEqu <=
+  Plus +
+  Minus -
+  Mod %
+  Mul *
+  Div /
+  Idx #
+  Pow ^
+  Dot .
+  LParen (
+  RParen )
+  Comma ,
+  Int <dyn>
+  Float <dyn> 
+  String <dyn>
+  LSqBracket [
+  RSqBracket ]
+  LBraces {
+  RBraces }
+  Bang !
+  EOF
+  
+Keywords:
+  return
+  continue
+  break
+  if
+  elseif
+  else
+  for
+  while
+  func
+  import
+  native
+  new
+  class
+  static
+  export
+  const
+
+statements    : (statement)*
+scoped-statements: LBRACE (statement)* RBRACE
 
 statement     : KEYWORD:return expr?
               : KEYWORD:continue|break
+              : KEYWORD:import
+                  KEYWORD:native IDENTIFIER
+                | LITERAL:STRING
+              : KEYWORD:export IDENTIFIER
+              : class-def
               : expr
+              : SEMICOLON
               
-expression    : KEYWORD:var IDENTIFIER (EQUALS expression)?
+expression    : (KEYWORD:const)? KEYWORD:var IDENTIFIER (EQUALS expression)?
               : IDENTIFIER EQUALS expression
-              : comp-expr ((KEYWORD:AND|KEYWORD) comp-expr)*
+              : comp-expr ((&& | ||) comp-expr)*
               
-comp-expr     : NOT comp-expr
+comp-expr     : !comp-expr
               : arith-expr ((==|<|>|<=|>=) aright-expr)*
               
 arith-expr    : term ((PLUS|MINUS) term)*
@@ -18,10 +76,13 @@ term          : factor ((MOD|MUL|DIV|IDX) factor)*
 factor        : (PLUS|MINUS) factor
               : power
               
-power         : dot ((POW) factor)*
+power         : call ((POW) factor)*
 
-call          : atom (DOT IDENTIFIER|call)*? (LPAREN (expr (COMMA expr)*)? RPAREN)?
+call          : cast (DOT IDENTIFIER|call)*? (LPAREN (expr (COMMA expr)*)? RPAREN)?
               
+cast          : (LessThan IDENTIFIER:int|float|string|list GreaterThan) cast
+              : atom
+
 atom          : INT|FLOAT|STRING|IDENTIFIER
               : LPAREN expr RPAREN
               : list-expr
@@ -29,32 +90,29 @@ atom          : INT|FLOAT|STRING|IDENTIFIER
               : for-expr
               : while-expr
               : func-def
+              : instantiate
               
 list-expr     : LSQBRACKET (expr (COMMA expr)*)? RSQBRACKET
               
-if-expr       : KEYWORD:if expr LEFTBRACES
-                (statement if-expr-elseif?|if-expr-else?)
-               | (NEWLINE statements RIGHTBRACES|if-expr-elseif|if-expr-else)
+if-expr       : KEYWORD:if LPAREN expr RPAREN scoped-statements
+                (KEYWORD:elseif LPAREN expr RPAREN scoped-statements)*?
+                (KEYWORD:else scoped-statements)?
               
-if-expr-elseif: KEYWORD:elseif expr LEFTBRACES
-                (statement if-expr-elseif?|if-expr-else?)
-               | (NEWLINE statements RIGHTBRACES|if-expr-elseif|if-expr-else)
+for-expr      : KEYWORD:for LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN
+                scoped-statements
               
-if-expr-else  : KEYWORD:else
-                statement
-              | (NEWLINE statements RIGHTBRACES)
+while-expr    : KEYWORD:while expr
+                scoped-statements
               
-              
-              
-for-expr      : KEYWORD:for IDENTIFIER = expr KEYWORD:until cond KEYWORD:also|step expr LEFTBRACES
-                statement
-              | (NEWLINE statements RIGHTBRACES)
-              
-while-expr    : KEYWORD:while expr LEFTBRACES
-                statement
-              | (NEWLINE statements RIGHTBRACES)
-              
-func-def      : KEYWORD:func IDENTIFIER?
-                LPAREN (IDENTIFIER(COMMA IDENTIFIER)*)? RPAREN
-                (ARROW expr)
-              | LEFTBRACES (NEWLINE statements RIGHTBRACES)
+func-def      : KEYWORD:func IDENTIFIER
+                LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
+                scoped-statements
+
+class-def     : KEYWORD:class IDENTIFIER LBRACE class-body RBRACE
+
+class-body    : (class-funcdef*)?
+
+class-funcdef : KEYWORD:func KEYWORD:static? IDENTIFIER func-args scoped-statements
+
+func-args     : LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
+instantiate   : KEYWORD:new IDENTIFIER LPAREN ((expr (COMMA expr))*)? RPAREN

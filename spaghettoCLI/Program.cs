@@ -1,224 +1,174 @@
 ﻿using spaghetto;
+using spaghetto.Parsing.Nodes;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace spaghettoCLI
 {
-    public class Program
-    {
-        static void Main(string[] args)
-        {
-            Dictionary<string, string> opts = new();
+    public class Program {
+        static bool showLexOutput = false, showParseOutput = false, timings = false, rethrow = false;
+        static Interpreter interpreter;
 
-            for(int i = 0; i < args.Length; i++)
-            {
-                if(args[i].StartsWith("--"))
-                {
-                    if(args.Length-1 == i)
-                    {
-                        opts[args[i].Substr(2, args[i].Length)] = "true";
-                    }
-                    else
-                    {
-                        opts[args[i].Substr(2, args[i].Length)] = args[i+1];
-                        i++;
-                    }
-                }
-            }
+        static void Main(string[] args) {
+            InitInterpreter();
 
-            if(opts.Count != 0)
-            {
-                if(!opts.ContainsKey("file"))
-                {
-                    Console.WriteLine("Missing option --file <path>\nOptions can not directly be used in CLI mode, which is why the file option is required.");
-                    Environment.Exit(0);
-                }
+            while (true) {
+                Console.Write("spaghetto > ");
+                string text = Console.ReadLine();
 
-                foreach(KeyValuePair<string, string> kvp in opts)
-                {
-                    if(Intepreter.runtimeOptions.ContainsKey(kvp.Key))
-                    {
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("[Warn] Option " + kvp.Key + " might not be applied as it would override an already defined value which is not allowed.");
-                    }else
-                    {
-                        Intepreter.runtimeOptions.Add(kvp.Key, kvp.Value);
+                if (text.Trim() == String.Empty) continue;
+
+                if (text.StartsWith("#")) {
+                    if (text.StartsWith("#lex")) {
+                        showLexOutput = !showLexOutput;
+                        Console.WriteLine("Showing Lex Output: " + showLexOutput);
                     }
 
+                    if (text.StartsWith("#parse")) {
+                        showParseOutput = !showParseOutput;
+                        Console.WriteLine("Showing Parse Output: " + showParseOutput);
+                    }
+
+                    if(text.StartsWith("#time")) {
+                        timings = !timings;
+                        Console.WriteLine("Timings: " + timings);
+                    }
+
+                    if (text.StartsWith("#rethrow")) {
+                        rethrow = !rethrow;
+                        Console.WriteLine("Rethrow: " + rethrow);
+                    }
+
+                    if (text.StartsWith("#reset")) {
+                        InitInterpreter();
+                        Console.WriteLine("Reset interpreter");
+                    }
+
+                    continue;
                 }
 
-                RunCode(File.ReadAllText(opts["file"]));
-
-                return;
-            }
-
-            Intepreter.runtimeOptions.Add("is-in-cli", "true");
-            Thread t = new(() => {
-                while (true)
-                {
-                    Console.Write("spaghetto > ");
-                    string text = Console.ReadLine();
-
-                    if (text.Trim() == String.Empty) continue;
-
-                    RunCode(text);
-                }
-            }, 1024 * 1024 * 10);
-
-            t.Start();
-            t.Join();
-        }
-
-        public static void RunCode(string text)
-        {
-            try
-            {
-                (RuntimeResult res, SpaghettoException err) = Intepreter.Run("<spaghetto_cli>", text);
-
-                if (err != null) throw err;
-                if (res.error != null) throw res.error;
-
-                if (res.value != null)
-                {
-                    Console.WriteLine(((res.value as ListValue).value.Count == 1 ? ((res.value as ListValue).value[0]?.Represent()) : res.value.Represent()));
-                }
-                else
-                {
-                    Console.ForegroundColor = ConsoleColor.DarkGray;
-                    //                          Console.WriteLine("\x001B[3mNothing was returned");
-                    Console.ResetColor();
-                }
-            }
-            catch (Exception ex)
-            {
-                if (ex is SpaghettoException)
-                    Console.WriteLine("Error: " + ex.Message);
-                else
-                    throw;
+                RunCode(interpreter, text);
             }
         }
 
-#pragma warning disable IDE0051 // New CLI is work in progress (probably forever:tm:)
-        static void StartNewCLI()
-#pragma warning restore IDE0051 // Nicht verwendete private Member entfernen
-        {
-            string currentCommand = "";
-            int cursorPos = 0;
+        public static void InitInterpreter() {
+            interpreter = new Interpreter();
+            spaghetto.Stdlib.Lang.Lib.Mount(interpreter.GlobalScope);
+            spaghetto.Stdlib.IO.Lib.Mount(interpreter.GlobalScope);
 
-            while (true)
-            {
-                Console.SetCursorPosition(cursorPos, 0);
-                ConsoleKeyInfo cki = Console.ReadKey();
+            var tdict = new SDictionary();
+            tdict.Value.Add((new SString("ok"), new SString("works string key")));
+            tdict.Value.Add((new SInt(0), new SString("works int key")));
 
-                if (cki.Key == ConsoleKey.Enter)
-                {
-                    if((cki.Modifiers & ConsoleModifiers.Shift) != 0)
-                    {
-                        currentCommand += "\n";
-                        continue;
-                    }
+            var classInstTest = new SClass("color");
+            classInstTest.InstanceBaseTable.Add((new SString("$$ctor"),
+                new SNativeFunction(
+                    impl: (Scope scope, List<SValue> args) => {
+                        // TODO: Add dot stack assignment; not possible yet
 
-                    try
-                    {
-                        Console.SetCursorPosition(0, 1);
-                        Console.Write(" ".Repeat(Console.WindowWidth * (Console.WindowHeight - 1)));
-                        Console.SetCursorPosition(0, 1);
+                        // TODO: Remove this code and replace it by safe methods
+                        (args[0] as SClassInstance).InstanceTable.Add((new SString("r"), args[1] as SInt));
+                        (args[0] as SClassInstance).InstanceTable.Add((new SString("g"), args[2] as SInt));
+                        (args[0] as SClassInstance).InstanceTable.Add((new SString("b"), args[3] as SInt));
 
-                        (RuntimeResult res, SpaghettoException err) = Intepreter.Run("<spaghetto_cli>", currentCommand);
+                        return args[0];
+                    },
+                    expectedArgs: new() { "self", "r", "g", "b" }
+                )
+            ));
 
-                        if (err != null) throw err;
-                        if (res.error != null) throw res.error;
+            classInstTest.InstanceBaseTable.Add((new SString("mul"),
+                new SNativeFunction(
+                    impl: (Scope scope, List<SValue> args) => {
+                        if (args[1] is not SClassInstance inst || inst.Class.Name != "color") throw new Exception("Expected argument 0 to be of type 'color'");
 
-                        if (res.value != null)
-                        {
-                            Console.WriteLine(((res.value as ListValue).value.Count == 1 ? ((res.value as ListValue).value[0]?.Represent()) : res.value.Represent()));
-                        }
-                        else
-                        {
-                            Console.ForegroundColor = ConsoleColor.DarkGray;
-                            Console.WriteLine("\x001B[3mNothing was returned");
-                            Console.ResetColor();
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        if (ex is SpaghettoException)
-                            Console.WriteLine("Error: " + ex.Message);
-                        else
-                            throw;
-                    }
+                        var current = args[0] as SClassInstance;
 
-                    Console.SetCursorPosition(0, 0);
-                }
-                else if (cki.Key == ConsoleKey.LeftArrow)
-                {
-                    cursorPos = Math.Max(0, cursorPos - 1);
-                    Console.SetCursorPosition(cursorPos, 0);
-                }
-                else if (cki.Key == ConsoleKey.RightArrow)
-                {
-                    cursorPos = Math.Min(currentCommand.Length, cursorPos + 1);
-                    Console.SetCursorPosition(cursorPos, 0);
-                }
-                else if (cki.Key == ConsoleKey.Backspace)
-                {
-                    if (cursorPos - 1 >= 0 && currentCommand.Length > 0)
-                    {
-                        currentCommand = currentCommand.Remove(cursorPos - 1, 1);
-                        cursorPos = Math.Max(0, Math.Min(currentCommand.Length, cursorPos - 1));
-                        Console.SetCursorPosition(cursorPos, 0);
-                    }
-                }
-                else if (cursorPos < Console.WindowWidth - 1)
-                {
-                    currentCommand = currentCommand.Insert(cursorPos, cki.KeyChar.ToString());
-                    cursorPos++;
-                }
+                        SClassInstance newInst = new(inst.Class);
+                        newInst.CallConstructor(scope, new() { newInst, current.Dot(new SString("r")).Mul(inst.Dot(new SString("r"))), current.Dot(new SString("g")).Mul(inst.Dot(new SString("g"))), current.Dot(new SString("b")).Mul(inst.Dot(new SString("b"))) });
 
-                Console.SetCursorPosition(0, 0);
+                        return newInst;
+                    },
+                    expectedArgs: new() { "self", "other" },
+                    isClassInstanceFunc: true
+                )
+            ));
 
-                Lexer lex = new(currentCommand, "<cli_preview>");
-                List<Token> tokens = lex.MakeTokens(true);
-                int totalPrinted = 0;
+            classInstTest.InstanceBaseTable.Add((new SString("$$toString"),
+                new SNativeFunction(
+                    impl: (Scope scope, List<SValue> args) => {
+                        var current = args[0] as SClassInstance;
+                        return new SString("<Color R=" + args[0].Dot(new SString("r")).SpagToCsString() + " G=" + args[0].Dot(new SString("g")).SpagToCsString() + " B=" + args[0].Dot(new SString("b")).SpagToCsString() + ">");
+                    },
+                    expectedArgs: new() { "self" },
+                    isClassInstanceFunc: true
+                )
+            ));
 
-                int prevEnd = 0;
-                foreach (Token token in tokens)
-                {
-                    string o = currentCommand.SubstrInBounds(prevEnd, token.posStart.idx);
+            interpreter.GlobalScope.Set("test", tdict);
+            interpreter.GlobalScope.Set("color", classInstTest);
+        }
 
-                    if (token.posStart != null) o += currentCommand.SubstrInBounds(token.posStart.idx, token.posEnd.idx + (token.posEnd == token.posStart ? 1 : 0));
-                    switch (token.type)
-                    {
-                        case (TokenType.Keyword):
-                            Console.ForegroundColor = ConsoleColor.Blue;
-                            break;
-                        case (TokenType.Identifier):
-                            Console.ForegroundColor = ConsoleColor.Yellow;
-                            break;
-                        case (TokenType.Plus):
-                        case (TokenType.Minus):
-                        case (TokenType.Mul):
-                        case (TokenType.Div):
-                        case (TokenType.Mod):
-                        case (TokenType.Pow):
-                        case (TokenType.Float):
-                            Console.ForegroundColor = ConsoleColor.White;
-                            break;
-                        case TokenType.String:
-                            Console.ForegroundColor = ConsoleColor.Cyan;
-                            break;
-                        default:
-                            Console.ForegroundColor = ConsoleColor.Gray;
-                            break;
-                    }
+        public static void RunCode(Interpreter interpreter, string text) {
+            TimingInterpreterResult res = new();
 
-                    prevEnd = token.posEnd.idx;
-                    Console.Write(o);
-                    totalPrinted += (o).Length;
+            //try {
+
+                interpreter.Interpret(text, ref res);
+
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+                Console.WriteLine("\n  C#: " + res.Result.LastValue.ToString());
+                Console.WriteLine("  Spag: " + res.Result.LastValue.ToSpagString().Value);
+
+
+                if (timings) {
+                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.WriteLine("Timings:");
+
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write("  Lex: ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine(res.LexTime + "ms");
+
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write("  Parse: ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine(res.ParseTime + "ms");
+
+                    Console.ForegroundColor = ConsoleColor.White;
+                    Console.Write("  Eval: ");
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                    Console.WriteLine(res.EvalTime + "ms");
                 }
 
-                Console.Write(" ".Repeat(Console.WindowWidth - totalPrinted));
+                Console.ResetColor();
+            //} catch (Exception ex) {
+            //    Console.WriteLine("Error: " + ex.Message);
+            //    if (rethrow) throw;
+            //}
 
-                Console.SetCursorPosition(currentCommand.Length, 0);
+            if(showParseOutput && res.Result.AST != null) {
+                PrintTree(res.Result.AST);
             }
+
+            if(showLexOutput && res.Result.LexedTokens != null) {
+                foreach (var tok in res.Result.LexedTokens) Console.WriteLine("  " + tok.ToString());
+            }
+        }
+
+        public static void PrintTree(SyntaxNode node, int ident = 0) {
+            Console.WriteLine(Ident(ident) + node.ToString());
+            
+            foreach(var n in node.GetChildren()) {
+                PrintTree(n, ident + 2);
+            }
+        }
+
+        public static string Ident(int ident) {
+            StringBuilder b = new();
+            for (int i = 0; i < ident; i++) b.Append(" ");
+            return b.ToString();
         }
     }
 }

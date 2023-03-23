@@ -1,461 +1,282 @@
-﻿
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace spaghetto {
     public class Lexer {
-        public string text, fileName;
-        public Position pos = null;
-        public char currentChar = '\0';
+        public string Code { get; set; }
+        public int Position { get; set; } = 0;
 
-        public Lexer(string text, string fileName) {
-            this.fileName = fileName;
-            this.pos = new Position(-1, 0, -1, fileName, text);
-            this.text = text;
-            Advance();
+        public char Current => Peek(0);
+
+        public char Peek(int off = 0) {
+            if (Position + off >= Code.Length || Position + off < 0) return '\0';
+            return Code[Position + off];
         }
 
-        public void Advance() {
-            pos.Advance(currentChar);
-
-            if (pos.idx < text.Length)
-                currentChar = text[pos.idx];
-            else
-                currentChar = '\0';
+        public Lexer(string code) {
+            Code = code;
         }
 
-        public List<Token> MakeTokens(bool ignoreErrors = false) {
-            List<Token> tokens = new();
+        public List<SyntaxToken> Lex() {
+            List<SyntaxToken> tokens = new();
 
-            while(currentChar != '\0') {
-                if (currentChar == ' ' || currentChar == '\t' || currentChar == '\r')
-                {
-                    Advance();
-                } else if (Token.SEPERATORS.Contains(currentChar)) {
-                    tokens.Add(new Token(TokenType.NewLine, posStart: pos));
-                    Advance();
-                } else if (Token.DIGITS.Contains(currentChar))
-                {
-                    tokens.Add(MakeNumber());
-                }
-                else if (Token.LETTERS.Contains(currentChar))
-                {
-                    tokens.Add(MakeIdentifier());
-                } else if (currentChar == '"')
-                {
-                    tokens.Add(MakeString());
-                }
-                else if (currentChar == '+')
-                {
-                    tokens.Add(new Token(TokenType.Plus, posStart: pos));
-                    Advance();
-                }
-                else if (currentChar == '-')
-                {
-                    tokens.Add(MakeMinusOrArrow());
-                }
-                else if (currentChar == '*')
-                {
-                    tokens.Add(new Token(TokenType.Mul, posStart: pos));
-                    Advance();
-                }
-                else if (currentChar == '^')
-                {
-                    tokens.Add(new Token(TokenType.Pow, posStart: pos));
-                    Advance();
-                }
-                else if (currentChar == '%')
-                {
-                    tokens.Add(new Token(TokenType.Mod, posStart: pos));
-                    Advance();
-                }
-                else if (currentChar == '/')
-                {
-                    Token ret = MakeCommentOrDivision();
-                    if(ret != null) tokens.Add(ret);
-                    Advance();
-                } else if (currentChar == '.') {
-                    tokens.Add(new Token(TokenType.Dot, posStart: pos));
-                    Advance();
-                } else if (currentChar == '(')
-                {
-                    tokens.Add(new Token(TokenType.LeftParen, posStart: pos));
-                    Advance();
-                }
-                else if (currentChar == ')')
-                {
-                    tokens.Add(new Token(TokenType.RightParen, posStart: pos));
-                    Advance();
-                }
-                else if (currentChar == '[')
-                {
-                    tokens.Add(new Token(TokenType.LeftSqBracket, posStart: pos));
-                    Advance();
-                }
-                else if (currentChar == ']')
-                {
-                    tokens.Add(new Token(TokenType.RightSqBracket, posStart: pos));
-                    Advance();
-                }
-                else if (currentChar == '#')
-                {
-                    tokens.Add(new Token(TokenType.Index, posStart: pos));
-                    Advance();
-                }
-                else if (currentChar == '{')
-                {
-                    tokens.Add(new Token(TokenType.LeftBraces, posStart: pos));
-                    Advance();
-                }
-                else if (currentChar == '}')
-                {
-                    tokens.Add(new Token(TokenType.RightBraces, posStart: pos));
-                    Advance();
-                }
-                else if (currentChar == '!')
-                {
-                    (Token tok, SpaghettoException error) = MakeNotEquals();
+            while(Current != '\0') {
+                SyntaxToken insertToken = new(SyntaxType.BadToken, Position, null, Current.ToString());
+                switch(Current) {
+                    case ';':
+                        insertToken = (new(SyntaxType.Semicolon, Position, null, Current.ToString()));
+                        break;
+                    case '=':
+                        if (Peek(1) == '=') {
+                            Position++;
+                            insertToken = (new(SyntaxType.EqualsEquals, Position, null, "=="));
+                        }else {
+                            insertToken = (new(SyntaxType.Equals, Position, null, Current.ToString()));
+                        }
 
-                    if (error != null) throw error;
-                    tokens.Add(tok);
+                        break;
+                    case '<':
+                        if (Peek(1) == '=') {
+                            Position++;
+                            insertToken = (new(SyntaxType.LessThanEqu, Position, null, "<="));
+                        } else {
+                            insertToken = (new(SyntaxType.LessThan, Position, null, Current.ToString()));
+                        }
+
+                        break;
+                    case '>':
+                        if (Peek(1) == '=') {
+                            Position++;
+                            insertToken = (new(SyntaxType.GreaterThanEqu, Position, null, ">="));
+                        } else {
+                            insertToken = (new(SyntaxType.GreaterThan, Position, null, Current.ToString()));
+                        }
+
+                        break;
+                    case '|':
+                        if (Peek(1) == '|') {
+                            Position++;
+                            insertToken = (new(SyntaxType.OrOr, Position, null, "||"));
+                        } else {
+                            insertToken = (new(SyntaxType.BadToken, Position, null, Current.ToString()));
+                        }
+
+                        break;
+                    case '&':
+                        if (Peek(1) == '&') {
+                            Position++;
+                            insertToken = (new(SyntaxType.AndAnd, Position, null, "&&"));
+                        } else {
+                            insertToken = (new(SyntaxType.BadToken, Position, null, Current.ToString()));
+                        }
+
+                        break;
+                    case '+':
+                        insertToken = (new(SyntaxType.Plus, Position, null, Current.ToString()));
+                        break;
+                    case '-':
+                        insertToken = (new(SyntaxType.Minus, Position, null, Current.ToString()));
+                        break;
+                    case '%':
+                        insertToken = (new(SyntaxType.Mod, Position, null, Current.ToString()));
+                        break;
+                    case '*':
+                        insertToken = (new(SyntaxType.Mul, Position, null, Current.ToString()));
+                        break;
+                    case '/':
+                        if(Peek(1) == '/') {
+                            SkipComment();
+                            continue;
+                        }
+                        insertToken = (new(SyntaxType.Div, Position, null, Current.ToString()));
+                        break;
+                    case '#':
+                        insertToken = (new(SyntaxType.Idx, Position, null, Current.ToString()));
+                        break;
+                    case '.':
+                        insertToken = (new(SyntaxType.Dot, Position, null, Current.ToString()));
+                        break;
+                    case ',':
+                        insertToken = (new(SyntaxType.Comma, Position, null, Current.ToString()));
+                        break;
+                    case '(':
+                        insertToken = (new(SyntaxType.LParen, Position, null, Current.ToString()));
+                        break;
+                    case ')':
+                        insertToken = (new(SyntaxType.RParen, Position, null, Current.ToString()));
+                        break;
+                    case '[':
+                        insertToken = (new(SyntaxType.LSqBracket, Position, null, Current.ToString()));
+                        break;
+                    case ']':
+                        insertToken = (new(SyntaxType.RSqBracket, Position, null, Current.ToString()));
+                        break;
+                    case '{':
+                        insertToken = (new(SyntaxType.LBraces, Position, null, Current.ToString()));
+                        break;
+                    case '}':
+                        insertToken = (new(SyntaxType.RBraces, Position, null, Current.ToString()));
+                        break;
+                    case '!':
+                        insertToken = (new(SyntaxType.Bang, Position, null, Current.ToString()));
+                        break;
                 }
-                else if (currentChar == '=')
-                {
-                    tokens.Add(MakeEquals());
-                }
-                else if (currentChar == '<')
-                {
-                    tokens.Add(MakeLessThan());
-                }
-                else if (currentChar == '>')
-                {
-                    tokens.Add(MakeGreaterThan());
-                }
-                else if (currentChar == ',')
-                {
-                    tokens.Add(new Token(TokenType.Comma, posStart: pos));
-                    Advance();
-                }
-                else
-                {
-                    if (ignoreErrors)
-                    {
-                        tokens.Add(new Token(TokenType.Unknown, currentChar));
-                        Advance();
-                        continue;
+
+                if (insertToken.Type == SyntaxType.BadToken) {
+                    if (char.IsDigit(Current)) {
+                        tokens.Add(ParseNumber());
+                    } else if (Current == '"') {
+                        tokens.Add(ParseString());
+                    } else if (char.IsLetter(Current)) {
+                        tokens.Add(ParseIdentifierOrKeyword());
+                    } else if (char.IsWhiteSpace(Current)) Position++;
+                    else {
+                        throw new Exception("Bad token at pos " + insertToken.Position + " with text " + insertToken.Text);
                     }
-
-                    Position posStart = pos.Copy();
-                    char chr = currentChar;
-                    Advance();
-
-                    throw new IllegalCharError(posStart, pos, $"'{chr}'");
+                } else {
+                    tokens.Add(insertToken);
+                    Position++;
                 }
             }
 
-            tokens.Add(new Token(TokenType.EndOfFile, posStart: pos));
+            tokens.Add(new SyntaxToken(SyntaxType.EOF, Position, null, "<EOF>"));
             return tokens;
         }
 
-        public Token MakeString() {
+        private void SkipComment() {
+            while(Current != '\0' && Current != '\n') {
+                Position++;
+            }
+        }
+
+        private SyntaxToken ParseIdentifierOrKeyword() {
             string str = "";
-            Position posStart = pos.Copy();
-            bool escapeCharacter = false;
 
-            Advance();
+            while (Current != '\0' && Current != ' ' && (char.IsLetterOrDigit(Current) || Current == '_')) {
+                str += Current;
+                Position++;
+            }
 
-            while(currentChar != '\0' && (currentChar != '"' || escapeCharacter)) {
-                if (escapeCharacter) {
-                    str += (Token.ESCAPE_CHARS.ContainsKey(currentChar) ? Token.ESCAPE_CHARS[currentChar] : currentChar);
-                    escapeCharacter = false;
-                } else {
-                    if (currentChar == '\\') {
-                        escapeCharacter = true;
-                    } else {
-                        str += currentChar;
+            var token = new SyntaxToken(SyntaxType.Identifier, Position, str, str);
+            SyntaxFacts.ClassifyIdentifier(ref token);
+
+            return token;
+        }
+
+
+        private SyntaxToken ParseString() {
+            string str = "";
+
+            Position++;
+            while(!(Current == '"' && Peek(-1) != '\\') && Current != '\0') {
+                if (Current == '\\') {
+                    Position++;
+
+                    switch (Current) {
+                        case '"': str += "\""; break;
+                        case 'n': str += "\n"; break;
+                        case '\\': str += "\\"; break;
+                        default: throw new Exception("Invalid escape sequence");
                     }
-                }
 
-                Advance();
-            }
-
-            Advance();
-
-            return new Token(TokenType.String, str, posStart, pos);
-        }
-
-        public Token MakeMinusOrArrow() {
-            TokenType tokenType = TokenType.Minus;
-            Position posStart = pos.Copy();
-
-            Advance();
-
-            if(currentChar == '>') {
-                Advance();
-                tokenType = TokenType.Arrow;
-            }
-
-            return new Token(tokenType, posStart, pos);
-        }
-
-        public Token MakeCommentOrDivision() {
-            TokenType tokenType = TokenType.Div;
-            Position posStart = pos.Copy();
-
-            Advance();
-
-            if (currentChar == '/') {
-                while(currentChar != '\n' && currentChar != '\0') { Advance(); };
-
-                return null;
-            }
-
-            return new Token(tokenType, posStart, pos);
-        }
-
-        public Token MakeNumber() {
-            string numStr = "";
-            int dotCount = 0;
-            Position posStart = pos.Copy();
-
-            while(currentChar != '\0' && Token.DIGITS_WITH_SPECIAL.Contains(currentChar)) {
-                if(currentChar == '.') {
-                    if (dotCount == 1) break;
-
-                    dotCount++;
-                    numStr += ".";
+                    Position++;
                 } else {
-                    numStr += currentChar;
+                    str += Current;
+                    Position++;
+                }
+            }
+
+            Position++;
+            return new(SyntaxType.String, Position-1, str, str);
+        }
+
+        private SyntaxToken ParseNumber() {
+            string numStr = "";
+            bool isDecimal = false;
+
+            while((char.IsDigit(Current) || Current == '.') && Current != '\0') {
+                numStr += Current;
+
+                if(Current == '.') {
+                    isDecimal = true;
                 }
 
-                Advance();
+                Position++;
             }
 
-            bool succededAsFloat = double.TryParse(numStr, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double resultFloat);
-
-            if (succededAsFloat)
-                return new Token(TokenType.Float, resultFloat, posStart, pos);
-            else 
-                throw new InvalidNumericalValueError(posStart, pos, "Value was not a valid Double.");
-        }
-
-        public Token MakeIdentifier() {
-            string idStr = "";
-            Position posStart = pos.Copy();
-
-            while(currentChar != '\0' && (Token.LETTERS_DIGITS + "_").Contains(currentChar)) {
-                idStr += currentChar;
-                Advance();
+            if(isDecimal) {
+                if (!float.TryParse(numStr, NumberStyles.Float, CultureInfo.InvariantCulture, out float floatVal)) throw new Exception("Invalid number (tried to parse " + numStr + " as float)");
+                return new(SyntaxType.Float, Position-1, floatVal, numStr);
+            }else {
+                if (!int.TryParse(numStr, out int intVal)) throw new Exception("Invalid number!");
+                return new(SyntaxType.Int, Position-1, intVal, numStr);
             }
-
-            TokenType tokenType = (Token.KEYWORDS.Contains(idStr) ? TokenType.Keyword : TokenType.Identifier);
-
-            return new Token(tokenType, idStr, posStart, pos);
-        }
-
-        public (Token, SpaghettoException) MakeNotEquals() {
-            Position posStart = pos.Copy();
-            Advance();
-
-            if(currentChar == '=') {
-                Advance();
-                return (new Token(TokenType.NotEquals, posStart: pos), null);
-            }
-
-            Advance();
-            return (null, new ExpectedCharError(posStart, pos, "'=' (after '!')"));
-        }
-
-        public Token MakeEquals() {
-            Position posStart = pos.Copy();
-            Advance();
-
-            TokenType tokType = TokenType.Equals;
-
-            if (currentChar == '=') {
-                tokType = TokenType.EqualsEquals;
-                Advance();
-            }
-
-            return new Token(tokType, posStart: posStart, posEnd: pos);
-        }
-
-        public Token MakeLessThan() {
-            Position posStart = pos.Copy();
-            Advance();
-
-            TokenType tokType = TokenType.LessThan;
-
-            if (currentChar == '=') {
-                tokType = TokenType.LessThanOrEquals;
-            }
-
-            return new Token(tokType, posStart: posStart, posEnd: pos);
-        }
-
-        public Token MakeGreaterThan() {
-            Position posStart = pos.Copy();
-            Advance();
-
-            TokenType tokType = TokenType.GreaterThan;
-
-            if (currentChar == '=') {
-                tokType = TokenType.GreaterThanOrEquals;
-            }
-
-            return new Token(tokType, posStart: posStart, posEnd: pos);
         }
     }
 
-    public enum TokenType {
-        Int,
-        Float,
-        Plus,
-        Minus,
-        Mul,
-        Div,
-        Pow,
-        Mod,
-        Index,
-        String,
-        LeftParen,
-        RightParen,
-        LeftBraces,
-        RightBraces,
-        EndOfFile,
-        Identifier,
-        Keyword,
-        Equals,
-        EqualsEquals,
-        NotEquals,
-        LessThan,
-        GreaterThan,
-        LessThanOrEquals,
-        GreaterThanOrEquals,
-        Comma,
-        Arrow,
-        LeftSqBracket,
-        RightSqBracket,
-        NewLine,
-        Dot,
-        Unknown
-}
+    public struct SyntaxToken {
+        public SyntaxType Type { get; set; }
+        public int Position { get; set; }
+        public object Value { get; set; }
+        public string Text { get; set; }
 
-    public class Token {
-        public const string DIGITS = "0123456789";
-        public const string LETTERS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        public const string SEPERATORS = ";\n";
-        public const string LETTERS_DIGITS = LETTERS + DIGITS;
-        public const string DIGITS_WITH_SPECIAL = DIGITS + ".";
-
-        public static List<string> KEYWORDS = new() {
-            "var", "and", "or", "not", "if", "then", "elseif", "else" , "for", "until", "also", "while", "step", "func", "end", "return", "continue", "break"
-        };
-
-        public static Dictionary<char, string> ESCAPE_CHARS = new() {
-            { 'n', "\n" }, {'t', "\t"}
-        };
-
-        public static Dictionary<TokenType, string> TOKEN_REPRESENTATIONS = new()
-        {
-            { TokenType.GreaterThanOrEquals, ">=" },
-            { TokenType.LessThanOrEquals, "<=" },
-            { TokenType.Plus, "+" },
-            { TokenType.Minus, "-" },
-            { TokenType.Mul, "*" },
-            { TokenType.Div, "/" },
-            { TokenType.Pow, "^" },
-            { TokenType.Mod, "%" },
-            { TokenType.Index, "#" },
-            { TokenType.LeftParen, "(" },
-            { TokenType.RightParen, ")" },
-            { TokenType.LeftBraces, "{" },
-            { TokenType.RightBraces, "}" },
-            { TokenType.LeftSqBracket, "[" },
-            { TokenType.RightSqBracket, "]" },
-            { TokenType.Equals, "=" },
-            { TokenType.EqualsEquals, "==" },
-            { TokenType.LessThan, "<" },
-            { TokenType.GreaterThan, ">" },
-            { TokenType.Comma, "," },
-            { TokenType.Arrow, "->" }
-        };
-
-        public static (string, bool) GetRepresentation(Token tok)
-        {
-            if(TOKEN_REPRESENTATIONS.ContainsKey(tok.type)) return (TOKEN_REPRESENTATIONS[tok.type], false);
-            if (tok.type == TokenType.String) return ($"\"{tok.value}\"", true);
-            return (tok?.value?.ToString(), true);
-        }
-
-        public TokenType type;
-        public object? value;
-        public Position posStart, posEnd;
-
-        public Token(TokenType type, object? value = null, Position posStart = null, Position posEnd = null) {
-            this.type = type;
-            this.value = value;
-
-            if(posStart != null) {
-                this.posStart = posStart.Copy();
-                this.posEnd = posStart.Copy();
-                this.posEnd.Advance();
-            }
-
-            if (posEnd != null) {
-                this.posEnd = posEnd.Copy();
-            }
-        }
-
-        public Token SetPosition(Position posStart, Position posEnd)
-        {
-            this.posStart = posStart.Copy();
-            this.posEnd = posEnd.Copy();
-
-            return this;
-        }
-
-        public static implicit operator TokenType(Token t) => t.type;
-
-        public bool Matches(TokenType type, string value) {
-            return (this.type == type && (string)this.value == value);
+        public SyntaxToken(SyntaxType type, int pos, object val, string txt) {
+            Type = type;
+            Position = pos;
+            Value = val;
+            Text = txt;
         }
 
         public override string ToString() {
-            if (value != null) return $"{type}:{value}";
-            return $"{type}";
+            return Type.ToString().PadRight(16) + " at " + Position.ToString().PadRight(3) + " with val: " + (Value ?? "null").ToString().PadRight(16) + " text: " + Text.ToString().PadRight(16);
         }
     }
 
-    public class Position {
-        public int idx;
-        public int ln;
-        public int col;
-        public string fileName, fileText;
+    public enum SyntaxType {
+        Semicolon,
+        Keyword,
+        Identifier,
+        Equals,
+        EqualsEquals,
+        AndAnd,
+        OrOr,
+        LessThan,
+        GreaterThan,
+        GreaterThanEqu,
+        LessThanEqu,
+        Plus, Minus,
+        Mod, Mul, Div, Idx,
+        Pow,
+        Dot,
+        LParen,
+        RParen,
+        Int,
+        Float,
+        String,
+        LSqBracket,
+        RSqBracket,
+        LBraces,
+        RBraces,
+        Bang,
+        EOF,
+        BadToken,
+        Comma,
+    }
 
-        public Position(int idx, int ln, int col, string fileName, string fileText) {
-            this.idx = idx;
-            this.ln = ln;
-            this.col = col;
-            this.fileName = fileName;
-            this.fileText = fileText;
-        }
-
-        public void Advance(char currentChar = '\0') {
-            idx++;
-            col++;
-
-            if (currentChar == '\n') {
-                ln++;
-                col = 0;
+    public static class SyntaxFacts {
+        public static void ClassifyIdentifier(ref SyntaxToken token) {
+            if (token.Text.ToString() is "return" or "continue" or "break"
+                                       or "if" or "elseif" or "else"
+                                       or "for" or "while" or "func" or "var"
+                                       or "import" or "native" or "new"
+                                       or "class" or "static" or "export"
+                                       or "const") {
+                token.Type = SyntaxType.Keyword;
             }
-        }
-
-        public Position Copy() {
-            return new Position(idx, ln, col, fileName, fileText);
         }
     }
 }

@@ -5,7 +5,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	  <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+	  <RuntimeIdentifier Condition="'$(Configuration)' == 'Release'">win-x64</RuntimeIdentifier>
 	  <PublishSingleFile Condition="'$(Configuration)' == 'Release'">true</PublishSingleFile>
 	  <PublishReadyToRun Condition="'$(Configuration)' == 'Release'">true</PublishReadyToRun>
 	  <PublishTrimmed Condition="'$(Configuration)' == 'Release'">true</PublishTrimmed>
@@ -13,6 +13,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\spaghetto.Stdlib.IO\spaghetto.Stdlib.IO.csproj" />
+    <ProjectReference Include="..\spaghetto.Stdlib.Lang\spaghetto.Stdlib.Lang.csproj" />
     <ProjectReference Include="..\spaghetto\spaghetto.csproj" />
   </ItemGroup>
 

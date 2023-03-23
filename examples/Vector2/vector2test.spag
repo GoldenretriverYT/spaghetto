@@ -1,0 +1,31 @@
+import native io;
+import native lang;
+import "vector2.spag";
+
+func runVectorTests() {
+    println("TestStringification:");
+    var testStringification = new Vector2(10, 20);
+    println(testStringification); // Expected: <Vector2 x: 10 y: 20>
+
+    println("TestAddition:");
+    var testAddition = new Vector2(5, 5);
+    println(testAddition.add(new Vector2(5, 10))); // Expected: <Vector2 x: 10 y: 15>
+
+    println("TestSubtraction:");
+    var testSubtraction = new Vector2(5, 5);
+    println(testSubtraction.sub(new Vector2(5, 10))); // Expected: <Vector2 x: 0 y: -5>
+
+    println("TestMultiplication:");
+    var testMultiplication = new Vector2(5, 5);
+    println(testMultiplication.mul(new Vector2(5, 10))); // Expected: <Vector2 x: 25 y: 50>
+
+    println("TestDivision:");
+    var testDivision = new Vector2(5, 5);
+    println(testDivision.div(new Vector2(5, 10))); // Expected: <Vector2 x: 1 y: 0> (0 because we are using ints here!)
+
+    println("TestInvert:");
+    var testInvert = new Vector2(5, 5);
+    println(Vector2.invert(testInvert)); // Expected: <Vector2 x: -5 y: -5> 
+};
+
+export runVectorTests;

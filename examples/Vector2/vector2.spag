@@ -1,0 +1,35 @@
+import native io;
+import native lang;
+
+class Vector2 {
+    func ctor(self, x, y) {
+        self.x = x;
+        self.y = y;
+    }
+
+    func toString(self) {
+        return "<Vector2 x: " + toString(self.x) + " y: " + toString(self.y) + ">";
+    }
+
+    func add(self, other) {
+        return new Vector2(self.x + other.x, self.y + other.y);
+    }
+
+    func sub(self, other) {
+        return new Vector2(self.x - other.x, self.y - other.y);
+    }
+
+    func mul(self, other) {
+        return new Vector2(self.x * other.x, self.y * other.y);
+    }
+
+    func div(self, other) {
+        return new Vector2(self.x / other.x, self.y / other.y);
+    }
+
+    func static invert(inst) {
+        return new Vector2(-inst.x, -inst.y);
+    }
+}
+
+export Vector2;
