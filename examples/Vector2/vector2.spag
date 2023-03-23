@@ -30,6 +30,6 @@ class Vector2 {
     func static invert(inst) {
         return new Vector2(-inst.x, -inst.y);
     }
-}
+};
 
 export Vector2;
