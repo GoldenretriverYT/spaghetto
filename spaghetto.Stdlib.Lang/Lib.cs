@@ -54,6 +54,7 @@
 
             scope.Set("int", Int.CreateClass());
             scope.Set("float", Float.CreateClass());
+            scope.Set("string", String.CreateClass());
         }
     }
 }
