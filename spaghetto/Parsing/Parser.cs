@@ -127,7 +127,9 @@ namespace spaghetto.Parsing {
                 MatchToken(SyntaxType.Semicolon);
                 return new ExportNode(ident);
             } else if (Current.Type == SyntaxType.Keyword && Current.Text == "class") {
-                return ParseClassDefinition();
+                var c = ParseClassDefinition();
+                MatchToken(SyntaxType.Semicolon);
+                return c;
             } else {
                 var exprNode = ParseExpression();
                 MatchToken(SyntaxType.Semicolon);
