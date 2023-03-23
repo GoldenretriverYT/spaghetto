@@ -7,10 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "spaghetto", "spaghetto\spag
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "spaghettoCLI", "spaghettoCLI\spaghettoCLI.csproj", "{64E44FFD-A8E4-4548-AB1F-43D4B4F0CD7D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaghettoIDE", "SpaghettoIDE\SpaghettoIDE.csproj", "{79C444C1-741D-44BA-8F01-CD337A3194E5}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PerfTest", "PerfTest\PerfTest.csproj", "{F05E9923-11D3-4B86-8EE3-EFC7E35802A1}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "stdlib", "stdlib", "{D2C74680-6182-4352-808D-C3AA9AE91E6D}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "spaghetto.Stdlib.IO", "spaghetto.Stdlib.IO\spaghetto.Stdlib.IO.csproj", "{325C4B51-3AB9-455D-BFA3-A452FE7AD672}"
@@ -20,6 +16,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cosmos", "cosmos", "{4F7301E1-43A3-41F0-8AC4-CD1E39DE4CB4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaghettoCosmosTestKernel", "SpaghettoCosmosTestKernel\SpaghettoCosmosTestKernel.csproj", "{B9093756-EE3F-4265-815E-6DED16CAD141}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spaghettoPacker", "spaghettoPacker\spaghettoPacker.csproj", "{B8A4B70C-8317-492B-BD54-E9DCC6241A9E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,14 +33,6 @@ Global
 		{64E44FFD-A8E4-4548-AB1F-43D4B4F0CD7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{64E44FFD-A8E4-4548-AB1F-43D4B4F0CD7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{64E44FFD-A8E4-4548-AB1F-43D4B4F0CD7D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{79C444C1-741D-44BA-8F01-CD337A3194E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{79C444C1-741D-44BA-8F01-CD337A3194E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{79C444C1-741D-44BA-8F01-CD337A3194E5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{79C444C1-741D-44BA-8F01-CD337A3194E5}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F05E9923-11D3-4B86-8EE3-EFC7E35802A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F05E9923-11D3-4B86-8EE3-EFC7E35802A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F05E9923-11D3-4B86-8EE3-EFC7E35802A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F05E9923-11D3-4B86-8EE3-EFC7E35802A1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{325C4B51-3AB9-455D-BFA3-A452FE7AD672}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{325C4B51-3AB9-455D-BFA3-A452FE7AD672}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{325C4B51-3AB9-455D-BFA3-A452FE7AD672}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -55,6 +45,10 @@ Global
 		{B9093756-EE3F-4265-815E-6DED16CAD141}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9093756-EE3F-4265-815E-6DED16CAD141}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9093756-EE3F-4265-815E-6DED16CAD141}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8A4B70C-8317-492B-BD54-E9DCC6241A9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8A4B70C-8317-492B-BD54-E9DCC6241A9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8A4B70C-8317-492B-BD54-E9DCC6241A9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8A4B70C-8317-492B-BD54-E9DCC6241A9E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
