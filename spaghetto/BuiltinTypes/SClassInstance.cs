@@ -15,7 +15,7 @@ namespace spaghetto {
         public void CallConstructor(Scope scope, List<SValue> args) {
             var ctor = Dot(new SString("$$ctor"));
 
-            if (ctor == null) throw new Exception("Class " + Class.Name + " does not have a constructor and can therefore not be instantiated.");
+            if (ctor.IsNull()) throw new Exception("Class " + Class.Name + " does not have a constructor and can therefore not be instantiated.");
 
             var newArgs = new List<SValue> { this };
             newArgs.AddRange(args);
