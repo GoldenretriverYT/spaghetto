@@ -17,6 +17,7 @@ namespace spaghetto.Parsing {
         public int Position = 0;
 
         public SyntaxToken Current => Peek(0);
+        public static SyntaxToken EmptyToken => new(SyntaxType.EOF, 0, null, null);
 
         public SyntaxToken Peek(int off = 0) {
             if (Position + off >= Tokens.Count || Position + off < 0) return new(SyntaxType.BadToken, 0, null, "");
@@ -66,11 +67,11 @@ namespace spaghetto.Parsing {
                 nodes.Add(ParseStatement());
             }
 
-            return new BlockNode(nodes, false);
+            return new BlockNode(Tokens.FirstOrDefault(EmptyToken), Tokens.LastOrDefault(EmptyToken), nodes, false);
         }
 
         public SyntaxNode ParseScopedStatements() {
-            MatchToken(SyntaxType.LBraces);
+            var startingBrace = MatchToken(SyntaxType.LBraces);
             List<SyntaxNode> nodes = new();
 
             while(Current.Type != SyntaxType.RBraces) {
@@ -79,32 +80,40 @@ namespace spaghetto.Parsing {
                 nodes.Add(ParseStatement());
             }
 
-            MatchToken(SyntaxType.RBraces);
+            var endingBrace = MatchToken(SyntaxType.RBraces);
 
-            return new BlockNode(nodes);
+            return new BlockNode(startingBrace, endingBrace, nodes);
         }
 
         public SyntaxNode ParseStatement() {
             if (Current.Type == SyntaxType.Keyword && Current.Text == "return") {
+                var retTok = Current;
+
                 if (Peek(1).Type == SyntaxType.Semicolon) {
                     Position += 2;
-                    var ret = new ReturnNode();
+                    var ret = new ReturnNode(retTok);
                     MatchToken(SyntaxType.Semicolon);
                     return ret;
                 } else {
                     Position++;
-                    var ret = new ReturnNode(ParseExpression());
+                    var ret = new ReturnNode(retTok, ParseExpression());
                     MatchToken(SyntaxType.Semicolon);
                     return ret;
                 }
             } else if (Current.Type == SyntaxType.Keyword && Current.Text == "continue") {
+                var n = new ContinueNode(Current);
+
                 Position++;
                 MatchToken(SyntaxType.Semicolon);
-                return new ContinueNode();
+
+                return n;
             } else if (Current.Type == SyntaxType.Keyword && Current.Text == "break") {
+                var n = new BreakNode(Current);
+
                 Position++;
                 MatchToken(SyntaxType.Semicolon);
-                return new BreakNode();
+
+                return n;
             } else if (Current.Type == SyntaxType.Keyword && Current.Text == "import") {
                 Position++;
 
@@ -306,8 +315,6 @@ namespace spaghetto.Parsing {
                 MatchToken(SyntaxType.LessThan);
                 var ident = MatchToken(SyntaxType.Identifier);
 
-                if (ident.Text is not "int" and not "float" and not "list" and not "string") throw new Exception("Can not cast to " + ident.Text);
-
                 MatchToken(SyntaxType.GreaterThan);
 
                 var node = ParseCastExpression();
@@ -336,7 +343,7 @@ namespace spaghetto.Parsing {
 
                 MatchToken(SyntaxType.RParen);
 
-                return expr; // TODO: Do we have to create a ParenthisizedExpr? (probably not, but what if we do?)
+                return expr;
             } else if (Current.Type is SyntaxType.LSqBracket) {
                 return ParseListExpression();
             } else if (Current.Type is SyntaxType.Keyword && Current.Text == "if") {
@@ -355,12 +362,13 @@ namespace spaghetto.Parsing {
         }
 
         public SyntaxNode ParseListExpression() {
-            MatchToken(SyntaxType.LSqBracket);
+            var lsq = MatchToken(SyntaxType.LSqBracket);
+            SyntaxToken rsq;
 
             List<SyntaxNode> list = new();
 
             if (Current.Type == SyntaxType.RSqBracket) {
-                MatchToken(SyntaxType.RSqBracket);
+                rsq = MatchToken(SyntaxType.RSqBracket);
             } else {
                 var expr = ParseExpression();
                 list.Add(expr);
@@ -371,24 +379,24 @@ namespace spaghetto.Parsing {
                     list.Add(expr);
                 }
 
-                MatchToken(SyntaxType.RSqBracket);
+                rsq = MatchToken(SyntaxType.RSqBracket);
             }
 
-            return new ListNode(list);
+            return new ListNode(list, lsq, rsq);
         }
 
         public SyntaxNode ParseIfExpression() {
-            MatchKeyword("if");
+            var kw = MatchKeyword("if");
 
-            IfNode node = new();
+            IfNode node = new(kw);
 
             MatchToken(SyntaxType.LParen);
             var initialCond = ParseExpression();
             MatchToken(SyntaxType.RParen);
 
-            var initialBlock = ParseScopedStatements();
+            var lastBlock = ParseScopedStatements();
 
-            node.AddCase(initialCond, initialBlock);
+            node.AddCase(initialCond, lastBlock);
 
             while (Current.Type == SyntaxType.Keyword && (string)Current.Value == "elseif") {
                 Position++;
@@ -396,17 +404,19 @@ namespace spaghetto.Parsing {
                 MatchToken(SyntaxType.LParen);
                 var cond = ParseExpression();
                 MatchToken(SyntaxType.RParen);
-                var block = ParseScopedStatements();
+                lastBlock = ParseScopedStatements();
 
-                node.AddCase(cond, block);
+                node.AddCase(cond, lastBlock);
             }
 
             if(Current.Type == SyntaxType.Keyword && Current.Text == "else") {
                 Position++;
-                var block = ParseScopedStatements();
+                lastBlock = ParseScopedStatements();
 
-                node.AddCase(new BoolNode(true), block);
+                node.AddCase(new IntLiteralNode(new SyntaxToken(SyntaxType.Int, 0, 1, "1")), lastBlock);
             }
+
+            node.EndPosition = lastBlock.EndPosition;
 
             return node;
         }
@@ -518,7 +528,7 @@ namespace spaghetto.Parsing {
     internal class ImportNode : SyntaxNode {
         private SyntaxToken path;
 
-        public ImportNode(SyntaxToken path) {
+        public ImportNode(SyntaxToken path) : base(path.Position, path.EndPosition) {
             this.path = path;
         }
 
@@ -565,7 +575,7 @@ namespace spaghetto.Parsing {
     internal class ExportNode : SyntaxNode {
         private SyntaxToken ident;
 
-        public ExportNode(SyntaxToken ident) {
+        public ExportNode(SyntaxToken ident) : base(ident.Position, ident.EndPosition) {
             this.ident = ident;
         }
 

@@ -1,11 +1,13 @@
-﻿namespace spaghetto.Parsing.Nodes
+﻿using spaghetto.Helpers;
+
+namespace spaghetto.Parsing.Nodes
 {
     internal class CallNode : SyntaxNode
     {
         public SyntaxNode ToCallNode { get; set; }
         private List<SyntaxNode> argumentNodes;
 
-        public CallNode(SyntaxNode atomNode, List<SyntaxNode> argumentNodes)
+        public CallNode(SyntaxNode atomNode, List<SyntaxNode> argumentNodes) : base(atomNode.StartPosition, argumentNodes.GetEndingPosition(atomNode.EndPosition))
         {
             ToCallNode = atomNode;
             this.argumentNodes = argumentNodes;

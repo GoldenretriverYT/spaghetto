@@ -4,7 +4,7 @@
     {
         private SyntaxToken ident;
 
-        public NativeImportNode(SyntaxToken ident)
+        public NativeImportNode(SyntaxToken ident) : base(ident.Position, ident.EndPosition)
         {
             this.ident = ident;
         }

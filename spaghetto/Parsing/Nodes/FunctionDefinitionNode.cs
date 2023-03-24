@@ -1,4 +1,6 @@
-﻿namespace spaghetto.Parsing.Nodes
+﻿using spaghetto.Helpers;
+
+namespace spaghetto.Parsing.Nodes
 {
     internal class FunctionDefinitionNode : SyntaxNode
     {
@@ -7,6 +9,7 @@
         private SyntaxNode block;
 
         public FunctionDefinitionNode(SyntaxToken? nameToken, List<SyntaxToken> args, SyntaxNode block)
+            : base(nameToken != null ? nameToken.Value.Position : args.GetStartingPosition(block.StartPosition), block.EndPosition) // either nametoken start, args start or finally block start
         {
             this.nameToken = nameToken;
             this.args = args;

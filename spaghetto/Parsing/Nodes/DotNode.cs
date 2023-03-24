@@ -1,16 +1,18 @@
 ﻿using spaghetto.BuiltinTypes;
+using spaghetto.Helpers;
 
 namespace spaghetto.Parsing.Nodes
 {
     internal class DotNode : SyntaxNode
     {
-        public DotNode(SyntaxNode callNode)
+        public DotNode(SyntaxNode callNode) : base(callNode.StartPosition, -1) // ending pos is overwritten
         {
             CallNode = callNode;
         }
 
         public SyntaxNode CallNode { get; }
         public List<SyntaxNode> NextNodes { get; internal set; } = new();
+        public override int EndPosition => NextNodes.GetEndingPosition(CallNode.EndPosition);
 
         public override NodeType Type => NodeType.Dot;
 

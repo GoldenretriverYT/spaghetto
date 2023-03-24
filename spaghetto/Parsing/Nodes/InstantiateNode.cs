@@ -1,11 +1,13 @@
-﻿namespace spaghetto.Parsing.Nodes
+﻿using spaghetto.Helpers;
+
+namespace spaghetto.Parsing.Nodes
 {
     internal class InstantiateNode : SyntaxNode
     {
         private SyntaxToken ident;
         private List<SyntaxNode> argumentNodes;
 
-        public InstantiateNode(SyntaxToken ident, List<SyntaxNode> argumentNodes)
+        public InstantiateNode(SyntaxToken ident, List<SyntaxNode> argumentNodes) : base(ident.Position, argumentNodes.GetEndingPosition(ident.EndPosition))
         {
             this.ident = ident;
             this.argumentNodes = argumentNodes;

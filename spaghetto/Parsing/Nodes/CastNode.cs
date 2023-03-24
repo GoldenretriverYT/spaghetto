@@ -5,7 +5,7 @@
         private SyntaxToken ident;
         private SyntaxNode node;
 
-        public CastNode(SyntaxToken ident, SyntaxNode node)
+        public CastNode(SyntaxToken ident, SyntaxNode node) : base(ident.Position, node.EndPosition)
         {
             this.ident = ident;
             this.node = node;
@@ -15,19 +15,9 @@
 
         public override SValue Evaluate(Scope scope)
         {
-            // TODO: maybe improve this
-            switch (ident.Text)
-            {
-                case "int":
-                    return node.Evaluate(scope).CastToBuiltin(SBuiltinType.Int);
-                case "float":
-                    return node.Evaluate(scope).CastToBuiltin(SBuiltinType.Float);
-                case "string":
-                    return node.Evaluate(scope).CastToBuiltin(SBuiltinType.String);
-                case "list":
-                    return node.Evaluate(scope).CastToBuiltin(SBuiltinType.List);
-                default: throw new InvalidOperationException("INTERNAL: Cast was parsed successfully, but cast is not implemented for that!");
-            }
+            // TODO: Allow for cast to classes
+            if (!Enum.TryParse<SBuiltinType>(ident.Text, true, out var type)) throw new Exception("Unknown type " + ident.Text + "; only builtin types supported right now.");
+            return node.Evaluate(scope).CastToBuiltin(type);
         }
 
         public override IEnumerable<SyntaxNode> GetChildren()

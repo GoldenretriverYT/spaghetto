@@ -2,11 +2,11 @@
 {
     internal class ReturnNode : SyntaxNode
     {
-        public ReturnNode()
+        public ReturnNode(SyntaxToken tok) : base(tok.Position, tok.EndPosition)
         {
         }
 
-        public ReturnNode(SyntaxNode returnValueNode)
+        public ReturnNode(SyntaxToken tok, SyntaxNode returnValueNode) : base(tok.Position, returnValueNode.EndPosition)
         {
             ReturnValueNode = returnValueNode;
         }

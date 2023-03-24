@@ -221,6 +221,7 @@ namespace spaghetto {
     public struct SyntaxToken {
         public SyntaxType Type { get; set; }
         public int Position { get; set; }
+        public int EndPosition => Position + Text.Length;
         public object Value { get; set; }
         public string Text { get; set; }
 

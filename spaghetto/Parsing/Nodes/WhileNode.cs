@@ -5,7 +5,7 @@
         private SyntaxNode condNode;
         private SyntaxNode block;
 
-        public WhileNode(SyntaxNode condNode, SyntaxNode block)
+        public WhileNode(SyntaxNode condNode, SyntaxNode block) : base(condNode.EndPosition, block.EndPosition)
         {
             this.condNode = condNode;
             this.block = block;
@@ -15,7 +15,7 @@
 
         public override SValue Evaluate(Scope scope)
         {
-            Scope whileScope = new(scope);
+            Scope whileScope = new(scope, StartPosition);
             SValue lastVal = SValue.Null;
 
             while (true)

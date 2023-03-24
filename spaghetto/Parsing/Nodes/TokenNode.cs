@@ -8,7 +8,7 @@
         public override NodeType Type => NodeType.Token;
         public SyntaxToken Token { get; set; }
 
-        public TokenNode(SyntaxToken token)
+        public TokenNode(SyntaxToken token) : base(token.Position, token.EndPosition)
         {
             Token = token;
         }

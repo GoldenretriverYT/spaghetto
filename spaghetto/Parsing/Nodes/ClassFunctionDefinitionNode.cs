@@ -7,7 +7,7 @@
         private SyntaxNode body;
         private bool isStatic;
 
-        public ClassFunctionDefinitionNode(SyntaxToken name, List<SyntaxToken> args, SyntaxNode body, bool isStatic)
+        public ClassFunctionDefinitionNode(SyntaxToken name, List<SyntaxToken> args, SyntaxNode body, bool isStatic) : base(name.Position, body.EndPosition)
         {
             this.name = name;
             this.args = args;

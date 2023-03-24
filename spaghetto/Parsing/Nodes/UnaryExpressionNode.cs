@@ -5,7 +5,7 @@
         private SyntaxToken token;
         private SyntaxNode rhs;
 
-        public UnaryExpressionNode(SyntaxToken token, SyntaxNode rhs)
+        public UnaryExpressionNode(SyntaxToken token, SyntaxNode rhs) : base(token.Position, rhs.EndPosition)
         {
             this.token = token;
             this.rhs = rhs;

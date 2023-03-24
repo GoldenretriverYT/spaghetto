@@ -5,7 +5,7 @@
         private SyntaxToken ident;
         private SyntaxNode expr;
 
-        public AssignVariableNode(SyntaxToken ident, SyntaxNode expr)
+        public AssignVariableNode(SyntaxToken ident, SyntaxNode expr) : base(ident.Position, expr.EndPosition)
         {
             this.Ident = ident;
             this.Expr = expr;

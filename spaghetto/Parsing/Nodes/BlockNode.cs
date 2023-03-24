@@ -7,7 +7,7 @@ namespace spaghetto.Parsing.Nodes
         private List<SyntaxNode> nodes;
         private readonly bool createNewScope;
 
-        public BlockNode(List<SyntaxNode> nodes, bool createNewScope = true)
+        public BlockNode(SyntaxToken startTok, SyntaxToken endTok, List<SyntaxNode> nodes, bool createNewScope = true) : base(startTok.Position, endTok.Position)
         {
             this.nodes = nodes;
             this.createNewScope = createNewScope;
@@ -20,7 +20,7 @@ namespace spaghetto.Parsing.Nodes
             var lastVal = SValue.Null;
             var blockScope = scope;
 
-            if (createNewScope) blockScope = new Scope(scope);
+            if (createNewScope) blockScope = new Scope(scope, StartPosition);
 
             foreach (var node in nodes)
             {

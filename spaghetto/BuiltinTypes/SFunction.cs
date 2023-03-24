@@ -20,7 +20,7 @@ namespace spaghetto
         public override SValue Call(Scope scope, List<SValue> args) {
             if (args.Count != ExpectedArgs.Count) throw new Exception(FunctionName + " expected " + ExpectedArgs.Count + " arguments. (" + string.Join(", ", ExpectedArgs) + ")");
 
-            Scope funcScope = new(DefiningScope);
+            Scope funcScope = new(DefiningScope, DefiningScope.CreatedPosition);
             
             for(int i = 0; i < ExpectedArgs.Count; i++) {
                 funcScope.Set(ExpectedArgs[i], args[i]);

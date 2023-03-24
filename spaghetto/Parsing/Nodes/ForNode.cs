@@ -7,7 +7,7 @@
         private SyntaxNode stepNode;
         private SyntaxNode block;
 
-        public ForNode(SyntaxNode initialExpressionNode, SyntaxNode condNode, SyntaxNode stepNode, SyntaxNode block)
+        public ForNode(SyntaxNode initialExpressionNode, SyntaxNode condNode, SyntaxNode stepNode, SyntaxNode block) : base(initialExpressionNode.StartPosition, block.EndPosition)
         {
             this.initialExpressionNode = initialExpressionNode;
             this.condNode = condNode;
@@ -19,7 +19,7 @@
 
         public override SValue Evaluate(Scope scope)
         {
-            Scope forScope = new(scope);
+            Scope forScope = new(scope, StartPosition);
             SValue lastVal = SValue.Null;
             initialExpressionNode.Evaluate(forScope);
 

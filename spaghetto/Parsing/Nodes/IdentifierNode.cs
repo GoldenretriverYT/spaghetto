@@ -4,7 +4,7 @@
     {
         public SyntaxToken Token { get; private set; }
 
-        public IdentifierNode(SyntaxToken syntaxToken)
+        public IdentifierNode(SyntaxToken syntaxToken) : base(syntaxToken.Position, syntaxToken.EndPosition)
         {
             Token = syntaxToken;
         }

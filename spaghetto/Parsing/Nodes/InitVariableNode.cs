@@ -7,13 +7,13 @@
         private readonly bool isFixedType = true;
         private readonly bool isConst = false;
 
-        public InitVariableNode(SyntaxToken ident, bool isFixedType, bool isConst = false) {
+        public InitVariableNode(SyntaxToken ident, bool isFixedType, bool isConst = false) : base(ident.Position, ident.EndPosition) {
             this.ident = ident;
             this.isFixedType = isFixedType;
             this.isConst = isConst;
         }
 
-        public InitVariableNode(SyntaxToken ident, SyntaxNode expr, bool isFixedType, bool isConst = false)
+        public InitVariableNode(SyntaxToken ident, SyntaxNode expr, bool isFixedType, bool isConst = false) : base(ident.Position, expr.EndPosition)
         {
             this.ident = ident;
             this.expr = expr;

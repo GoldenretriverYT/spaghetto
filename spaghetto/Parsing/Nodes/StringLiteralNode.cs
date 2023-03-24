@@ -4,7 +4,7 @@
     {
         private SyntaxToken syntaxToken;
 
-        public StringLiteralNode(SyntaxToken syntaxToken)
+        public StringLiteralNode(SyntaxToken syntaxToken) : base(syntaxToken.Position, syntaxToken.EndPosition)
         {
             this.syntaxToken = syntaxToken;
         }

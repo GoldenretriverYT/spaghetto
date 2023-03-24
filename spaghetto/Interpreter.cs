@@ -13,7 +13,7 @@ namespace spaghetto
         public Scope GlobalScope { get; private set; }
 
         public Interpreter() {
-            GlobalScope = new();
+            GlobalScope = new(0);
         }
 
         public void Interpret(string text, ref InterpreterResult res) {

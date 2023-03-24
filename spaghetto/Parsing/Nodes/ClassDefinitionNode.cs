@@ -1,11 +1,13 @@
-﻿namespace spaghetto.Parsing.Nodes
+﻿using spaghetto.Helpers;
+
+namespace spaghetto.Parsing.Nodes
 {
     internal class ClassDefinitionNode : SyntaxNode
     {
         private SyntaxToken className;
         private IEnumerable<SyntaxNode> body;
 
-        public ClassDefinitionNode(SyntaxToken className, IEnumerable<SyntaxNode> body)
+        public ClassDefinitionNode(SyntaxToken className, IEnumerable<SyntaxNode> body) : base(className.Position, body.GetEndingPosition(className.EndPosition))
         {
             this.className = className;
             this.body = body;

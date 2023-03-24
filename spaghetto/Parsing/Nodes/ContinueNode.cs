@@ -4,6 +4,8 @@
     {
         public override NodeType Type => NodeType.Continue;
 
+        public ContinueNode(SyntaxToken continueToken) : base(continueToken.Position, continueToken.EndPosition) { }
+
         public override SValue Evaluate(Scope scope)
         {
             scope.SetState(ScopeState.ShouldContinue);

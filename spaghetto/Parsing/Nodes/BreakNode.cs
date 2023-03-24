@@ -4,6 +4,8 @@
     {
         public override NodeType Type => NodeType.Break;
 
+        public BreakNode(SyntaxToken breakToken) : base(breakToken.Position, breakToken.EndPosition) { }
+
         public override SValue Evaluate(Scope scope)
         {
             scope.SetState(ScopeState.ShouldBreak);

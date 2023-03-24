@@ -1,10 +1,12 @@
-﻿namespace spaghetto.Parsing.Nodes
+﻿using spaghetto.Helpers;
+
+namespace spaghetto.Parsing.Nodes
 {
     internal class ListNode : SyntaxNode
     {
         private List<SyntaxNode> list;
 
-        public ListNode(List<SyntaxNode> list)
+        public ListNode(List<SyntaxNode> list, SyntaxToken lsqBracket, SyntaxToken rsqBracket) : base(lsqBracket.Position, rsqBracket.EndPosition)
         {
             this.list = list;
         }

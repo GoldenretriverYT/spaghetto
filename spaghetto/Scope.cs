@@ -11,10 +11,16 @@ namespace spaghetto
         public ScopeState State { get; private set; } = ScopeState.None;
         public SValue ReturnValue { get; set; } = SValue.Null;
 
-        public Scope() { }
-        public Scope(Scope parentScope)
+        public int CreatedPosition { get; private set; }
+
+        public Scope(int startPos) {
+            CreatedPosition = startPos;
+        }
+
+        public Scope(Scope parentScope, int startPos)
         {
             ParentScope = parentScope;
+            CreatedPosition = startPos;
         }
 
         public SValue Get(string key)
@@ -74,6 +80,15 @@ namespace spaghetto
             ReturnValue = val;
             ParentScope?.SetReturnValue(val);
         }
+
+        /*public string GetScopeStrace() {
+            string o = "";
+            var current = this;
+
+            while(true) {
+                current += ""
+            }
+        }*/
     }
 
     public enum ScopeState

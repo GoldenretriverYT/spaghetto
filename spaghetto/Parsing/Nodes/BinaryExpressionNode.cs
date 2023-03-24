@@ -6,7 +6,7 @@
         private SyntaxToken operatorToken;
         private SyntaxNode right;
 
-        public BinaryExpressionNode(SyntaxNode left, SyntaxToken operatorToken, SyntaxNode right)
+        public BinaryExpressionNode(SyntaxNode left, SyntaxToken operatorToken, SyntaxNode right) : base(left.StartPosition, right.EndPosition)
         {
             this.left = left;
             this.operatorToken = operatorToken;

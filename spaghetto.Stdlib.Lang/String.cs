@@ -39,7 +39,7 @@ namespace spaghetto.Stdlib.Lang {
                    return new SInt(str.Value.Length);
                },
                expectedArgs: new() { "string" }
-           )));
+            )));
 
             @class.StaticTable.Add((new SString("substring"), new SNativeFunction(
                impl: (Scope scope, List<SValue> args) => {
@@ -50,7 +50,17 @@ namespace spaghetto.Stdlib.Lang {
                    return new SString(str.Value.Substring(offset.Value, length.Value));
                },
                expectedArgs: new() { "string", "start", "length" }
-           )));
+            )));
+
+            @class.StaticTable.Add((new SString("takeafter"), new SNativeFunction(
+                impl: (Scope scope, List<SValue> args) => {
+                    if (args[0] is not SString str) throw new Exception("Expected argument 0 to be a string");
+                    if (args[1] is not SInt offset) throw new Exception("Expected argument 1 to be an int");
+
+                    return new SString(str.Value.Substring(offset.Value));
+                },
+                expectedArgs: new() { "string", "start" }
+            )));
 
             @class.StaticTable.Add((new SString("EMPTY"), new SString(string.Empty) { IsConstant = true }));
 
