@@ -611,7 +611,7 @@ namespace spaghetto.Parsing {
         private int tokenIdx;
 
         private SyntaxToken CausingToken => context.Tokens[tokenIdx];
-        private string SurroundingText => context.Code.PadLeft(20).;
+        private string SurroundingText => ""; // TODO
 
         public ParsingException(string parseMessage, Parser context, int tokenIdx = -1) {
             this.parseMessage = parseMessage;
@@ -625,7 +625,6 @@ namespace spaghetto.Parsing {
         // TODO: Clean up this shit
         public string GetMessage() {
             return $@"{parseMessage}
-Near '{SurroundingText}'
 Position: {CausingToken.Position}";
         }
 
