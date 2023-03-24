@@ -155,13 +155,14 @@ namespace spaghetto {
 
         private SyntaxToken ParseIdentifierOrKeyword() {
             string str = "";
+            int startPos = Position;
 
             while (Current != '\0' && Current != ' ' && (char.IsLetterOrDigit(Current) || Current == '_')) {
                 str += Current;
                 Position++;
             }
 
-            var token = new SyntaxToken(SyntaxType.Identifier, Position, str, str);
+            var token = new SyntaxToken(SyntaxType.Identifier, startPos, str, str);
             SyntaxFacts.ClassifyIdentifier(ref token);
 
             return token;
@@ -170,6 +171,7 @@ namespace spaghetto {
 
         private SyntaxToken ParseString() {
             string str = "";
+            int startPos = Position;
 
             Position++;
             while(!(Current == '"' && Peek(-1) != '\\') && Current != '\0') {
@@ -191,12 +193,13 @@ namespace spaghetto {
             }
 
             Position++;
-            return new(SyntaxType.String, Position-1, str, str);
+            return new(SyntaxType.String, startPos, str, str);
         }
 
         private SyntaxToken ParseNumber() {
             string numStr = "";
             bool isDecimal = false;
+            int startPos = Position;
 
             while((char.IsDigit(Current) || Current == '.') && Current != '\0') {
                 numStr += Current;
@@ -210,10 +213,10 @@ namespace spaghetto {
 
             if(isDecimal) {
                 if (!float.TryParse(numStr, NumberStyles.Float, CultureInfo.InvariantCulture, out float floatVal)) throw new Exception("Invalid number (tried to parse " + numStr + " as float)");
-                return new(SyntaxType.Float, Position-1, floatVal, numStr);
+                return new(SyntaxType.Float, startPos, floatVal, numStr);
             }else {
                 if (!int.TryParse(numStr, out int intVal)) throw new Exception("Invalid number!");
-                return new(SyntaxType.Int, Position-1, intVal, numStr);
+                return new(SyntaxType.Int, startPos, intVal, numStr);
             }
         }
     }

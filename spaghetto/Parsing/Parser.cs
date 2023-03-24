@@ -6,6 +6,7 @@ using System.Linq.Expressions;
 using System.Numerics;
 using System.Reflection.Metadata;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,8 @@ using spaghetto.Parsing.Nodes;
 namespace spaghetto.Parsing {
     public class Parser {
         public List<SyntaxToken> Tokens { get; set; }
+        public string Code { get; }
+
         public int Position = 0;
 
         public SyntaxToken Current => Peek(0);
@@ -30,7 +33,7 @@ namespace spaghetto.Parsing {
                 return Peek(-1);
             }
 
-            throw new Exception("Unexpected token " + Current.Type + "; expected " + type);
+            throw MakeException("Unexpected token " + Current.Type + "; expected " + type);
         }
 
         public SyntaxToken MatchTokenWithValue(SyntaxType type, object value)
@@ -40,7 +43,7 @@ namespace spaghetto.Parsing {
                 return Peek(-1);
             }
 
-            throw new Exception("Unexpected token " + Current.Type + "; expected " + type + " with value " + value);
+            throw MakeException("Unexpected token " + Current.Type + "; expected " + type + " with value " + value);
         }
 
         public SyntaxToken MatchKeyword(string value) {
@@ -49,11 +52,12 @@ namespace spaghetto.Parsing {
                 return Peek(-1);
             }
 
-            throw new Exception("Unexpected token " + Current.Type + "; expected Keyword with value " + value);
+            throw MakeException("Unexpected token " + Current.Type + "; expected Keyword with value " + value);
         }
 
-        public Parser(List<SyntaxToken> tokens) {
+        public Parser(List<SyntaxToken> tokens, string code) {
             Tokens = tokens;
+            Code = code;
         }
 
         public SyntaxNode Parse() {
@@ -75,7 +79,7 @@ namespace spaghetto.Parsing {
             List<SyntaxNode> nodes = new();
 
             while(Current.Type != SyntaxType.RBraces) {
-                if (Current.Type == SyntaxType.EOF) throw new Exception("Unclosed block at " + Current.Position);
+                if (Current.Type == SyntaxType.EOF) throw MakeException("Unclosed block at " + Current.Position);
 
                 nodes.Add(ParseStatement());
             }
@@ -357,7 +361,7 @@ namespace spaghetto.Parsing {
             } else if (Current.Type is SyntaxType.Keyword && Current.Text == "new") {
                 return ParseInstantiateExpression();
             } else {
-                throw new Exception($"Unexpected token {Current.Type} at pos {Current.Position} in atom expression!");
+                throw MakeException($"Unexpected token {Current.Type} at pos {Current.Position} in atom expression!");
             }
         }
 
@@ -510,6 +514,7 @@ namespace spaghetto.Parsing {
 
             return args;
         }
+
         public SyntaxNode BinaryOperation(Func<SyntaxNode> leftParse, List<SyntaxType> allowedTypes, Func<SyntaxNode> rightParse = null) {
             var left = leftParse();
             SyntaxNode right;
@@ -522,6 +527,10 @@ namespace spaghetto.Parsing {
             }
 
             return left;
+        }
+
+        public ParsingException MakeException(string msg) {
+            return new ParsingException(msg, this, Position);
         }
     }
 
@@ -591,6 +600,37 @@ namespace spaghetto.Parsing {
 
         public override IEnumerable<SyntaxNode> GetChildren() {
             yield return new TokenNode(ident);
+        }
+    }
+
+    public class ParsingException : Exception {
+        public override string Message => GetMessage();
+
+        private string parseMessage;
+        private Parser context;
+        private int tokenIdx;
+
+        private SyntaxToken CausingToken => context.Tokens[tokenIdx];
+        private string SurroundingText => context.Code.PadLeft(20).;
+
+        public ParsingException(string parseMessage, Parser context, int tokenIdx = -1) {
+            this.parseMessage = parseMessage;
+            this.context = context;
+            this.tokenIdx = tokenIdx == -1 ? context.Position : tokenIdx;
+        }
+
+        const string NORMAL = "\u001b[38;5;15m";
+        const string ERROR = "\u001b[38;5;160m";
+
+        // TODO: Clean up this shit
+        public string GetMessage() {
+            return $@"{parseMessage}
+Near '{SurroundingText}'
+Position: {CausingToken.Position}";
+        }
+
+        public override string ToString() {
+            return Message;
         }
     }
 }

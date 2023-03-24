@@ -20,7 +20,7 @@ namespace spaghetto
             Lexer lexer = new(text);
             res.LexedTokens = lexer.Lex();
 
-            Parser p = new(res.LexedTokens);
+            Parser p = new(res.LexedTokens, text);
             res.AST = p.Parse();
 
             res.LastValue = res.AST.Evaluate(GlobalScope);
@@ -35,7 +35,7 @@ namespace spaghetto
             res.LexTime = sw.Elapsed.TotalMilliseconds;
             sw.Restart();
 
-            Parser p = new(res.Result.LexedTokens);
+            Parser p = new(res.Result.LexedTokens, text);
             res.Result.AST = p.Parse();
             res.ParseTime = sw.Elapsed.TotalMilliseconds;
             sw.Restart();
