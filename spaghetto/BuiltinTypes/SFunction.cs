@@ -27,6 +27,7 @@ namespace spaghetto
             }
 
             Callback.Evaluate(funcScope);
+            scope.SetState(ScopeState.None);
 
             return funcScope.ReturnValue;
         }

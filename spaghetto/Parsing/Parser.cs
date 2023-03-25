@@ -221,6 +221,7 @@ namespace spaghetto.Parsing {
                 var expr = ParseExpression();
                 return new AssignVariableNode(ident, expr);
             }else {
+                // TODO: parse || and && lmao; totally forgot that :skull:
                 return ParseCompExpression();
             }
         }

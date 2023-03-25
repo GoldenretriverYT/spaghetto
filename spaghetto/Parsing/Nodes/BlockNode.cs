@@ -37,7 +37,6 @@ namespace spaghetto.Parsing.Nodes
                 if (scope.State == ScopeState.ShouldReturn)
                 {
                     Debug.WriteLine("Returning from call node");
-                    scope.SetState(ScopeState.None);
                     var v = scope.ReturnValue;
                     return v;
                 }
