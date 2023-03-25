@@ -24,7 +24,7 @@ namespace spaghetto {
         }
 
         public override SString ToSpagString() {
-            var toStringVal = Dot(new SString("$$toString"));
+            var toStringVal = GetValue(new SString("$$toString"));
 
             if (toStringVal is not SBaseFunction toStringFunc) {
                 return new SString("<instance of class " + Class.Name + ">");
@@ -42,29 +42,48 @@ namespace spaghetto {
         }
 
         public override SValue Dot(SValue other) {
-            foreach (var kvp in Class.StaticTable) {
-                if (kvp.key.Equals(other).IsTruthy()) return kvp.val;
-            }
-
-            foreach (var kvp in InstanceTable) {
-                if (kvp.key.Equals(other).IsTruthy()) return kvp.val;
-            }
-
-            return SValue.Null;
+            var val = GetValue(other);
+            if (Class.FixedProps && val.IsNull()) throw new Exception($"Property {other.ToSpagString().Value} not found!");
+             
+            return val;
         }
 
+
         public override SValue DotAssignment(SValue key, SValue other) {
+            // todo: get rid of the code duplication
+            foreach (var kvp in Class.StaticTable) {
+                if (kvp.key.Equals(key).IsTruthy()) {
+                    if (kvp.val.IsConstant) throw new Exception($"Tried to overwrite constant value {kvp.key}!");
+
+                    InstanceTable.Remove(kvp);
+                    return other;
+                }
+            }
+
             foreach (var kvp in InstanceTable) {
                 if (kvp.key.Equals(key).IsTruthy()) {
                     if (kvp.val.IsConstant) throw new Exception($"Tried to overwrite constant value {kvp.key}!");
 
                     InstanceTable.Remove(kvp);
-                    break;
+                    return other;
                 }
             }
 
+            if (Class.FixedProps) throw new Exception($"Property {key.ToSpagString().Value} not found!");
             InstanceTable.Add((key, other));
             return other;
+        }
+
+        public SValue GetValue(SValue key) {
+            foreach (var kvp in Class.StaticTable) {
+                if (kvp.key.Equals(key).IsTruthy()) return kvp.val;
+            }
+
+            foreach (var kvp in InstanceTable) {
+                if (kvp.key.Equals(key).IsTruthy()) return kvp.val;
+            }
+
+            return SValue.Null;
         }
 
         public override bool IsTruthy() {

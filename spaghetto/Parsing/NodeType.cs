@@ -29,6 +29,7 @@
         ClassFunctionDefinition,
         DotAssign,
         Export,
-        Import
+        Import,
+        ClassPropertyDefinition
     }
 }

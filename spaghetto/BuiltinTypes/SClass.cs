@@ -5,6 +5,7 @@
         public List<(SValue key, SValue val)> InstanceBaseTable { get; set; } = new();
 
         public string Name { get; set; } = "";
+        public bool FixedProps { get; set; } = false;
         public override SBuiltinType BuiltinName => SBuiltinType.Class;
 
         public SClass() {

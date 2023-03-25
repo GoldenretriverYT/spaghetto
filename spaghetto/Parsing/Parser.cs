@@ -153,32 +153,59 @@ namespace spaghetto.Parsing {
 
         private SyntaxNode ParseClassDefinition() {
             MatchKeyword("class");
+            var fixedProps = false;
+
+            if(Current.Type == SyntaxType.Keyword && Current.Text == "fixedprops") {
+                Position++;
+                fixedProps = true;
+            }
+
             var className = MatchToken(SyntaxType.Identifier);
 
             MatchToken(SyntaxType.LBraces);
             var body = ParseClassBody();
             MatchToken(SyntaxType.RBraces);
 
-            return new ClassDefinitionNode(className, body);
+            return new ClassDefinitionNode(className, body, fixedProps);
         }
 
         private List<SyntaxNode> ParseClassBody() {
             List<SyntaxNode> nodes = new();
 
-            while(Current.Type == SyntaxType.Keyword && Current.Text == "func") {
-                Position++;
-                var isStatic = false;
-
-                if(Current.Type == SyntaxType.Keyword && Current.Text == "static") {
+            while(Current.Type == SyntaxType.Keyword && (Current.Text == "func" || Current.Text == "prop")) {
+                if (Current.Text == "func") {
                     Position++;
-                    isStatic = true;
+                    var isStatic = false;
+
+                    if (Current.Type == SyntaxType.Keyword && Current.Text == "static") {
+                        Position++;
+                        isStatic = true;
+                    }
+
+                    var name = MatchToken(SyntaxType.Identifier);
+                    var args = ParseFunctionArgs();
+                    var body = ParseScopedStatements();
+
+                    nodes.Add(new ClassFunctionDefinitionNode(name, args, body, isStatic));
+                } else if (Current.Text == "prop") {
+                    Position++;
+                    var isStatic = false;
+
+                    if (Current.Type == SyntaxType.Keyword && Current.Text == "static") {
+                        Position++;
+                        isStatic = true;
+                    }
+
+                    var name = MatchToken(SyntaxType.Identifier);
+                    MatchToken(SyntaxType.Equals);
+                    var expr = ParseExpression();
+
+                    nodes.Add(new ClassPropDefinitionNode(name, expr, isStatic));
                 }
 
-                var name = MatchToken(SyntaxType.Identifier);
-                var args = ParseFunctionArgs();
-                var body = ParseScopedStatements();
-
-                nodes.Add(new ClassFunctionDefinitionNode(name, args, body, isStatic));
+                while(Current.Type == SyntaxType.Semicolon) {
+                    Position++;
+                }
             }
 
             return nodes;
@@ -531,75 +558,6 @@ namespace spaghetto.Parsing {
 
         public ParsingException MakeException(string msg) {
             return new ParsingException(msg, this, Position);
-        }
-    }
-
-    internal class ImportNode : SyntaxNode {
-        private SyntaxToken path;
-
-        public ImportNode(SyntaxToken path) : base(path.Position, path.EndPosition) {
-            this.path = path;
-        }
-
-        public override NodeType Type => NodeType.Import;
-
-        public override SValue Evaluate(Scope scope) {
-            if (!File.Exists(path.Text)) throw new Exception($"Failed to import '{path.Text}': File not found");
-            var text = File.ReadAllText(path.Text);
-
-            Interpreter ip = new();
-            Scope rootScope = scope.GetRoot();
-
-            // copy available namespaces provided by runtime
-            foreach (var kvp in rootScope.Table) {
-                if (kvp.Key.StartsWith("nlimporter$$")) {
-                    ip.GlobalScope.Table[kvp.Key] = kvp.Value;
-                }
-            }
-
-            InterpreterResult res = new();
-
-            try {
-                ip.Interpret(text, ref res);
-
-                // copy export table
-
-                foreach(var kvp in ip.GlobalScope.ExportTable) {
-                    if (scope.Get(kvp.Key) != null) throw new Exception($"Failed to import '{path.Text}': Import conflict; file exports '{kvp.Key}' but that identifier is already present in the current scope.");
-
-                    scope.Set(kvp.Key, kvp.Value);
-                }
-            }catch(Exception ex) {
-                throw new Exception($"Failed to import '{path.Text}': {ex.Message}");
-            }
-
-            return res.LastValue;
-        }
-
-        public override IEnumerable<SyntaxNode> GetChildren() {
-            throw new NotImplementedException();
-        }
-    }
-
-    internal class ExportNode : SyntaxNode {
-        private SyntaxToken ident;
-
-        public ExportNode(SyntaxToken ident) : base(ident.Position, ident.EndPosition) {
-            this.ident = ident;
-        }
-
-        public override NodeType Type => NodeType.Export;
-
-        public override SValue Evaluate(Scope scope) {
-            var val = scope.Get(ident.Text);
-            if (val == null) throw new Exception("Can not export value of non-existent identifier");
-
-            scope.GetRoot().ExportTable.Add(ident.Text, val);
-            return val;
-        }
-
-        public override IEnumerable<SyntaxNode> GetChildren() {
-            yield return new TokenNode(ident);
         }
     }
 

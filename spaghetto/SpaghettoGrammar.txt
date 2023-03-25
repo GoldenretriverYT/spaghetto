@@ -18,6 +18,7 @@
   Idx #
   Pow ^
   Dot .
+  Colon :
   LParen (
   RParen )
   Comma ,
@@ -48,6 +49,7 @@ Keywords:
   static
   export
   const
+  fixedprops
 
 statements    : (statement)*
 scoped-statements: LBRACE (statement)* RBRACE
@@ -108,11 +110,12 @@ func-def      : KEYWORD:func IDENTIFIER
                 LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
                 scoped-statements
 
-class-def     : KEYWORD:class IDENTIFIER LBRACE class-body RBRACE
+class-def     : KEYWORD:class KEYWORD:fixedprops? IDENTIFIER LBRACE class-body RBRACE
 
-class-body    : (class-funcdef*)?
+class-body    : (class-funcdef|class-propdef*)?
 
 class-funcdef : KEYWORD:func KEYWORD:static? IDENTIFIER func-args scoped-statements
+class-propdef : KEYWORD:prop KEYWORD:static? IDENTIFIER EQUALS expression
 
 func-args     : LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
 instantiate   : KEYWORD:new IDENTIFIER LPAREN ((expr (COMMA expr))*)? RPAREN

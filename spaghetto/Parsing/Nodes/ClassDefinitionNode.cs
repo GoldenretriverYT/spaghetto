@@ -6,11 +6,13 @@ namespace spaghetto.Parsing.Nodes
     {
         private SyntaxToken className;
         private IEnumerable<SyntaxNode> body;
+        private readonly bool fixedProps;
 
-        public ClassDefinitionNode(SyntaxToken className, IEnumerable<SyntaxNode> body) : base(className.Position, body.GetEndingPosition(className.EndPosition))
+        public ClassDefinitionNode(SyntaxToken className, IEnumerable<SyntaxNode> body, bool fixedProps) : base(className.Position, body.GetEndingPosition(className.EndPosition))
         {
             this.className = className;
             this.body = body;
+            this.fixedProps = fixedProps;
         }
 
         public override NodeType Type => NodeType.ClassDefinition;
@@ -19,22 +21,29 @@ namespace spaghetto.Parsing.Nodes
         {
             var @class = new SClass();
             @class.Name = className.Text;
+            @class.FixedProps = fixedProps;
 
             foreach (var bodyNode in body)
             {
-                if (bodyNode is not ClassFunctionDefinitionNode cfdn) throw new Exception("Unexpected node in class definition");
+                if (bodyNode is ClassFunctionDefinitionNode cfdn) {
+                    var funcRaw = cfdn.Evaluate(scope);
+                    if (funcRaw is not SFunction func) throw new Exception("Expected ClassFunctionDefinitionNode to return SFunction");
 
-                var funcRaw = cfdn.Evaluate(scope);
+                    if (func.IsClassInstanceMethod) {
+                        @class.InstanceBaseTable.Add((new SString(func.FunctionName), func));
+                    } else {
+                        @class.StaticTable.Add((new SString(func.FunctionName), func));
+                    }
+                } else if (bodyNode is ClassPropDefinitionNode cpdn) {
+                    var val = cpdn.Expression.Evaluate(scope);
 
-                if (funcRaw is not SFunction func) throw new Exception("Expected ClassFunctionDefinitionNode to return SFunction");
-
-                if (func.IsClassInstanceMethod)
-                {
-                    @class.InstanceBaseTable.Add((new SString(func.FunctionName), func));
-                }
-                else
-                {
-                    @class.StaticTable.Add((new SString(func.FunctionName), func));
+                    if(!cpdn.IsStatic) {
+                        @class.InstanceBaseTable.Add((new SString(cpdn.Name.Text), val));
+                    }else {
+                        @class.StaticTable.Add((new SString(cpdn.Name.Text), val));
+                    }
+                } else {
+                    throw new Exception("Unexpected node in class definition");
                 }
             }
 

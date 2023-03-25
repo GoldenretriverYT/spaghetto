@@ -17,7 +17,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "cosmos", "cosmos", "{4F7301
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaghettoCosmosTestKernel", "SpaghettoCosmosTestKernel\SpaghettoCosmosTestKernel.csproj", "{B9093756-EE3F-4265-815E-6DED16CAD141}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spaghettoPacker", "spaghettoPacker\spaghettoPacker.csproj", "{B8A4B70C-8317-492B-BD54-E9DCC6241A9E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "spaghettoPacker", "spaghettoPacker\spaghettoPacker.csproj", "{B8A4B70C-8317-492B-BD54-E9DCC6241A9E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerfTest", "PerfTest\PerfTest.csproj", "{39D90083-FC05-4C82-8AEA-23AFB2B7C7FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -49,6 +51,10 @@ Global
 		{B8A4B70C-8317-492B-BD54-E9DCC6241A9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B8A4B70C-8317-492B-BD54-E9DCC6241A9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B8A4B70C-8317-492B-BD54-E9DCC6241A9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39D90083-FC05-4C82-8AEA-23AFB2B7C7FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39D90083-FC05-4C82-8AEA-23AFB2B7C7FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39D90083-FC05-4C82-8AEA-23AFB2B7C7FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39D90083-FC05-4C82-8AEA-23AFB2B7C7FB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
