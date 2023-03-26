@@ -79,23 +79,54 @@ namespace spaghetto {
 
                         break;
                     case '+':
-                        insertToken = (new(SyntaxType.Plus, Position, null, Current.ToString()));
+                        if (Peek(1) == '=') {
+                            Position++;
+                            insertToken = (new(SyntaxType.PlusEqu, Position, null, "+="));
+                        } else {
+                            insertToken = (new(SyntaxType.Plus, Position, null, Current.ToString()));
+                        }
+
                         break;
                     case '-':
-                        insertToken = (new(SyntaxType.Minus, Position, null, Current.ToString()));
+                        if (Peek(1) == '=') {
+                            Position++;
+                            insertToken = (new(SyntaxType.MinusEqu, Position, null, "-="));
+                        } else {
+                            insertToken = (new(SyntaxType.Minus, Position, null, Current.ToString()));
+                        }
+
                         break;
                     case '%':
-                        insertToken = (new(SyntaxType.Mod, Position, null, Current.ToString()));
+                        if (Peek(1) == '=') {
+                            Position++;
+                            insertToken = (new(SyntaxType.ModEqu, Position, null, "%="));
+                        } else {
+                            insertToken = (new(SyntaxType.Mod, Position, null, Current.ToString()));
+                        }
+
                         break;
                     case '*':
-                        insertToken = (new(SyntaxType.Mul, Position, null, Current.ToString()));
+                        if (Peek(1) == '=') {
+                            Position++;
+                            insertToken = (new(SyntaxType.MulEqu, Position, null, "*="));
+                        } else {
+                            insertToken = (new(SyntaxType.Mul, Position, null, Current.ToString()));
+                        }
+
                         break;
                     case '/':
                         if(Peek(1) == '/') {
                             SkipComment();
                             continue;
                         }
-                        insertToken = (new(SyntaxType.Div, Position, null, Current.ToString()));
+
+                        if (Peek(1) == '=') {
+                            Position++;
+                            insertToken = (new(SyntaxType.DivEqu, Position, null, "/="));
+                        } else {
+                            insertToken = (new(SyntaxType.Div, Position, null, Current.ToString()));
+                        }
+
                         break;
                     case '#':
                         insertToken = (new(SyntaxType.Idx, Position, null, Current.ToString()));
@@ -256,8 +287,14 @@ namespace spaghetto {
         GreaterThan,
         GreaterThanEqu,
         LessThanEqu,
+
         Plus, Minus,
-        Mod, Mul, Div, Idx,
+        PlusEqu, MinusEqu,
+
+        Mod, Mul, Div,
+        ModEqu, MulEqu, DivEqu,
+        Idx,
+
         Pow,
         Dot,
         LParen,

@@ -231,8 +231,16 @@ namespace spaghetto.Parsing {
                 MatchToken(SyntaxType.Equals);
                 var expr = ParseExpression();
                 return new AssignVariableNode(ident, expr);
-            }else {
-                // TODO: parse || and && lmao; totally forgot that :skull:
+            } else if (Current.Type == SyntaxType.Identifier && (Peek(1).Type is SyntaxType.Equals or SyntaxType.PlusEqu or SyntaxType.MinusEqu or SyntaxType.ModEqu or SyntaxType.DivEqu or SyntaxType.MulEqu)) {
+                var ident = MatchToken(SyntaxType.Identifier);
+
+                var assignTok = Current;
+                assignTok.Type = MapEqualsTokens(assignTok.Type);
+                Position++;
+
+                var expr = ParseExpression();
+                return new AssignVariableNode(ident, new BinaryExpressionNode(new IdentifierNode(ident), assignTok, expr));
+            } else {
                 return BinaryOperation(() => ParseCompExpression(), new List<SyntaxType>() { SyntaxType.AndAnd, SyntaxType.OrOr });
             }
         }
@@ -588,6 +596,15 @@ namespace spaghetto.Parsing {
         public ParsingException MakeException(string msg) {
             return new ParsingException(msg, this, Position);
         }
+
+        public SyntaxType MapEqualsTokens(SyntaxType type) => type switch {
+            SyntaxType.PlusEqu => SyntaxType.Plus,
+            SyntaxType.MinusEqu => SyntaxType.Minus,
+            SyntaxType.ModEqu => SyntaxType.Mod,
+            SyntaxType.MulEqu => SyntaxType.Mul,
+            SyntaxType.DivEqu => SyntaxType.Div,
+            _ => throw new Exception(type + " is not a equals token.")
+        };
     }
 
     public class ParsingException : Exception {

@@ -52,6 +52,7 @@ Keywords:
   const
   fixedprops
 
+equtoks       : (EQUALS|PLUSEQU|MINUSEQU|MULEQU|DIVEQU|MODEQU)
 statements    : (statement)*
 scoped-statements: LBRACE (statement)* RBRACE
 scoped-or-expr: LBRACE (statement)* RBRACE | expr SEMICOLON
@@ -67,7 +68,7 @@ statement     : KEYWORD:return expr?
               : SEMICOLON
               
 expression    : (KEYWORD:const)? KEYWORD:var IDENTIFIER (EQUALS expression)?
-              : IDENTIFIER EQUALS expression
+              : IDENTIFIER equtoks expression
               : comp-expr ((&& | ||) comp-expr)*
               
 comp-expr     : !comp-expr
