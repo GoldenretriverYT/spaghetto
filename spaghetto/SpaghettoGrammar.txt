@@ -4,6 +4,7 @@
   Identifier <dyn>
   Equals =
   EqualsEquals ==
+  Arrow =>
   AndAnd &&
   OrOr ||
   LessThan <
@@ -109,7 +110,7 @@ while-expr    : KEYWORD:while expr
               
 func-def      : KEYWORD:func IDENTIFIER
                 LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
-                scoped-statements
+                (scoped-statements | ARROW scoped-or-expr)
 
 class-def     : KEYWORD:class KEYWORD:fixedprops? IDENTIFIER LBRACE class-body RBRACE
 

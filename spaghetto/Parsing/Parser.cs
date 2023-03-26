@@ -508,7 +508,15 @@ namespace spaghetto.Parsing {
 
             var args = ParseFunctionArgs();
 
-            var block = ParseScopedStatements();
+            SyntaxNode block;
+            
+            if(Current.Type == SyntaxType.LBraces) {
+                block = ParseScopedStatements();
+            } else {
+                var arrow = MatchToken(SyntaxType.Arrow);
+                block = ParseScopedOrExpression();
+                block = new ReturnNode(arrow, block);
+            }
 
             return new FunctionDefinitionNode(nameToken, args, block);
         }

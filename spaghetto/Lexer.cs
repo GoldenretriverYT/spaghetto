@@ -34,7 +34,10 @@ namespace spaghetto {
                         if (Peek(1) == '=') {
                             Position++;
                             insertToken = (new(SyntaxType.EqualsEquals, Position, null, "=="));
-                        }else {
+                        } else if (Peek(1) == '>') {
+                            Position++;
+                            insertToken = (new(SyntaxType.Arrow, Position, null, "=>"));
+                        } else {
                             insertToken = (new(SyntaxType.Equals, Position, null, Current.ToString()));
                         }
 
@@ -246,6 +249,7 @@ namespace spaghetto {
         Identifier,
         Equals,
         EqualsEquals,
+        Arrow,
         AndAnd,
         OrOr,
         LessThan,
