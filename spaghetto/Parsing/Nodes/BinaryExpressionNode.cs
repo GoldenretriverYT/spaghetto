@@ -44,9 +44,12 @@
                     return leftRes.GreaterThan(rightRes);
                 case SyntaxType.GreaterThanEqu:
                     return leftRes.GreaterThanEqu(rightRes);
-
+                case SyntaxType.AndAnd:
+                    return new SInt((leftRes.IsTruthy() && rightRes.IsTruthy()) ? 1 : 0);
+                case SyntaxType.OrOr:
+                    return new SInt((leftRes.IsTruthy() || rightRes.IsTruthy()) ? 1 : 0);
                 default:
-                    throw new NotImplementedException();
+                    throw new NotImplementedException($"Operator {operatorToken.Type} does not have an implementation for binary expressions.");
             }
         }
 

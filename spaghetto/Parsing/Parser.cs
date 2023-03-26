@@ -233,7 +233,7 @@ namespace spaghetto.Parsing {
                 return new AssignVariableNode(ident, expr);
             }else {
                 // TODO: parse || and && lmao; totally forgot that :skull:
-                return ParseCompExpression();
+                return BinaryOperation(() => ParseCompExpression(), new List<SyntaxType>() { SyntaxType.AndAnd, SyntaxType.OrOr });
             }
         }
 
