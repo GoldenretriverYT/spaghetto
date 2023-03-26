@@ -51,6 +51,8 @@ Keywords:
   export
   const
   fixedprops
+  repeat
+  times
 
 equtoks       : (EQUALS|PLUSEQU|MINUSEQU|MULEQU|DIVEQU|MODEQU)
 statements    : (statement)*
@@ -94,6 +96,7 @@ atom          : INT|FLOAT|STRING|IDENTIFIER
               : list-expr
               : if-expr
               : for-expr
+              : repeat-expr
               : while-expr
               : func-def
               : instantiate
@@ -106,6 +109,8 @@ if-expr       : KEYWORD:if LPAREN expr RPAREN scoped-or-expr
               
 for-expr      : KEYWORD:for LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN
                 scoped-or-expr
+
+repeat-expr   : KEYWORD:repeat LPAREN INT KEYWORD:times RPAREN scoped-or-expr
               
 while-expr    : KEYWORD:while expr
                 scoped-or-expr

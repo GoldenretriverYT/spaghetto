@@ -30,6 +30,7 @@
         DotAssign,
         Export,
         Import,
-        ClassPropertyDefinition
+        ClassPropertyDefinition,
+        Repeat
     }
 }

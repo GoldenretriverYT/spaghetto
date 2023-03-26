@@ -409,6 +409,8 @@ namespace spaghetto.Parsing {
                 return ParseIfExpression();
             } else if (Current.Type is SyntaxType.Keyword && Current.Text == "for") {
                 return ParseForExpression();
+            } else if (Current.Type is SyntaxType.Keyword && Current.Text == "repeat") {
+                return ParseRepeatExpression();
             } else if (Current.Type is SyntaxType.Keyword && Current.Text == "while") {
                 return ParseWhileExpression();
             } else if (Current.Type is SyntaxType.Keyword && Current.Text == "func") {
@@ -502,6 +504,19 @@ namespace spaghetto.Parsing {
             var block = ParseScopedOrExpression();
 
             return new ForNode(initialExpressionNode, condNode, stepNode, block);
+        }
+
+        public SyntaxNode ParseRepeatExpression() {
+            MatchKeyword("repeat");
+
+            MatchToken(SyntaxType.LParen);
+            var intTok = MatchToken(SyntaxType.Int);
+            var timesTok = MatchKeyword("times");
+            MatchToken(SyntaxType.RParen);
+
+            var block = ParseScopedOrExpression();
+
+            return new RepeatNode(intTok, block);
         }
 
         public SyntaxNode ParseWhileExpression() {
@@ -619,6 +634,33 @@ namespace spaghetto.Parsing {
             SyntaxType.MinusMinus => SyntaxType.Minus,
             _ => throw new Exception(type + " is not a double token.")
         };
+    }
+
+    internal class RepeatNode : SyntaxNode {
+        private SyntaxToken intTok;
+        private SyntaxNode block;
+
+        public RepeatNode(SyntaxToken intTok, SyntaxNode block) : base(intTok.Position, block.EndPosition) {
+            this.intTok = intTok;
+            this.block = block;
+        }
+
+        public override NodeType Type => NodeType.Repeat;
+
+        public override SValue Evaluate(Scope scope) {
+            var times = (int)intTok.Value;
+
+            for(int i = 0; i < times; i++) {
+                block.Evaluate(scope);
+            }
+
+            return SValue.Null;
+        }
+
+        public override IEnumerable<SyntaxNode> GetChildren() {
+            yield return new TokenNode(intTok);
+            yield return block;
+        }
     }
 
     public class ParsingException : Exception {

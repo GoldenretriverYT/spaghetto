@@ -54,20 +54,6 @@ namespace spaghetto.Stdlib.Lang {
                 expectedArgs: new() { "code" }
             ));
 
-            scope.Set("fastrepeat", new SNativeFunction(
-                impl: (Scope callingScope, List<SValue> args) => {
-                    if (args[0] is not SInt times) throw new Exception("Expected argument 0 to be of type int");
-                    if (args[1] is not SFunction func) throw new Exception("Expected argument 1 to be of type function");
-
-                    var callArgs = new List<SValue>();
-                    for(int i = 0; i < times.Value; i++) {
-                        func.Call(callingScope, callArgs);
-                    }
-                    return SValue.Null;
-                },
-                expectedArgs: new() { "times", "func" }
-            ));
-
             scope.Set("int", Int.CreateClass());
             scope.Set("float", Float.CreateClass());
             scope.Set("string", String.CreateClass());
