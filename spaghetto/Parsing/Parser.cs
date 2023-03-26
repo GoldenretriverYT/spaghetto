@@ -107,26 +107,26 @@ namespace spaghetto.Parsing {
                 if (Peek(1).Type == SyntaxType.Semicolon) {
                     Position += 2;
                     var ret = new ReturnNode(retTok);
-                    MatchToken(SyntaxType.Semicolon);
+                    MatchTokenOptionally(SyntaxType.Semicolon, out _);
                     return ret;
                 } else {
                     Position++;
                     var ret = new ReturnNode(retTok, ParseExpression());
-                    MatchToken(SyntaxType.Semicolon);
+                    MatchTokenOptionally(SyntaxType.Semicolon, out _);
                     return ret;
                 }
             } else if (Current.Type == SyntaxType.Keyword && Current.Text == "continue") {
                 var n = new ContinueNode(Current);
 
                 Position++;
-                MatchToken(SyntaxType.Semicolon);
+                MatchTokenOptionally(SyntaxType.Semicolon, out _);
 
                 return n;
             } else if (Current.Type == SyntaxType.Keyword && Current.Text == "break") {
                 var n = new BreakNode(Current);
 
                 Position++;
-                MatchToken(SyntaxType.Semicolon);
+                MatchTokenOptionally(SyntaxType.Semicolon, out _);
 
                 return n;
             } else if (Current.Type == SyntaxType.Keyword && Current.Text == "import") {
@@ -135,12 +135,12 @@ namespace spaghetto.Parsing {
                 if (Current.Type == SyntaxType.Keyword && Current.Text == "native") {
                     Position++;
                     var ident = MatchToken(SyntaxType.Identifier);
-                    MatchToken(SyntaxType.Semicolon);
+                    MatchTokenOptionally(SyntaxType.Semicolon, out _);
 
                     return new NativeImportNode(ident);
                 } else {
                     var path = MatchToken(SyntaxType.String);
-                    MatchToken(SyntaxType.Semicolon);
+                    MatchTokenOptionally(SyntaxType.Semicolon, out _);
 
                     return new ImportNode(path);
                 }
@@ -148,15 +148,15 @@ namespace spaghetto.Parsing {
                 Position++;
 
                 var ident = MatchToken(SyntaxType.Identifier);
-                MatchToken(SyntaxType.Semicolon);
+                MatchTokenOptionally(SyntaxType.Semicolon, out _);
                 return new ExportNode(ident);
             } else if (Current.Type == SyntaxType.Keyword && Current.Text == "class") {
                 var c = ParseClassDefinition();
-                MatchToken(SyntaxType.Semicolon);
+                MatchTokenOptionally(SyntaxType.Semicolon, out _);
                 return c;
             } else {
                 var exprNode = ParseExpression();
-                MatchToken(SyntaxType.Semicolon);
+                MatchTokenOptionally(SyntaxType.Semicolon, out _);
 
                 return exprNode;
             }
@@ -468,7 +468,7 @@ namespace spaghetto.Parsing {
                 return ParseScopedStatements();
             else {
                 var expr = ParseExpression();
-                MatchToken(SyntaxType.Semicolon);
+                MatchTokenOptionally(SyntaxType.Semicolon, out _);
                 return expr;
             }
         }
@@ -478,9 +478,9 @@ namespace spaghetto.Parsing {
 
             MatchToken(SyntaxType.LParen);
             var initialExpressionNode = ParseExpression();
-            MatchToken(SyntaxType.Semicolon);
+            MatchTokenOptionally(SyntaxType.Semicolon, out _);
             var condNode = ParseExpression();
-            MatchToken(SyntaxType.Semicolon);
+            MatchTokenOptionally(SyntaxType.Semicolon, out _);
             var stepNode = ParseExpression();
             MatchToken(SyntaxType.RParen);
             var block = ParseScopedStatements();
