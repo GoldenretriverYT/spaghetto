@@ -36,6 +36,17 @@ namespace spaghetto.Parsing {
             throw MakeException("Unexpected token " + Current.Type + "; expected " + type);
         }
 
+        public bool MatchTokenOptionally(SyntaxType type, out SyntaxToken tok) {
+            if (Current.Type == type) {
+                Position++;
+                tok = Peek(-1);
+                return true;
+            }
+
+            tok = default;
+            return false;
+        }
+
         public SyntaxToken MatchTokenWithValue(SyntaxType type, object value)
         {
             if (Current.Type == type && Current.Value == value) {
@@ -425,8 +436,7 @@ namespace spaghetto.Parsing {
             MatchToken(SyntaxType.LParen);
             var initialCond = ParseExpression();
             MatchToken(SyntaxType.RParen);
-
-            var lastBlock = ParseScopedStatements();
+            var lastBlock = ParseScopedOrExpression();
 
             node.AddCase(initialCond, lastBlock);
 
@@ -436,14 +446,14 @@ namespace spaghetto.Parsing {
                 MatchToken(SyntaxType.LParen);
                 var cond = ParseExpression();
                 MatchToken(SyntaxType.RParen);
-                lastBlock = ParseScopedStatements();
+                lastBlock = ParseScopedOrExpression();
 
                 node.AddCase(cond, lastBlock);
             }
 
             if(Current.Type == SyntaxType.Keyword && Current.Text == "else") {
                 Position++;
-                lastBlock = ParseScopedStatements();
+                lastBlock = ParseScopedOrExpression();
 
                 node.AddCase(new IntLiteralNode(new SyntaxToken(SyntaxType.Int, 0, 1, "1")), lastBlock);
             }
@@ -451,6 +461,16 @@ namespace spaghetto.Parsing {
             node.EndPosition = lastBlock.EndPosition;
 
             return node;
+        }
+
+        public SyntaxNode ParseScopedOrExpression() {
+            if (Current.Type == SyntaxType.LBraces)
+                return ParseScopedStatements();
+            else {
+                var expr = ParseExpression();
+                MatchToken(SyntaxType.Semicolon);
+                return expr;
+            }
         }
 
         public SyntaxNode ParseForExpression() {

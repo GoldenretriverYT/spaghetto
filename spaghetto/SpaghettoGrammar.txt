@@ -53,6 +53,7 @@ Keywords:
 
 statements    : (statement)*
 scoped-statements: LBRACE (statement)* RBRACE
+scoped-or-expr: LBRACE (statement)* RBRACE | expr SEMICOLON
 
 statement     : KEYWORD:return expr?
               : KEYWORD:continue|break
@@ -96,19 +97,19 @@ atom          : INT|FLOAT|STRING|IDENTIFIER
               
 list-expr     : LSQBRACKET (expr (COMMA expr)*)? RSQBRACKET
               
-if-expr       : KEYWORD:if LPAREN expr RPAREN scoped-statements
-                (KEYWORD:elseif LPAREN expr RPAREN scoped-statements)*?
-                (KEYWORD:else scoped-statements)?
+if-expr       : KEYWORD:if LPAREN expr RPAREN scoped-or-expr
+                (KEYWORD:elseif LPAREN expr RPAREN scoped-or-expr)*?
+                (KEYWORD:else scoped-or-expr)?
               
 for-expr      : KEYWORD:for LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN
-                scoped-statements
+                scoped-or-expr
               
 while-expr    : KEYWORD:while expr
-                scoped-statements
+                scoped-or-expr
               
 func-def      : KEYWORD:func IDENTIFIER
                 LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
-                scoped-statements
+                scoped-or-expr
 
 class-def     : KEYWORD:class KEYWORD:fixedprops? IDENTIFIER LBRACE class-body RBRACE
 
