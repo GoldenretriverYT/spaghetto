@@ -69,6 +69,7 @@ statement     : KEYWORD:return expr?
               
 expression    : (KEYWORD:const)? KEYWORD:var IDENTIFIER (EQUALS expression)?
               : IDENTIFIER equtoks expression
+              : IDENTIFIER PLUSPLUS|MINUSMINUS
               : comp-expr ((&& | ||) comp-expr)*
               
 comp-expr     : !comp-expr

@@ -82,6 +82,9 @@ namespace spaghetto {
                         if (Peek(1) == '=') {
                             Position++;
                             insertToken = (new(SyntaxType.PlusEqu, Position, null, "+="));
+                        } else if (Peek(1) == '+') {
+                            Position++;
+                            insertToken = (new(SyntaxType.PlusPlus, Position, null, "++"));
                         } else {
                             insertToken = (new(SyntaxType.Plus, Position, null, Current.ToString()));
                         }
@@ -91,6 +94,9 @@ namespace spaghetto {
                         if (Peek(1) == '=') {
                             Position++;
                             insertToken = (new(SyntaxType.MinusEqu, Position, null, "-="));
+                        } else if (Peek(1) == '-') {
+                            Position++;
+                            insertToken = (new(SyntaxType.MinusMinus, Position, null, "--"));
                         } else {
                             insertToken = (new(SyntaxType.Minus, Position, null, Current.ToString()));
                         }
@@ -290,6 +296,7 @@ namespace spaghetto {
 
         Plus, Minus,
         PlusEqu, MinusEqu,
+        PlusPlus, MinusMinus,
 
         Mod, Mul, Div,
         ModEqu, MulEqu, DivEqu,

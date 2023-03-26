@@ -240,6 +240,14 @@ namespace spaghetto.Parsing {
 
                 var expr = ParseExpression();
                 return new AssignVariableNode(ident, new BinaryExpressionNode(new IdentifierNode(ident), assignTok, expr));
+            } else if (Current.Type == SyntaxType.Identifier && (Peek(1).Type is SyntaxType.PlusPlus or SyntaxType.MinusMinus)) {
+                var ident = MatchToken(SyntaxType.Identifier);
+
+                var assignTok = Current;
+                assignTok.Type = MapDoubleTokens(assignTok.Type);
+                Position++;
+
+                return new AssignVariableNode(ident, new BinaryExpressionNode(new IdentifierNode(ident), assignTok, new IntLiteralNode(new SyntaxToken(SyntaxType.Int, assignTok.Position, 1, "1"))));
             } else {
                 return BinaryOperation(() => ParseCompExpression(), new List<SyntaxType>() { SyntaxType.AndAnd, SyntaxType.OrOr });
             }
@@ -604,6 +612,12 @@ namespace spaghetto.Parsing {
             SyntaxType.MulEqu => SyntaxType.Mul,
             SyntaxType.DivEqu => SyntaxType.Div,
             _ => throw new Exception(type + " is not a equals token.")
+        };
+
+        public SyntaxType MapDoubleTokens(SyntaxType type) => type switch {
+            SyntaxType.PlusPlus => SyntaxType.Plus,
+            SyntaxType.MinusMinus => SyntaxType.Minus,
+            _ => throw new Exception(type + " is not a double token.")
         };
     }
 
