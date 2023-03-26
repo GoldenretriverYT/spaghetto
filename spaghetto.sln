@@ -19,7 +19,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpaghettoCosmosTestKernel",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "spaghettoPacker", "spaghettoPacker\spaghettoPacker.csproj", "{B8A4B70C-8317-492B-BD54-E9DCC6241A9E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PerfTest", "PerfTest\PerfTest.csproj", "{39D90083-FC05-4C82-8AEA-23AFB2B7C7FB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PerfTest", "PerfTest\PerfTest.csproj", "{39D90083-FC05-4C82-8AEA-23AFB2B7C7FB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

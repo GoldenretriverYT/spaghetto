@@ -483,7 +483,7 @@ namespace spaghetto.Parsing {
             MatchTokenOptionally(SyntaxType.Semicolon, out _);
             var stepNode = ParseExpression();
             MatchToken(SyntaxType.RParen);
-            var block = ParseScopedStatements();
+            var block = ParseScopedOrExpression();
 
             return new ForNode(initialExpressionNode, condNode, stepNode, block);
         }
@@ -494,7 +494,7 @@ namespace spaghetto.Parsing {
             MatchToken(SyntaxType.LParen);
             var condNode = ParseExpression();
             MatchToken(SyntaxType.RParen);
-            var block = ParseScopedStatements();
+            var block = ParseScopedOrExpression();
 
             return new WhileNode(condNode, block);
         }

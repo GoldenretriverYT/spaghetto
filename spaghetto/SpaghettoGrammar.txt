@@ -109,7 +109,7 @@ while-expr    : KEYWORD:while expr
               
 func-def      : KEYWORD:func IDENTIFIER
                 LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
-                scoped-or-expr
+                scoped-statements
 
 class-def     : KEYWORD:class KEYWORD:fixedprops? IDENTIFIER LBRACE class-body RBRACE
 

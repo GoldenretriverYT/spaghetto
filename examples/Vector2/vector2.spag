@@ -1,3 +1,4 @@
+// Semicolons are purely optional in spaghetto, but recommended for readability.
 import native io;
 import native lang;
 
