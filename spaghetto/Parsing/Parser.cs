@@ -508,15 +508,16 @@ namespace spaghetto.Parsing {
 
         public SyntaxNode ParseRepeatExpression() {
             MatchKeyword("repeat");
+            var keepScope = MatchTokenOptionally(SyntaxType.Bang, out _);
 
             MatchToken(SyntaxType.LParen);
-            var intTok = MatchToken(SyntaxType.Int);
+            var timesExpr = ParseExpression();
             var timesTok = MatchKeyword("times");
             MatchToken(SyntaxType.RParen);
 
             var block = ParseScopedOrExpression();
 
-            return new RepeatNode(intTok, block);
+            return new RepeatNode(timesExpr, block, keepScope);
         }
 
         public SyntaxNode ParseWhileExpression() {
@@ -637,28 +638,42 @@ namespace spaghetto.Parsing {
     }
 
     internal class RepeatNode : SyntaxNode {
-        private SyntaxToken intTok;
+        private SyntaxNode timesExpr;
         private SyntaxNode block;
+        private bool keepScope = false;
 
-        public RepeatNode(SyntaxToken intTok, SyntaxNode block) : base(intTok.Position, block.EndPosition) {
-            this.intTok = intTok;
+        public RepeatNode(SyntaxNode timesExpr, SyntaxNode block, bool keepScope = false) : base(timesExpr.StartPosition, block.EndPosition) {
+            this.timesExpr = timesExpr;
             this.block = block;
+            this.keepScope = keepScope;
         }
 
         public override NodeType Type => NodeType.Repeat;
 
         public override SValue Evaluate(Scope scope) {
-            var times = (int)intTok.Value;
+            var timesRaw = timesExpr.Evaluate(scope);
+            if (timesRaw is not SInt timesSInt) throw new Exception("Repeat x times expression must evaluate to SInt");
+            var times = timesSInt.Value;
 
-            for(int i = 0; i < times; i++) {
-                block.Evaluate(scope);
+            if (keepScope) {
+                if (block is not BlockNode blockNode) throw new Exception("Kept-scope repeat expressions must have a full body.");
+
+                for (int i = 0; i < times; i++) {
+                    foreach(var n in blockNode.Nodes) {
+                        n.Evaluate(scope);
+                    }
+                }
+            } else {
+                for (int i = 0; i < times; i++) {
+                    block.Evaluate(scope);
+                }
             }
 
             return SValue.Null;
         }
 
         public override IEnumerable<SyntaxNode> GetChildren() {
-            yield return new TokenNode(intTok);
+            yield return timesExpr;
             yield return block;
         }
     }

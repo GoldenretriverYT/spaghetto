@@ -9,11 +9,13 @@ namespace spaghetto.Parsing.Nodes
 
         public BlockNode(SyntaxToken startTok, SyntaxToken endTok, List<SyntaxNode> nodes, bool createNewScope = true) : base(startTok.Position, endTok.Position)
         {
-            this.nodes = nodes;
+            this.Nodes = nodes;
             this.createNewScope = createNewScope;
         }
 
         public override NodeType Type => NodeType.Block;
+
+        public List<SyntaxNode> Nodes { get => nodes; set => nodes = value; }
 
         public override SValue Evaluate(Scope scope)
         {
@@ -22,7 +24,7 @@ namespace spaghetto.Parsing.Nodes
 
             if (createNewScope) blockScope = new Scope(scope, StartPosition);
 
-            foreach (var node in nodes)
+            foreach (var node in Nodes)
             {
                 var res = node.Evaluate(blockScope);
 
@@ -47,7 +49,7 @@ namespace spaghetto.Parsing.Nodes
 
         public override IEnumerable<SyntaxNode> GetChildren()
         {
-            foreach (var node in nodes) yield return node;
+            foreach (var node in Nodes) yield return node;
         }
 
         public override string ToString()
