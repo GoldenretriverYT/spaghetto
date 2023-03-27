@@ -30,6 +30,8 @@ namespace spaghetto.Parsing.Nodes
                     if (funcRaw is not SFunction func) throw new Exception("Expected ClassFunctionDefinitionNode to return SFunction");
 
                     if (func.IsClassInstanceMethod) {
+                        if (func.ExpectedArgs.IndexOf("self") == -1) func.ExpectedArgs.Insert(0, "self");
+
                         @class.InstanceBaseTable.Add((new SString(func.FunctionName), func));
                     } else {
                         @class.StaticTable.Add((new SString(func.FunctionName), func));

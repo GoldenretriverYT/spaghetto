@@ -22,9 +22,9 @@
             var targetName = name.Text;
 
             if (targetName is "ctor" or "toString") {
-                if(args.Where(v => v.Text == "self").Count() != 1) {
+                /*if(args.Where(v => v.Text == "self").Count() != 1) {
                     throw new Exception($"Special class method '{targetName}' must contain the argument 'self' exactly once.");
-                }
+                }*/
 
                 targetName = "$$" + targetName;
             }
