@@ -70,5 +70,11 @@ namespace spaghetto.Parsing.Nodes
         {
             return "DotNode:";
         }
+
+        public DotNode Clone()
+        {
+            var dn = new DotNode(CallNode);
+            dn.NextNodes = this.NextNodes.ToList(); return dn;
+        }
     }
 }

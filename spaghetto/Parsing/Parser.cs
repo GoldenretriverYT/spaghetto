@@ -330,6 +330,29 @@ namespace spaghetto.Parsing {
                             var expr = ParseExpression();
 
                             accessStack.NextNodes.Add(new AssignVariableNode(ident, expr));
+                        } else if (Peek(1).Type is SyntaxType.Equals or SyntaxType.PlusEqu or SyntaxType.MinusEqu or SyntaxType.ModEqu or SyntaxType.DivEqu or SyntaxType.MulEqu) {
+                            var ident = MatchToken(SyntaxType.Identifier);
+
+                            var assignTok = Current;
+                            assignTok.Type = MapEqualsTokens(assignTok.Type);
+                            Position++;
+
+                            var expr = ParseExpression();
+                            // TODO: Check if we can do this in a better way
+                            var binOpDot = accessStack.Clone();
+                            binOpDot.NextNodes.Add(new IdentifierNode(ident));
+
+                            accessStack.NextNodes.Add(new AssignVariableNode(ident, new BinaryExpressionNode(binOpDot, assignTok, expr)));
+                        } else if (Peek(1).Type is SyntaxType.PlusPlus or SyntaxType.MinusMinus) {
+                            var ident = MatchToken(SyntaxType.Identifier);
+
+                            var assignTok = Current;
+                            assignTok.Type = MapDoubleTokens(assignTok.Type);
+                            Position++;
+
+                            var binOpDot = accessStack.Clone();
+                            binOpDot.NextNodes.Add(new IdentifierNode(ident));
+                            accessStack.NextNodes.Add(new AssignVariableNode(ident, new BinaryExpressionNode(binOpDot, assignTok, new IntLiteralNode(new SyntaxToken(SyntaxType.Int, assignTok.Position, 1, "1")))));
                         } else {
                             var n = ParseCallExpression();
                             accessStack.NextNodes.Add(n);
