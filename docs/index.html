@@ -18,45 +18,125 @@
         <div class="warning" style="padding-top: 10px; padding-bottom: 10px; font-size: 16px; font-weight: 800; padding-left: 10px; width: 100%">This documentation is work in progress!</div>
 
         <h1 id="welcome">Welcome</h1>
-        <h3>Spaghetto is a simple, interpreted programming language not specialized in anything.</h3>
-        Spaghetto files uses the .spag extension, but you can also run code using the CLI. Also, Spaghetto is quite easy to learn.<br><br>
+        <h3>Spaghetto is a simple, c-like, interpreted programming language not specialized in anything really.</h3>
+        Spaghetto files uses the .spag extension, but you can also run code using the CLI.<br><br>
 
         <h2 id="gettingStarted">Getting Started</h2>
         To start using Spaghetto, you are gonna have to <a href="https://github.com/GoldenretriverYT/spaghetto/releases/latest">download the latest release</a> or download <a href="https://github.com/GoldenretriverYT/spaghetto/">the repository</a> and build it yourself.
-        The downloaded file will be in the zip format, extract to to where you want. Inside your new folder, there should be a spaghettoCLI.exe file. Run it to open the CLI interpreter (run code quickly in the console) or use --file to specify a file to run. If you want to
-        run a file, but stay in the CLI, you can use the global run(path: String) method.
+        The downloaded file will be in the zip format, extract to to where you want. Inside your new folder, there should be a spaghettoCLI.exe file. Run it to open the CLI interpreter (run code quickly in the console).
 
         <br><h2 id="vt">Value types</h2>
-        Spaghetto has so called <i>Value types</i>, these are built-in types that hold values. Technically, every variable ever is a value type. Currently, these Value types exist: Number, Function, Class, ClassInstance, List and String.<br>
-        To create a string, you can simple use double quotes like this: <code>"Hello World!"</code> This code will create a string with the content <i>Hello World!</i>. Numbers are created by just, well, typing in numbers.
+        Spaghetto is a language where everything is an object - from class definitions to functions; they are just an "SValue" object too. To create strings, use the string literal syntax <code>"my string"</code>. You can use ints or floats in your calculations, if you want to use a float your number needs to be a fully qualified decimal number (<code>3.0</code>)
         
         <br><h2 id="comments">Comments</h2>
-        Spaghetto supports single-line comments. To create a comment, start the line with <code>//</code> and it will be ignored.
+        Spaghetto supports single-line comments. They use the same syntax as in many languages by starting with <code>//</code>.
 
         <br><h2 id="variables">Variables</h2>
-        To define a variable, you use <code>var myVar = &lt;value&gt;</code>. This will define the variable myVar in the current "context" (function context, global context, etc.). To re-assign your variable, you can use <code>myVar = 3</code> - this technically also works without having defined it previously, but it makes your code less readable if you use it like that.<br>
-        A variable can contain any value type. Lists are used to store a list of values. These can also contain any value, in any order. To define a list, use <code>var myVar = [1, 2, 3]</code>.
+        To define a variable, you use <code>var myVar = &lt;value&gt;</code>. This will define the variable myVar in the current "context" (function context, global context, etc.).
+        To change your variables value at a later time, do <code>myVar = &lt;newValue&gt;;</code>. Note that variables are fixed-type by default, which means that a
+        different type can not be assigned after initilization; to change that you can use the <code>var%</code> syntax which makes your variable free-typed.
+        Spaghetto also offers support for constant variables using the <code>const var myVar = &lt;value&gt;</code> - these can not be changed after initilization.
 
         <br><h2 id="semicolons">Semicolons</h2>
-        Semicolons aren't required if you don't want to use them. The only case where you need them is, for example, when using an if with an inline statement. Take a look at this example:
-        <code class="fullWidth">
-            if(myVar == 5) {; print("My var is 5"); }
-        </code>
+        In Spaghetto, semicolons are purely optional but recommended.
 
         <br><h2 id="functions">Functions</h2>
-        Unlike in my previous, horrible, programming language, you can actually define proper functions with methods and return values. Use this example:
+        Spaghetto supports functions like almost every other language does too.
         <code class="fullWidth">
+            import native lang; // We need to import the native library 'lang' here to use the list.length function<br>
+            <br>
             func calcAvg(lst) {<br>
             &emsp;var sum = 0;<br>
             <br>
-            &emsp;for i = 0 while i &lt; lst.size() step 1 {<br>
+            &emsp;repeat!(list.length(lst) times) {<br>
             &emsp;&emsp;sum = sum + lst#i;<br>
             &emsp;}<br>
             <br>
-            &emsp;return sum / lst.size();<br>
+            &emsp;return sum / list.length(lst);<br>
             }
         </code><br><br>
 
-        This code will define a new function called <i>calcAvg</i>, which can be called by using calcAvg([3, 2, 6, 2, 4, 0]) or with whatever list you want to use.
+        This code will define a new function called <i>calcAvg</i>, which can be called by using calcAvg([3, 2, 6, 2, 4, 0]) or with whatever list you want to use. It returns the average value of the lists entries as int.
+    
+        <br><h2 id="imports">Imports</h2>
+        As seen above, you can import native libraries and normal files. Those two have a slightly different syntax as shown here:
+        <code class="fullWidth">
+            import native lang; // A native import features the "native" keyword and then an identifier.<br>
+            import "myfile.spag"; // File imports do not have the extra keyword and they need a string literal instead of an identifier.<br>
+        </code><br><br>
+
+        <br><h2 id="imports">Control flow</h2>
+        Spaghetto supports if/else/elseif. Switches are not supported yet.
+        <code class="fullWidth">
+            import native io; // adds println func<br><br>
+
+            if(x == 3 || x == 2) <br>
+            &emsp;println("ok"); // that works too<br>
+            else if(x == 1) {<br>
+            &emsp;println("well thats not so ok");<br>
+            } else {<br>
+            &emsp;println("something went completely wrong!");<br>
+            }<br>
+        </code><br><br>
+
+        <br><h2 id="loops">Loops</h2>
+        Spaghetto supports for and while loops, but also so-called "repeat" loops
+        
+        <br><h3 id="loopsFor">For</h3>
+        For loops work basically the same way they do in most C-like languages.
+
+        <code class="fullWidth">
+            import native io; // adds println func<br><br>
+
+            for(var i = 0; i < 100; i++) { <br>
+            &emsp;if(i % 3 == 0) continue; // Dont print every third number<br>
+            &emsp;if(i == 33) break; // Stop at 33<br>
+            <br>
+            &emsp;println(i);<br>
+            }
+        </code>
+
+        <div class="actual-warning fullWidth">Note: Using for loops for repeation tasks with no special conditions (= no breaks or continues either) is not recommended as there is a faster alternative.</div>
+
+        <br><h3 id="loopsFor">While</h3>
+        While loops are also identical to other C-like languages
+
+        <code class="fullWidth">
+            import native io; // adds println func<br><br>
+
+            while(1) {
+                println("muhahaha");
+            }
+        </code>
+
+        <br><h3 id="loopsFor">Repeat</h3>
+        Repeat is a special loop as it is made for performance. It gets rid of the overhead through calling a condition which gets converted to a bool and the check if we should continue or break and blablabla. You get the point. There are two different versions of the repeat loop, <code>repeat</code> and <code>repeat!</code>.<br>
+        The difference between those two is easy:<br>
+        <ul>
+            <li>
+                <code>repeat</code> creates a new scope for every cycle, which means that variables defined within the repeat block are not accessible outside of the block
+            </li>
+            <li>
+                <code>repeat!</code> does NOT create a new scope for every cycle, which improves performance to be near native C# performance (without any body obviously)
+            </li>
+        </ul>
+
+        You can not use break; or continue; in those loops, they would try to affect the outer loop (if there is one)
+
+        <code class="fullWidth">
+            import native io; // adds print func<br><br>
+
+            repeat(100 times) {<br>
+                &emsp;var x = 30; // this works fine here<br>
+                &emsp;print("ok ");<br>
+            }<br>
+            <br>
+            repeat!(100 times) {<br>
+                &emsp;var x = 30; // this will throw an exception as we try to initilize the variable multiple times.<br>
+                &emsp;print("ok ");<br>
+            }<br>
+        </code>
+
+        
     </div>
 </body>
