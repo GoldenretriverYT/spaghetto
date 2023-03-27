@@ -42,9 +42,12 @@
             else
             {
                 if (isFixedType) throw new InvalidOperationException("Tried to initiliaze a fixed type variable with no value; this is not permitted. Use var% instead.");
+                var nul = new SNull();
+                nul.TypeIsFixed = isFixedType;
+                nul.IsConstant = isConst;
 
-                scope.Set(ident.Value.ToString(), SValue.Null);
-                return SValue.Null;
+                scope.Set(ident.Value.ToString(), nul);
+                return nul;
             }
 
         }

@@ -1,0 +1,150 @@
+import native io;
+import native lang;
+import "test/lexer.spag";
+
+class fixedprops Parser {
+    prop toks = [];
+    prop pos = 0;
+
+    func current(self) {
+        return self.peek(0);
+    }
+    
+    func peek(self, off) {
+        // todo: implement list length!
+        return self.toks#(self.pos + off);
+    }
+
+    func matchToken(self, type) {
+        if(self.current().type == type) {
+            self.pos = self.pos + 1;
+            return self.peek(-1);
+        }
+
+        println("Unexpected token!");
+    }
+
+    func ctor(self, toks) {
+        self.toks = toks;
+    }
+
+    func parse(self) {
+        return self.parseArithmetic();
+    }
+
+    func parseArithmetic(self) {
+        return self.binop(func(self) { return self.parseTerm() }, [TOK_PLUS, TOK_MINUS]);
+    }
+
+    func parseTerm(self) {
+        return self.binop(func(self) { return self.parseFactor() }, [TOK_MUL, TOK_DIV]);
+    }
+
+    func parseFactor(self) {
+        if(self.current().type == TOK_PLUS || self.current().type == TOK_MINUS) {
+            var tok = self.current();
+            self.pos = self.pos+1;
+            var factor = self.parseFactor();
+            return new UnaryNode(tok, factor);
+        }
+
+        return self.parseAtom();
+    }
+
+    func parseAtom(self) {
+        if(self.current().type == TOK_NUMBER) {
+            self.pos = self.pos + 1;
+            var p = self.peek(-1);
+            return new IntLiteralNode(p);
+        }else if(self.current().type == TOK_LPAREN) {
+            self.pos = self.pos+1;
+            var expr = self.parseArithmetic();
+            self.matchToken(TOK_RPAREN);
+            return expr;
+        }
+    }
+
+    func binop(self, parse, allowedTypes) {
+        var left = parse(self);
+        var% right;
+
+        while(list.contains(allowedTypes, self.current().type)) {
+            var optok = self.current();
+            self.pos = self.pos + 1;
+            right = parse(self);
+            left = new BinaryNode(left, optok, right);
+        }
+
+        return left;
+    }
+}
+
+class fixedprops IntLiteralNode {
+    prop val = 0;
+
+    func ctor(self, tok) {
+        self.val = tok.value;
+    }
+
+    func eval(self) {
+        return self.val;
+    }
+
+    func print(self, indent) {
+        return indent + "IntLit " + toString(self.val);
+    }
+}
+
+class fixedprops UnaryNode {
+    prop tok = new SyntaxToken(0,0,0,0);
+    prop rhs = 0;
+
+    func ctor(self, tok, rhs) {
+        self.tok = tok;
+        self.rhs = rhs;
+    }
+
+    func eval(self) {
+        if(self.tok.type == TOK_MINUS) {
+            return -(self.rhs.eval());
+        }else {
+            return int.MIN_VALUE; // error
+        }
+    }
+
+    func print(self, indent) {
+        return indent + "UnaryNode " + toString(self.tok) + "\n" + self.rhs.print(indent + "  ");
+    }
+}
+
+class fixedprops BinaryNode {
+    prop lhs = 0;
+    prop rhs = 0;
+    prop tok = new SyntaxToken(0,0,0,0);
+
+    func ctor(self, lhs, tok, rhs) {
+        self.lhs = lhs;
+        self.tok = tok;
+        self.rhs = rhs;
+    }
+
+    func eval(self) {
+        if(self.tok.type == TOK_PLUS) {
+            return self.lhs.eval() + self.rhs.eval();
+        }else if(self.tok.type == TOK_MINUS) {
+            return self.lhs.eval() - self.rhs.eval();
+        }else if(self.tok.type == TOK_MUL) {
+            return self.lhs.eval() * self.rhs.eval();
+        }else if(self.tok.type == TOK_DIV) {
+            return self.lhs.eval() / self.rhs.eval();
+        }else {
+            return -int.MAX_VALUE; // error
+        }
+    }
+
+    func print(self, indent) {
+        return indent + "BinaryNode " + toString(self.tok) + "\n" + self.lhs.print(indent + "  ") + "\n" + self.rhs.print(indent + "  ");
+    }
+}
+
+export Parser;

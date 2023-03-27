@@ -53,7 +53,7 @@
 
         public override IEnumerable<SyntaxNode> GetChildren()
         {
-            throw new NotImplementedException();
+            yield return new TokenNode(path);
         }
     }
 }

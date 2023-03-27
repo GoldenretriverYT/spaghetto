@@ -18,7 +18,7 @@ namespace spaghetto.Parsing.Nodes
         public override SValue Evaluate(Scope scope)
         {
             var @class = scope.Get(ident.Text);
-            if (@class == null || @class is not SClass sclass) throw new Exception("Class not found!");
+            if (@class == null || @class is not SClass sclass) throw new Exception("Class " + ident.Text + " not found!");
 
 
             var instance = new SClassInstance(sclass);
@@ -33,7 +33,8 @@ namespace spaghetto.Parsing.Nodes
 
         public override IEnumerable<SyntaxNode> GetChildren()
         {
-            throw new NotImplementedException();
+            yield return new TokenNode(ident);
+            foreach (var n in argumentNodes) yield return n;
         }
     }
 }

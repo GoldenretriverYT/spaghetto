@@ -454,7 +454,7 @@ namespace spaghetto.Parsing {
             MatchToken(SyntaxType.LParen);
             var initialCond = ParseExpression();
             MatchToken(SyntaxType.RParen);
-            var lastBlock = ParseScopedOrExpression();
+            var lastBlock = ParseScopedOrStatement();
 
             node.AddCase(initialCond, lastBlock);
 
@@ -464,14 +464,14 @@ namespace spaghetto.Parsing {
                 MatchToken(SyntaxType.LParen);
                 var cond = ParseExpression();
                 MatchToken(SyntaxType.RParen);
-                lastBlock = ParseScopedOrExpression();
+                lastBlock = ParseScopedOrStatement();
 
                 node.AddCase(cond, lastBlock);
             }
 
             if(Current.Type == SyntaxType.Keyword && Current.Text == "else") {
                 Position++;
-                lastBlock = ParseScopedOrExpression();
+                lastBlock = ParseScopedOrStatement();
 
                 node.AddCase(new IntLiteralNode(new SyntaxToken(SyntaxType.Int, 0, 1, "1")), lastBlock);
             }
@@ -481,11 +481,11 @@ namespace spaghetto.Parsing {
             return node;
         }
 
-        public SyntaxNode ParseScopedOrExpression() {
+        public SyntaxNode ParseScopedOrStatement() {
             if (Current.Type == SyntaxType.LBraces)
                 return ParseScopedStatements();
             else {
-                var expr = ParseExpression();
+                var expr = ParseStatement();
                 MatchTokenOptionally(SyntaxType.Semicolon, out _);
                 return expr;
             }
@@ -501,7 +501,7 @@ namespace spaghetto.Parsing {
             MatchTokenOptionally(SyntaxType.Semicolon, out _);
             var stepNode = ParseExpression();
             MatchToken(SyntaxType.RParen);
-            var block = ParseScopedOrExpression();
+            var block = ParseScopedOrStatement();
 
             return new ForNode(initialExpressionNode, condNode, stepNode, block);
         }
@@ -515,7 +515,7 @@ namespace spaghetto.Parsing {
             var timesTok = MatchKeyword("times");
             MatchToken(SyntaxType.RParen);
 
-            var block = ParseScopedOrExpression();
+            var block = ParseScopedOrStatement();
 
             return new RepeatNode(timesExpr, block, keepScope);
         }
@@ -526,7 +526,7 @@ namespace spaghetto.Parsing {
             MatchToken(SyntaxType.LParen);
             var condNode = ParseExpression();
             MatchToken(SyntaxType.RParen);
-            var block = ParseScopedOrExpression();
+            var block = ParseScopedOrStatement();
 
             return new WhileNode(condNode, block);
         }
@@ -546,7 +546,7 @@ namespace spaghetto.Parsing {
                 block = ParseScopedStatements();
             } else {
                 var arrow = MatchToken(SyntaxType.Arrow);
-                block = ParseScopedOrExpression();
+                block = ParseScopedOrStatement();
                 block = new ReturnNode(arrow, block);
             }
 

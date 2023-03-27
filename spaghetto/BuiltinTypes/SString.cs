@@ -22,8 +22,14 @@
 
         public override SValue Add(SValue other)
         {
-            if (other is not SString @string) throw new NotImplementedException();
+            if (other is not SString @string) throw NotSupportedBetween(other, "Add");
             return new SString(Value + @string.Value);
+        }
+
+        public override SValue Idx(SValue other)
+        {
+            if (other is not SInt idx) throw NotSupportedBetween(other, "Add");
+            return new SString(Value[idx.Value].ToString());
         }
 
         public override SValue Equals(SValue other) {

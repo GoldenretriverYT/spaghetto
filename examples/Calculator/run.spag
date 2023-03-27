@@ -1,0 +1,33 @@
+import native io;
+import native lang;
+import "test/lexer.spag";
+import "test/parser.spag";
+
+func calcWithComp(eq) {
+    var lex = new Lexer(eq);
+    var parser = new Parser(lex.lex());
+    var node = parser.parse();
+
+    println("");
+
+    println("THE RESULT OF '" + eq + "' IS:");
+    println(node.eval());
+    println("SPAG EVAL RESULT:");
+    println(eval(eq));
+}
+
+func calc(eq) {
+    var lex = new Lexer(eq);
+    var parser = new Parser(lex.lex());
+    var node = parser.parse();
+
+    println("");
+
+    println("THE RESULT OF '" + eq + "' IS:");
+    println(node.eval());
+}
+
+calcWithComp("(3+3) * 3");
+
+export calcWithComp;
+export calc;

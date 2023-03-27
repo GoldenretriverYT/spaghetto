@@ -222,6 +222,7 @@ namespace spaghetto {
                         case '"': str += "\""; break;
                         case 'n': str += "\n"; break;
                         case '\\': str += "\\"; break;
+                        case '0': str += "\0"; break;
                         default: throw new Exception("Invalid escape sequence");
                     }
 

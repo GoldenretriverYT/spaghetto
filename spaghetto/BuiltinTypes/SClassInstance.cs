@@ -30,7 +30,8 @@ namespace spaghetto {
                 return new SString("<instance of class " + Class.Name + ">");
             }else {
                 // TODO: Find a solution to pass the scope; maybe keep a "DefiningScope" on each value?
-                var ret = toStringFunc.Call(null, new() { this });
+                // For now, just use an empty scope
+                var ret = toStringFunc.Call(new Scope(0), new() { this });
 
                 if (ret is not SString str) throw new Exception("A classes toString function must return a string!");
                 return str;
@@ -56,6 +57,7 @@ namespace spaghetto {
                     if (kvp.val.IsConstant) throw new Exception($"Tried to overwrite constant value {kvp.key}!");
 
                     InstanceTable.Remove(kvp);
+                    InstanceTable.Add((key, other));
                     return other;
                 }
             }
@@ -65,6 +67,7 @@ namespace spaghetto {
                     if (kvp.val.IsConstant) throw new Exception($"Tried to overwrite constant value {kvp.key}!");
 
                     InstanceTable.Remove(kvp);
+                    InstanceTable.Add((key, other));
                     return other;
                 }
             }

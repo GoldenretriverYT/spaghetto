@@ -1,0 +1,145 @@
+import native lang;
+import native io;
+
+var TOK_BADTOK = -1;
+var TOK_NUMBER = 0;
+var TOK_PLUS = 1;
+var TOK_MINUS = 2;
+var TOK_MUL = 3;
+var TOK_DIV = 4;
+var TOK_LPAREN = 5;
+var TOK_RPAREN = 6;
+var TOK_EOF = 7;
+
+class fixedprops Lexer {
+    prop text = "";
+    prop pos = 0;
+
+    func current(self) {
+        return self.peek(0);
+    }
+
+    func peek(self, off) {
+        if(self.pos + off >= string.length(self.text) || self.pos + off < 0) return "\0";
+
+        return self.text#(self.pos + off);
+    }
+
+    func ctor(self, text) {
+        self.text = text;
+    }
+
+    func lex(self) {
+        var toks = [];
+
+        while((self.current() == "\0") == 0) {
+            var current = self.current();
+            var insertTok = self.tryGetTokenRegular(current);
+
+            if(insertTok.type == TOK_BADTOK) {
+                if(Lexer.isNumber(current)) {
+                    var numStr = "";
+                    var startPos = self.pos;
+
+                    while(Lexer.isNumber(self.current())) {
+                        numStr += self.current();
+                        self.pos = self.pos + 1;
+                    }
+
+                    toks += new SyntaxToken(TOK_NUMBER, startPos, int.parse(numStr), numStr);
+                }else if(current == " ") {
+                    self.pos = self.pos + 1;
+                }else {
+                    println("LEX ERROR AT POS " + toString(self.pos) + " (text=" + self.current() + "); CAN NOT GURANTEE SUCCESSFUL EXECUTION!");
+                    self.pos = self.pos + 1;
+                }
+
+                
+            }else {
+                toks += insertTok;
+                // BUG TO FIX: ++ and += do NOT work with dot assignments!
+                self.pos = self.pos + 1;
+            }
+        }
+
+        toks += new SyntaxToken(TOK_EOF, self.pos, 0, "\0");
+        return toks;
+    }
+
+    func tryGetTokenRegular(self, current) {
+        if(current == "+") {
+            return new SyntaxToken(TOK_PLUS, self.pos, 0, current);
+        }
+
+        if(current == "-") {
+            return new SyntaxToken(TOK_MINUS, self.pos, 0, current);
+        }
+
+        if(current == "*") {
+            return new SyntaxToken(TOK_MUL, self.pos, 0, current);
+        }
+
+        if(current == "/") {
+            return new SyntaxToken(TOK_DIV, self.pos, 0, current);
+        }
+
+        if(current == "(") {
+            return new SyntaxToken(TOK_LPAREN, self.pos, 0, current);
+        }
+
+        if(current == ")") {
+            return new SyntaxToken(TOK_RPAREN, self.pos, 0, current);
+        }
+
+        return new SyntaxToken(TOK_BADTOK, self.pos, 0, current);
+    }
+
+    func static isNumber(current) {
+        return current == "0" || current == "1" || current == "2"
+                || current == "3" || current == "4" || current == "5"
+                || current == "6" || current == "7" || current == "8"
+                || current == "9";
+    }
+}
+
+class fixedprops SyntaxToken {
+    prop type = 0;
+    prop pos = 0;
+    prop value = 0;
+    prop text = "";
+
+    func ctor(self, type, pos, value, text) {
+        self.type = type;
+        self.pos = pos;
+        self.value = value;
+        self.text = text;
+    }
+
+    func toString(self) {
+        return "Type: " + self.getTypeString() + " at " + toString(self.pos) + " with value " + toString(self.value) + " and text " + toString(self.text);
+    }
+
+    func getTypeString(self) {
+        if(self.type == TOK_BADTOK) return "BadToken";
+        if(self.type == TOK_NUMBER) return "Number";
+        if(self.type == TOK_PLUS) return "Plus";
+        if(self.type == TOK_MINUS) return "Minus";
+        if(self.type == TOK_MUL) return "Mul";
+        if(self.type == TOK_DIV) return "Div";
+        if(self.type == TOK_LPAREN) return "LParen";
+        if(self.type == TOK_RPAREN) return "RParen";
+        if(self.type == TOK_EOF) return "EOF";
+    }
+}
+
+export Lexer;
+export SyntaxToken;
+export TOK_BADTOK;
+export TOK_NUMBER;
+export TOK_PLUS;
+export TOK_MINUS;
+export TOK_MUL;
+export TOK_DIV;
+export TOK_LPAREN;
+export TOK_RPAREN;
+export TOK_EOF;

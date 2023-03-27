@@ -57,6 +57,7 @@ namespace spaghetto.Stdlib.Lang {
             scope.Set("int", Int.CreateClass());
             scope.Set("float", Float.CreateClass());
             scope.Set("string", String.CreateClass());
+            scope.Set("list", List.CreateClass());
         }
     }
 }

@@ -40,8 +40,11 @@ namespace spaghetto
         public Exception? Update(string key, SValue value) {
             if (Table.TryGetValue(key, out var origVal)) {
                 if (origVal.TypeIsFixed &&
-                    origVal.BuiltinName != value.BuiltinName)
-                    return new InvalidOperationException("A variables type may not change after initilization (Tried to assign " + value.BuiltinName + " to " + origVal.BuiltinName + ")");
+                    origVal.BuiltinName != value.BuiltinName) {
+                    if(value.BuiltinName == SBuiltinType.ClassInstance)
+                        return new InvalidOperationException("A variables type may not change after initilization (Tried to assign " + value.BuiltinName + " to " + origVal.BuiltinName + ")");
+                }
+                    
 
                 if (origVal.IsConstant) throw new InvalidOperationException("Tried to assign to constant variable.");
 

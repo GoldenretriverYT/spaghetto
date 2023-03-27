@@ -17,13 +17,13 @@
 
         public override SValue Evaluate(Scope scope)
         {
-            scope.SetState(ScopeState.ShouldReturn);
-
             if (ReturnValueNode != null)
             {
                 var v = ReturnValueNode.Evaluate(scope);
                 scope.SetReturnValue(v);
             }
+
+            scope.SetState(ScopeState.ShouldReturn);
 
             return SValue.Null;
         }

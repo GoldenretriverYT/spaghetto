@@ -7,7 +7,7 @@ using System.Text;
 namespace spaghettoCLI
 {
     public class Program {
-        static bool showLexOutput = false, showParseOutput = false, timings = false, rethrow = false;
+        static bool showLexOutput = false, showParseOutput = false, timings = false, rethrow = false, csstack = false;
         static Interpreter interpreter;
 
         static void Main(string[] args) {
@@ -38,6 +38,11 @@ namespace spaghettoCLI
                     if (text.StartsWith("#rethrow")) {
                         rethrow = !rethrow;
                         Console.WriteLine("Rethrow: " + rethrow);
+                    }
+
+                    if (text.StartsWith("#cs")) {
+                        csstack = !csstack;
+                        Console.WriteLine("csstack: " + csstack);
                     }
 
                     if (text.StartsWith("#reset")) {
@@ -92,6 +97,7 @@ namespace spaghettoCLI
                 Console.ResetColor();
             } catch (Exception ex) {
                 Console.WriteLine("Error: " + ex.Message);
+                if (csstack) Console.WriteLine("C# Stacktrace: " + ex.StackTrace);
                 if (rethrow) throw;
             }
 
