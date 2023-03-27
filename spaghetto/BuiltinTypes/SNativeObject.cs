@@ -20,7 +20,7 @@
         }
 
         public override string ToString() {
-            return $"<NativeObject<T={Value.GetType().Name}> value={Value}>";
+            return $"<NativeObject<T={Value?.GetType().Name ?? "Null"}> value={Value ?? "Null"}>";
         }
 
         public override SString ToSpagString() {

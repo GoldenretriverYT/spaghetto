@@ -14,6 +14,7 @@ namespace spaghettoCLI
             InitInterpreter();
 
             while (true) {
+                Console.ForegroundColor = ConsoleColor.White;
                 Console.Write("spaghetto > ");
                 string text = Console.ReadLine();
 
