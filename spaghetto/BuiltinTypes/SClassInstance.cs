@@ -5,6 +5,12 @@ namespace spaghetto {
         public SClass Class { get; set; }
         public List<(SValue key, SValue val)> InstanceTable { get; set; } = new();
 
+        /// <summary>
+        /// These are native properties intended to allow native functions/classes to store/read information faster than using InstanceTable.
+        /// However, these can not be directly accessed through the Dot operator.
+        /// </summary>
+        public Dictionary<object, object> NativeProperties { get; set; } = new();
+
         public override SBuiltinType BuiltinName => SBuiltinType.ClassInstance;
 
         public SClassInstance(SClass @class) {

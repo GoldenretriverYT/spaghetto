@@ -31,7 +31,7 @@
                 return new SString(Console.ReadLine());
             }));
 
-            scope.Set("file", File.CreateClass());
+            scope.Set("File", File.CreateClass());
         }
     }
 }
