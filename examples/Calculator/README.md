@@ -19,3 +19,4 @@ calc("(3 + 3) * 3");
   - '' should either be a special type SChar or just be parsed as strings, but we should not make that cause an error.
   - Props are non-fixed type by default it seems. Not sure about that though.
   - We should have "method like properties", like `prop current => self.peek(0);` *q: should self be passed implicitly or somehow explictely?*
+  - I have encountered several bugs and I fixed those. However, this proves that real world tests are important.
