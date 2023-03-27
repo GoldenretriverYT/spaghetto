@@ -20,4 +20,4 @@ calc("(3 + 3) * 3");
   - Props are non-fixed type by default it seems. Not sure about that though.
   - We should have "method like properties", like `prop current => self.peek(0);` *q: should self be passed implicitly or somehow explictely?*
   - I have encountered several bugs and I fixed those. However, this proves that real world tests are important.
-  - Having to put `self` as explicit argument in a function seems a bit annoying, maybe implicitly pass it?
+  - [NOW IMPLICITLY PASSED] Having to put `self` as explicit argument in a function seems a bit annoying, maybe implicitly pass it?
