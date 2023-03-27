@@ -31,6 +31,7 @@
         Export,
         Import,
         ClassPropertyDefinition,
-        Repeat
+        Repeat,
+        Dict
     }
 }

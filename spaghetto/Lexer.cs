@@ -164,6 +164,9 @@ namespace spaghetto {
                     case '!':
                         insertToken = (new(SyntaxType.Bang, Position, null, Current.ToString()));
                         break;
+                    case ':':
+                        insertToken = (new(SyntaxType.Colon, Position, null, Current.ToString()));
+                        break;
                 }
 
                 if (insertToken.Type == SyntaxType.BadToken) {
@@ -318,6 +321,7 @@ namespace spaghetto {
         EOF,
         BadToken,
         Comma,
+        Colon,
     }
 
     public static class SyntaxFacts {

@@ -428,6 +428,8 @@ namespace spaghetto.Parsing {
                 return expr;
             } else if (Current.Type is SyntaxType.LSqBracket) {
                 return ParseListExpression();
+            } else if (Current.Type is SyntaxType.LBraces) {
+                return ParseDictExpression();
             } else if (Current.Type is SyntaxType.Keyword && Current.Text == "if") {
                 return ParseIfExpression();
             } else if (Current.Type is SyntaxType.Keyword && Current.Text == "for") {
@@ -467,6 +469,37 @@ namespace spaghetto.Parsing {
             }
 
             return new ListNode(list, lsq, rsq);
+        }
+
+        public SyntaxNode ParseDictExpression()
+        {
+            var lsq = MatchToken(SyntaxType.LBraces);
+            SyntaxToken rsq;
+
+            List<(SyntaxToken tok, SyntaxNode expr)> dict = new();
+
+            if (Current.Type == SyntaxType.RBraces) {
+                rsq = MatchToken(SyntaxType.RBraces);
+            } else {
+                var tok = MatchToken(SyntaxType.String);
+                _ = MatchToken(SyntaxType.Colon);
+                var expr = ParseExpression();
+                dict.Add((tok, expr));
+
+                while (Current.Type == SyntaxType.Comma) {
+                    Position++;
+                    
+                    tok = MatchToken(SyntaxType.String);
+                    _ = MatchToken(SyntaxType.Colon);
+                    expr = ParseExpression();
+
+                    dict.Add((tok, expr));
+                }
+
+                rsq = MatchToken(SyntaxType.RBraces);
+            }
+
+            return new DictNode(dict, lsq, rsq);
         }
 
         public SyntaxNode ParseIfExpression() {

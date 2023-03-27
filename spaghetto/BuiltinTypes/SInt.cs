@@ -85,6 +85,11 @@
             return Value == 1;
         }
 
+        public override SValue Not()
+        {
+            return (!IsTruthy() ? One : Zero);
+        }
+
         public override string ToString() {
             return $"<{BuiltinName.ToString()} value={Value}>";
         }

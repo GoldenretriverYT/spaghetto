@@ -94,6 +94,7 @@ cast          : (LessThan IDENTIFIER:int|float|string|list GreaterThan) cast
 atom          : INT|FLOAT|STRING|IDENTIFIER
               : LPAREN expr RPAREN
               : list-expr
+              : dict-expr
               : if-expr
               : for-expr
               : repeat-expr
@@ -102,6 +103,7 @@ atom          : INT|FLOAT|STRING|IDENTIFIER
               : instantiate
               
 list-expr     : LSQBRACKET (expr (COMMA expr)*)? RSQBRACKET
+dict-expr     : LBRACE ((STRING COLON expr COMMA?)*)? RBRACE
               
 if-expr       : KEYWORD:if LPAREN expr RPAREN scoped-or-expr
                 (KEYWORD:elseif LPAREN expr RPAREN scoped-or-expr)*?
