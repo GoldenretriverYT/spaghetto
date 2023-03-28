@@ -13,6 +13,19 @@
 
         public override SValue Evaluate(Scope scope)
         {
+            if(ident.Text == "all") {
+                var rootScope = scope.GetRoot();
+
+                foreach(var kvp in rootScope.Table.ToList()) {
+                    if(kvp.Key.StartsWith("nlimporter$$")) {
+                        if (kvp.Value is not SNativeLibraryImporter importerFromAllLoop) throw new Exception("Found unexpexted type in root tables nlimporters!");
+                        importerFromAllLoop.Import(scope);
+                    }
+                }
+
+                return SValue.Null;
+            }
+
             var val = scope.Get("nlimporter$$" + ident.Text);
 
             if (val == null || val is not SNativeLibraryImporter importer)
