@@ -62,6 +62,7 @@ namespace spaghettoCLI
             interpreter = new Interpreter();
             spaghetto.Stdlib.Lang.Lib.Mount(interpreter.GlobalScope);
             spaghetto.Stdlib.IO.Lib.Mount(interpreter.GlobalScope);
+            spaghetto.Stdlib.Interop.Lib.Mount(interpreter.GlobalScope);
         }
 
         public static void RunCode(Interpreter interpreter, string text) {

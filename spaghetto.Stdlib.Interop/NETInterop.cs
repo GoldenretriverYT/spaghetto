@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Xsl;
 
-namespace spaghetto.Stdlib.IO
+namespace spaghetto.Stdlib.Interop
 {
     public class NETInterop
     {
@@ -79,8 +79,52 @@ namespace spaghetto.Stdlib.IO
 
                    return new SNativeObject(t.Invoke(null, invocationArgs.ToArray()));
                },
-               expectedArgs: new() { "type", "list of args" }
-           )));
+               expectedArgs: new() { "method", "list of args" }
+            )));
+
+            @class.StaticTable.Add((new SString("invoke"), new SNativeFunction(
+               impl: (Scope scope, List<SValue> args) =>
+               {
+                   if (args[0] is not SNativeObject method) throw new Exception("Arg 0 must be native object");
+                   if (args[1] is not SNativeObject instance) throw new Exception("Arg 0 must be native object");
+                   if (args[2] is not SList argList) throw new Exception("Arg 2 must be list");
+
+                   if ((method.Value as MethodInfo).DeclaringType.FullName != instance.Value.GetType().FullName)
+                       throw new Exception("The method you are trying to invoke is not a part of the instance provided.");
+
+                   List<object> invocationArgs = new();
+
+                   foreach (var val in argList.Value) {
+                       if (val is not SNativeObject argNativeObject) throw new Exception("Arg 2 entries must be native objects");
+                       invocationArgs.Add(argNativeObject.Value);
+                   }
+
+                   if (method.Value is not MethodInfo t) throw new Exception("Arg 0 native object type must be Method");
+
+                   return new SNativeObject(t.Invoke(instance.Value, invocationArgs.ToArray()));
+               },
+               expectedArgs: new() { "method", "instance", "list of args" }
+            )));
+
+            @class.StaticTable.Add((new SString("instantiate"), new SNativeFunction(
+               impl: (Scope scope, List<SValue> args) =>
+               {
+                   if (args[0] is not SNativeObject method) throw new Exception("Arg 0 must be native object");
+                   if (args[1] is not SList argList) throw new Exception("Arg 1 must be list");
+
+                   List<object> invocationArgs = new();
+
+                   foreach (var val in argList.Value) {
+                       if (val is not SNativeObject argNativeObject) throw new Exception("Arg 1 entries must be native objects");
+                       invocationArgs.Add(argNativeObject.Value);
+                   }
+
+                   if (method.Value is not Type t) throw new Exception("Arg 0 native object type must be Type");
+
+                   return new SNativeObject(Activator.CreateInstance(t, invocationArgs.ToArray()));
+               },
+               expectedArgs: new() { "method", "list of args" }
+            )));
 
             return @class;
         }

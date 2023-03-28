@@ -32,8 +32,6 @@
             }));
 
             scope.Set("File", File.CreateClass());
-            scope.Set("NETInterop", NETInterop.CreateClass());
-
         }
     }
 }
