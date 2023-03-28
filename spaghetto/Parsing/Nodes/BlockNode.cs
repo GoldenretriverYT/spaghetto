@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace spaghetto.Parsing.Nodes
+﻿namespace spaghetto.Parsing.Nodes
 {
     internal class BlockNode : SyntaxNode
     {

@@ -4,7 +4,6 @@ using EtorumOS.Utils.KeyboardLayouts;
 using spaghetto;
 using spaghetto.Parsing.Nodes;
 using System;
-using System.Collections.Generic;
 using System.Text;
 using Console = System.Console;
 using Sys = Cosmos.System;

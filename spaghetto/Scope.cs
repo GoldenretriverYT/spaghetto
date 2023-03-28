@@ -1,6 +1,4 @@
-﻿using System.Xml;
-
-namespace spaghetto
+﻿namespace spaghetto
 {
     public class Scope
     {

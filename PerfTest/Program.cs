@@ -1,5 +1,4 @@
 ﻿using spaghetto;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace PerfTest {
     internal class Program {

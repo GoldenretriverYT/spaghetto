@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace spaghetto.Stdlib.Lang {
+﻿namespace spaghetto.Stdlib.Lang {
     public class String {
         public static SClass CreateClass() {
             var @class = new SClass("string");

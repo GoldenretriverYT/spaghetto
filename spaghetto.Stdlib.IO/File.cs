@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace spaghetto.Stdlib.IO {
+﻿namespace spaghetto.Stdlib.IO {
     public class File {
         public static SClass CreateClass() {
             var @class = new SClass("File");

@@ -1,16 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Numerics;
-using System.Reflection.Metadata;
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using spaghetto.Parsing.Nodes;
+﻿using spaghetto.Parsing.Nodes;
 
 namespace spaghetto.Parsing {
     public class Parser {

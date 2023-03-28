@@ -1,6 +1,4 @@
-﻿using System.Reflection.Metadata.Ecma335;
-
-namespace spaghetto.Stdlib.Lang {
+﻿namespace spaghetto.Stdlib.Lang {
     /// <summary>
     /// Provides basic language functions & types
     /// </summary>

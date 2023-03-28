@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace spaghetto.Stdlib.Reflection {
+﻿namespace spaghetto.Stdlib.Reflection {
     public class ClassWrapper {
         public static SClass CreateClass() {
             var @class = new SClass("ClassWrapper");

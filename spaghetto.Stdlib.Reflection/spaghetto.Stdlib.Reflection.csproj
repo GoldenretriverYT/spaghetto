@@ -6,4 +6,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\spaghetto\spaghetto.csproj" />
+  </ItemGroup>
+
 </Project>

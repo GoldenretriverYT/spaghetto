@@ -1,6 +1,4 @@
-﻿using spaghetto.Helpers;
-
-namespace spaghetto.Parsing.Nodes
+﻿namespace spaghetto.Parsing.Nodes
 {
     internal class ListNode : SyntaxNode
     {
