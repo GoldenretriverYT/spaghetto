@@ -1,4 +1,6 @@
-﻿namespace spaghetto.Stdlib.Lang {
+﻿using spaghetto.Stdlib.IO;
+
+namespace spaghetto.Stdlib.Lang {
     /// <summary>
     /// Provides basic language functions & types
     /// </summary>
@@ -56,6 +58,8 @@
             scope.Set("float", Float.CreateClass());
             scope.Set("string", String.CreateClass());
             scope.Set("list", List.CreateClass());
+            scope.Set("EnumVal", EnumVal.CreateClass());
+
         }
     }
 }
