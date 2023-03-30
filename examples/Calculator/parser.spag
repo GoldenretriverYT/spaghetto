@@ -33,15 +33,15 @@ class fixedprops Parser {
     }
 
     func parseArithmetic(self) {
-        return self.binop(func(self) { return self.parseTerm() }, [TOK_PLUS, TOK_MINUS]);
+        return self.binop(func(self) { return self.parseTerm() }, [TokenType.PLUS, TokenType.MINUS]);
     }
 
     func parseTerm(self) {
-        return self.binop(func(self) { return self.parseFactor() }, [TOK_MUL, TOK_DIV]);
+        return self.binop(func(self) { return self.parseFactor() }, [TokenType.MUL, TokenType.DIV]);
     }
 
     func parseFactor(self) {
-        if(self.current().type == TOK_PLUS || self.current().type == TOK_MINUS) {
+        if(self.current().type == TokenType.PLUS || self.current().type == TokenType.MINUS) {
             var tok = self.current();
             self.pos = self.pos+1;
             var factor = self.parseFactor();
@@ -52,14 +52,14 @@ class fixedprops Parser {
     }
 
     func parseAtom(self) {
-        if(self.current().type == TOK_NUMBER) {
+        if(self.current().type == TokenType.NUMBER) {
             self.pos = self.pos + 1;
             var p = self.peek(-1);
             return new IntLiteralNode(p);
-        }else if(self.current().type == TOK_LPAREN) {
+        }else if(self.current().type == TokenType.LPAREN) {
             self.pos = self.pos+1;
             var expr = self.parseArithmetic();
-            self.matchToken(TOK_RPAREN);
+            self.matchToken(TokenType.RPAREN);
             return expr;
         }
     }
@@ -105,7 +105,7 @@ class fixedprops UnaryNode {
     }
 
     func eval(self) {
-        if(self.tok.type == TOK_MINUS) {
+        if(self.tok.type == TokenType.MINUS) {
             return -(self.rhs.eval());
         }else {
             return int.MIN_VALUE; // error
@@ -129,13 +129,13 @@ class fixedprops BinaryNode {
     }
 
     func eval(self) {
-        if(self.tok.type == TOK_PLUS) {
+        if(self.tok.type == TokenType.PLUS) {
             return self.lhs.eval() + self.rhs.eval();
-        }else if(self.tok.type == TOK_MINUS) {
+        }else if(self.tok.type == TokenType.MINUS) {
             return self.lhs.eval() - self.rhs.eval();
-        }else if(self.tok.type == TOK_MUL) {
+        }else if(self.tok.type == TokenType.MUL) {
             return self.lhs.eval() * self.rhs.eval();
-        }else if(self.tok.type == TOK_DIV) {
+        }else if(self.tok.type == TokenType.DIV) {
             return self.lhs.eval() / self.rhs.eval();
         }else {
             return -int.MAX_VALUE; // error

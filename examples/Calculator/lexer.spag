@@ -1,15 +1,19 @@
 import native lang;
 import native io;
 
-var TOK_BADTOK = -1;
-var TOK_NUMBER = 0;
-var TOK_PLUS = 1;
-var TOK_MINUS = 2;
-var TOK_MUL = 3;
-var TOK_DIV = 4;
-var TOK_LPAREN = 5;
-var TOK_RPAREN = 6;
-var TOK_EOF = 7;
+var TokenType = new EnumVal(["BADTOK", "NUMBER",  "PLUS",
+                            "MINUS", "MUL", "DIV",
+                            "LPAREN", "RPAREN", "EOF"]);
+
+// var BADTOK = -1;
+// var NUMBER = 0;
+// var PLUS = 1;
+// var MINUS = 2;
+// var MUL = 3;
+// var DIV = 4;
+// var LPAREN = 5;
+// var RPAREN = 6;
+// var EOF = 7; 
 
 class fixedprops Lexer {
     prop text = "";
@@ -36,7 +40,7 @@ class fixedprops Lexer {
             var current = self.current();
             var insertTok = self.tryGetTokenRegular(current);
 
-            if(insertTok.type == TOK_BADTOK) {
+            if(insertTok.type == TokenType.BADTOK) {
                 if(Lexer.isNumber(current)) {
                     var numStr = "";
                     var startPos = self.pos;
@@ -46,7 +50,7 @@ class fixedprops Lexer {
                         self.pos = self.pos + 1;
                     }
 
-                    toks += new SyntaxToken(TOK_NUMBER, startPos, int.parse(numStr), numStr);
+                    toks += new SyntaxToken(TokenType.NUMBER, startPos, int.parse(numStr), numStr);
                 }else if(current == " ") {
                     self.pos = self.pos + 1;
                 }else {
@@ -62,36 +66,36 @@ class fixedprops Lexer {
             }
         }
 
-        toks += new SyntaxToken(TOK_EOF, self.pos, 0, "\0");
+        toks += new SyntaxToken(TokenType.EOF, self.pos, 0, "\0");
         return toks;
     }
 
     func tryGetTokenRegular(self, current) {
         if(current == "+") {
-            return new SyntaxToken(TOK_PLUS, self.pos, 0, current);
+            return new SyntaxToken(TokenType.PLUS, self.pos, 0, current);
         }
 
         if(current == "-") {
-            return new SyntaxToken(TOK_MINUS, self.pos, 0, current);
+            return new SyntaxToken(TokenType.MINUS, self.pos, 0, current);
         }
 
         if(current == "*") {
-            return new SyntaxToken(TOK_MUL, self.pos, 0, current);
+            return new SyntaxToken(TokenType.MUL, self.pos, 0, current);
         }
 
         if(current == "/") {
-            return new SyntaxToken(TOK_DIV, self.pos, 0, current);
+            return new SyntaxToken(TokenType.DIV, self.pos, 0, current);
         }
 
         if(current == "(") {
-            return new SyntaxToken(TOK_LPAREN, self.pos, 0, current);
+            return new SyntaxToken(TokenType.LPAREN, self.pos, 0, current);
         }
 
         if(current == ")") {
-            return new SyntaxToken(TOK_RPAREN, self.pos, 0, current);
+            return new SyntaxToken(TokenType.RPAREN, self.pos, 0, current);
         }
 
-        return new SyntaxToken(TOK_BADTOK, self.pos, 0, current);
+        return new SyntaxToken(TokenType.BADTOK, self.pos, 0, current);
     }
 
     func static isNumber(current) {
@@ -103,7 +107,7 @@ class fixedprops Lexer {
 }
 
 class fixedprops SyntaxToken {
-    prop type = 0;
+    prop type = 0
     prop pos = 0;
     prop value = 0;
     prop text = "";
@@ -120,26 +124,18 @@ class fixedprops SyntaxToken {
     }
 
     func getTypeString(self) {
-        if(self.type == TOK_BADTOK) return "BadToken";
-        if(self.type == TOK_NUMBER) return "Number";
-        if(self.type == TOK_PLUS) return "Plus";
-        if(self.type == TOK_MINUS) return "Minus";
-        if(self.type == TOK_MUL) return "Mul";
-        if(self.type == TOK_DIV) return "Div";
-        if(self.type == TOK_LPAREN) return "LParen";
-        if(self.type == TOK_RPAREN) return "RParen";
-        if(self.type == TOK_EOF) return "EOF";
+        if(self.type == TokenType.BADTOK) return "BadToken";
+        if(self.type == TokenType.NUMBER) return "Number";
+        if(self.type == TokenType.PLUS) return "Plus";
+        if(self.type == TokenType.MINUS) return "Minus";
+        if(self.type == TokenType.MUL) return "Mul";
+        if(self.type == TokenType.DIV) return "Div";
+        if(self.type == TokenType.LPAREN) return "LParen";
+        if(self.type == TokenType.RPAREN) return "RParen";
+        if(self.type == TokenType.EOF) return "EOF";
     }
 }
 
 export Lexer;
 export SyntaxToken;
-export TOK_BADTOK;
-export TOK_NUMBER;
-export TOK_PLUS;
-export TOK_MINUS;
-export TOK_MUL;
-export TOK_DIV;
-export TOK_LPAREN;
-export TOK_RPAREN;
-export TOK_EOF;
+export TokenType;
