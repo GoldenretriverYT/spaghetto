@@ -12,7 +12,7 @@ calc("(3 + 3) * 3");
 ## Identified problems
 > **Note**
 > I primarily write these examples to test the language myself and to identify issues.
-  - Enums do not exist but those are important in many applications. Whilst they can be "emulated" by constant values, its not as convienient.
+  - [ADDED] Enums do not exist but those are important in many applications. Whilst they can be "emulated" by constant values, its not as convienient.
   - [FIXED] +=/-=/++/etc. do not work on dot nodes, they only work on direct identifiers.
   - Errors are unclear, there should at **the very least** be a position in runtime errors.
   - != operator is completely missing
