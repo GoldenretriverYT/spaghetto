@@ -39,7 +39,6 @@
             if (Table.TryGetValue(key, out var origVal)) {
                 if (origVal.TypeIsFixed &&
                     origVal.BuiltinName != value.BuiltinName) {
-                    if(value.BuiltinName == SBuiltinType.ClassInstance)
                         return new InvalidOperationException("A variables type may not change after initilization (Tried to assign " + value.BuiltinName + " to " + origVal.BuiltinName + ")");
                 }
                     

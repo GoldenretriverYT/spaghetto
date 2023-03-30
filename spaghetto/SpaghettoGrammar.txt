@@ -75,7 +75,7 @@ expression    : (KEYWORD:const)? KEYWORD:var IDENTIFIER (EQUALS expression)?
               : comp-expr ((&& | ||) comp-expr)*
               
 comp-expr     : !comp-expr
-              : arith-expr ((==|<|>|<=|>=) aright-expr)*
+              : arith-expr ((==|!=|<|>|<=|>=) aright-expr)*
               
 arith-expr    : term ((PLUS|MINUS) term)*
               
