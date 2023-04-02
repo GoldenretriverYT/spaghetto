@@ -275,7 +275,7 @@ namespace spaghetto.Parsing {
             }else {
                 return BinaryOperation(() => { return ParseArithmeticExpression(); },
                     new List<SyntaxType>() {
-                        SyntaxType.EqualsEquals, SyntaxType.LessThan, SyntaxType.LessThanEqu, SyntaxType.GreaterThan, SyntaxType.GreaterThanEqu
+                        SyntaxType.EqualsEquals, SyntaxType.BangEquals, SyntaxType.LessThan, SyntaxType.LessThanEqu, SyntaxType.GreaterThan, SyntaxType.GreaterThanEqu
                     });
             }
         }

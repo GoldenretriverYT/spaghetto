@@ -34,6 +34,8 @@
                     return leftRes.Mod(rightRes);
                 case SyntaxType.EqualsEquals:
                     return leftRes.Equals(rightRes);
+                case SyntaxType.BangEquals:
+                    return leftRes.Equals(rightRes).Not();
                 case SyntaxType.Idx:
                     return leftRes.Idx(rightRes);
                 case SyntaxType.LessThan:

@@ -157,7 +157,13 @@ namespace spaghetto {
                         insertToken = (new(SyntaxType.RBraces, Position, null, Current.ToString()));
                         break;
                     case '!':
-                        insertToken = (new(SyntaxType.Bang, Position, null, Current.ToString()));
+                        if (Peek(1) == '=') {
+                            Position++;
+                            insertToken = (new(SyntaxType.BangEquals, Position, null, "!="));
+                        } else {
+                            insertToken = (new(SyntaxType.Bang, Position, null, Current.ToString()));
+                        }
+
                         break;
                     case ':':
                         insertToken = (new(SyntaxType.Colon, Position, null, Current.ToString()));
@@ -317,6 +323,7 @@ namespace spaghetto {
         BadToken,
         Comma,
         Colon,
+        BangEquals,
     }
 
     public static class SyntaxFacts {
