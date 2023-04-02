@@ -9,6 +9,11 @@ namespace spaghetto
 
         public Interpreter() {
             GlobalScope = new(0);
+
+            // Fixed default imports; should be kept as minimal as possible
+            GlobalScope.Table["true"] = new SInt(1) { IsConstant = true };
+            GlobalScope.Table["false"] = new SInt(0) { IsConstant = true };
+            GlobalScope.Table["null"] = new SNull() { IsConstant = true };
         }
 
         public void Interpret(string text, ref InterpreterResult res) {
