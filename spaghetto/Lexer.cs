@@ -334,7 +334,7 @@ namespace spaghetto {
                                        or "import" or "native" or "new"
                                        or "class" or "static" or "export"
                                        or "const" or "fixedprops" or "prop"
-                                       or "repeat" or "times") {
+                                       or "repeat" or "times" or "op") {
                 token.Type = SyntaxType.Keyword;
             }
         }

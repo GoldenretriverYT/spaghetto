@@ -123,9 +123,12 @@ func-def      : KEYWORD:func IDENTIFIER
 
 class-def     : KEYWORD:class KEYWORD:fixedprops? IDENTIFIER LBRACE class-body RBRACE
 
-class-body    : (class-funcdef|class-propdef*)?
+class-body    : (class-funcdef|class-propdef|class-opdef)?*
 
 class-funcdef : KEYWORD:func KEYWORD:static? IDENTIFIER func-args scoped-statements
+class-opdef   : KEYWORD:op (
+                    (PLUS|MINUS|MUL|DIV|IDX|EQUALSEQUALS|NOTEQUALS|LESSTHAN|LESSTHANEQU|GREATERTHAN|GREATERTHANEQU)
+                ) LPAREN IDENTIFIER COMMA IDENTIFIER RPAREN scoped-statements
 class-propdef : KEYWORD:prop KEYWORD:static? IDENTIFIER EQUALS expression
 
 func-args     : LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN

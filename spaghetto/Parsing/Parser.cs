@@ -171,7 +171,7 @@ namespace spaghetto.Parsing {
         private List<SyntaxNode> ParseClassBody() {
             List<SyntaxNode> nodes = new();
 
-            while(Current.Type == SyntaxType.Keyword && (Current.Text == "func" || Current.Text == "prop")) {
+            while(Current.Type == SyntaxType.Keyword && (Current.Text == "func" || Current.Text == "prop" || Current.Text == "op")) {
                 if (Current.Text == "func") {
                     Position++;
                     var isStatic = false;
@@ -200,9 +200,24 @@ namespace spaghetto.Parsing {
                     var expr = ParseExpression();
 
                     nodes.Add(new ClassPropDefinitionNode(name, expr, isStatic));
+                } else if (Current.Text == "op") {
+                    Position++;
+
+                    var opTok = Current;
+                    Position++;
+
+                    if(opTok.Type is not (SyntaxType.Plus or SyntaxType.Minus or SyntaxType.Mul or SyntaxType.Div or SyntaxType.EqualsEquals
+                        or SyntaxType.LessThan or SyntaxType.LessThanEqu or SyntaxType.GreaterThan or SyntaxType.GreaterThanEqu)) {
+                        throw MakeException("Can not find or override operator of token type " + opTok.Type + " at position " + opTok.Position);
+                    }
+
+                    var args = ParseFunctionArgs();
+                    var body = ParseScopedStatements();
+
+                    nodes.Add(new ClassFunctionDefinitionNode(new(SyntaxType.Identifier, opTok.Position, "$$op" + opTok.Text, "$$op" + opTok.Text), args, body, false));
                 }
 
-                while(Current.Type == SyntaxType.Semicolon) {
+                    while (Current.Type == SyntaxType.Semicolon) {
                     Position++;
                 }
             }

@@ -27,6 +27,11 @@ namespace spaghetto {
             newArgs.AddRange(args);
 
             ctor.Call(scope, args);
+
+            if(scope.State != ScopeState.None) {
+                scope.SetState(ScopeState.None);
+                scope.SetReturnValue(SValue.Null);
+            }
         }
 
         public override SString ToSpagString() {
@@ -37,6 +42,7 @@ namespace spaghetto {
             }else {
                 // TODO: Find a solution to pass the scope; maybe keep a "DefiningScope" on each value?
                 // For now, just use an empty scope
+                //  SUBTODO: If this is done, dont forget to reset Scope.State!
                 var ret = toStringFunc.Call(new Scope(0), new() { this });
 
                 if (ret is not SString str) throw new Exception("A classes toString function must return a string!");
@@ -97,6 +103,42 @@ namespace spaghetto {
 
         public override bool IsTruthy() {
             return true;
+        }
+
+        public override SValue Add(SValue other)
+        {
+            var overload = GetValue(new SString("$$op+"));
+            if (overload == null) base.Add(other);
+
+            var ret = overload.Call(new Scope(0), new List<SValue>() { this, this, other }); // TODO: Use proper scope; dont forget to reset state then
+            return ret;
+        }
+
+        public override SValue Sub(SValue other)
+        {
+            var overload = GetValue(new SString("$$op-"));
+            if (overload == null) base.Sub(other);
+
+            var ret = overload.Call(new Scope(0), new List<SValue>() { this, this, other }); // TODO: Use proper scope; dont forget to reset state then
+            return ret;
+        }
+
+        public override SValue Mul(SValue other)
+        {
+            var overload = GetValue(new SString("$$op*"));
+            if (overload == null) base.Mul(other);
+
+            var ret = overload.Call(new Scope(0), new List<SValue>() { this, this, other }); // TODO: Use proper scope; dont forget to reset state then
+            return ret;
+        }
+
+        public override SValue Div(SValue other)
+        {
+            var overload = GetValue(new SString("$$op/"));
+            if (overload == null) base.Div(other);
+
+            var ret = overload.Call(new Scope(0), new List<SValue>() { this, this, other }); // TODO: Use proper scope; dont forget to reset state then
+            return ret;
         }
     }
 }
