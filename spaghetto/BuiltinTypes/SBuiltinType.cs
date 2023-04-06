@@ -13,5 +13,6 @@
         Class,
         NativeObject,
         ClassInstance,
+        Long,
     }
 }

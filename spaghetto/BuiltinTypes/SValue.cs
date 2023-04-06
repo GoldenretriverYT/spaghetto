@@ -1,4 +1,6 @@
-﻿namespace spaghetto {
+﻿using System.Runtime.CompilerServices;
+
+namespace spaghetto {
     public abstract class SValue
     {
         public static SValue Null => new SNull();
@@ -40,6 +42,7 @@
             throw NotSupportedOn("Idx");
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public virtual SValue Dot(SValue other) {
             throw NotSupportedOn("Dot");
         }
@@ -49,6 +52,7 @@
         }
 
         // TODO: Maybe force equals to be implemented?
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public virtual SValue Equals(SValue other) {
             throw NotSupportedOn("Equals");
         }
@@ -77,6 +81,7 @@
             throw NotSupportedOn("Call");
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public virtual bool IsNull() {
             return false;
         }
@@ -91,6 +96,7 @@
             throw NotSupportedOn("ArithNot");
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public abstract bool IsTruthy();
 
         public override string ToString()

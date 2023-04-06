@@ -32,6 +32,13 @@ namespace spaghetto.Stdlib.Lang {
                 expectedArgs: new() { "value" }
             ));
 
+            scope.Set("time", new SNativeFunction(
+                impl: (Scope callingScope, List<SValue> args) => {
+                    return new SLong(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
+                },
+                expectedArgs: new() { }
+            ));
+
             scope.Set("eval", new SNativeFunction(
                 impl: (Scope callingScope, List<SValue> args) => {
                     if (args[0] is not SString code) throw new Exception("Expected argument 0 to be of type string");

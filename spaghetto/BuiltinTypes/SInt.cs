@@ -1,4 +1,6 @@
-﻿namespace spaghetto {
+﻿using System.Runtime.CompilerServices;
+
+namespace spaghetto {
     public class SInt : SValue
     {
         public override SBuiltinType BuiltinName => SBuiltinType.Int;
@@ -75,6 +77,8 @@
             switch(other) {
                 case SBuiltinType.Int:
                     return new SInt(Value);
+                case SBuiltinType.Long:
+                    return new SLong(Value);
                 case SBuiltinType.Float:
                     return new SFloat(Value);
                 default: throw CastInvalid("native " + other.ToString());

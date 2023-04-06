@@ -49,6 +49,8 @@
             switch (other) {
                 case SBuiltinType.Int:
                     return new SInt((int)Value);
+                case SBuiltinType.Long:
+                    return new SLong((long)Value);
                 case SBuiltinType.Float:
                     return new SFloat(Value);
                 default: throw CastInvalid("native " + other.ToString());
