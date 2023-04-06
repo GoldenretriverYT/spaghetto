@@ -25,7 +25,7 @@ namespace spaghetto.Parsing.Nodes
                 if (node is IdentifierNode rvn)
                 {
                     var ident = rvn.Token;
-                    currentValue = currentValue.Dot(new SString((string)ident.Value));
+                    currentValue = currentValue.Dot(new SString(ident.Text));
                 }else if(node is AssignVariableNode avn) {
                     var ident = avn.Ident;
                     return currentValue.DotAssignment(new SString(ident.Text), avn.Expr.Evaluate(scope));
@@ -35,7 +35,7 @@ namespace spaghetto.Parsing.Nodes
                     if (cn.ToCallNode is IdentifierNode cnIdentNode)
                     {
                         var ident = cnIdentNode.Token;
-                        var lhs = currentValue.Dot(new SString((string)ident.Value));
+                        var lhs = currentValue.Dot(new SString(ident.Text));
 
                         var args = cn.EvaluateArgs(scope);
                         if (lhs is SBaseFunction func && func.IsClassInstanceMethod) {
