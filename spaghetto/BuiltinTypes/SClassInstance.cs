@@ -3,7 +3,7 @@
 namespace spaghetto {
     public class SClassInstance : SValue {
         public SClass Class { get; set; }
-        public List<(SValue key, SValue val)> InstanceTable { get; set; } = new();
+        public List<(string key, SValue val)> InstanceTable { get; set; } = new();
 
         /// <summary>
         /// These are native properties intended to allow native functions/classes to store/read information faster than using InstanceTable.
@@ -35,7 +35,7 @@ namespace spaghetto {
         }
 
         public override SString ToSpagString() {
-            var toStringVal = GetValue(new SString("$$toString"));
+            var toStringVal = GetValue("$$toString");
 
             if (toStringVal is not SBaseFunction toStringFunc) {
                 return new SString("<instance of class " + Class.Name + ">");
@@ -55,7 +55,9 @@ namespace spaghetto {
         }
 
         public override SValue Dot(SValue other) {
-            var val = GetValue(other);
+            if (other is not SString key) throw NotSupportedBetween(other, "Dot");
+
+            var val = GetValue(key.Value);
             if (Class.FixedProps && val.IsNull()) throw new Exception($"Property {other.ToSpagString().Value} not found!");
              
             return val;
@@ -63,39 +65,41 @@ namespace spaghetto {
 
 
         public override SValue DotAssignment(SValue key, SValue other) {
+            if (key is not SString keyVal) throw NotSupportedBetween(key, "DotAssignment");
+
             // todo: get rid of the code duplication
             foreach (var kvp in Class.StaticTable) {
-                if (kvp.key.Equals(key).IsTruthy()) {
+                if (kvp.key == keyVal.Value) {
                     if (kvp.val.IsConstant) throw new Exception($"Tried to overwrite constant value {kvp.key}!");
 
                     InstanceTable.Remove(kvp);
-                    InstanceTable.Add((key, other));
+                    InstanceTable.Add((keyVal.Value, other));
                     return other;
                 }
             }
 
             foreach (var kvp in InstanceTable) {
-                if (kvp.key.Equals(key).IsTruthy()) {
+                if (kvp.key == keyVal.Value) {
                     if (kvp.val.IsConstant) throw new Exception($"Tried to overwrite constant value {kvp.key}!");
 
                     InstanceTable.Remove(kvp);
-                    InstanceTable.Add((key, other));
+                    InstanceTable.Add((keyVal.Value, other));
                     return other;
                 }
             }
 
             if (Class.FixedProps) throw new Exception($"Property {key.ToSpagString().Value} not found!");
-            InstanceTable.Add((key, other));
+            InstanceTable.Add((keyVal.Value, other));
             return other;
         }
 
-        public SValue GetValue(SValue key) {
+        public SValue GetValue(string key) {
             foreach (var kvp in Class.StaticTable) {
-                if (kvp.key.Equals(key).IsTruthy()) return kvp.val;
+                if (kvp.key == key) return kvp.val;
             }
 
             foreach (var kvp in InstanceTable) {
-                if (kvp.key.Equals(key).IsTruthy()) return kvp.val;
+                if (kvp.key == key) return kvp.val;
             }
 
             return SValue.Null;
@@ -107,7 +111,7 @@ namespace spaghetto {
 
         public override SValue Add(SValue other)
         {
-            var overload = GetValue(new SString("$$op+"));
+            var overload = GetValue("$$op+");
             if (overload == null) base.Add(other);
 
             var ret = overload.Call(new Scope(0), new List<SValue>() { this, this, other }); // TODO: Use proper scope; dont forget to reset state then
@@ -116,7 +120,7 @@ namespace spaghetto {
 
         public override SValue Sub(SValue other)
         {
-            var overload = GetValue(new SString("$$op-"));
+            var overload = GetValue("$$op-");
             if (overload == null) base.Sub(other);
 
             var ret = overload.Call(new Scope(0), new List<SValue>() { this, this, other }); // TODO: Use proper scope; dont forget to reset state then
@@ -125,7 +129,7 @@ namespace spaghetto {
 
         public override SValue Mul(SValue other)
         {
-            var overload = GetValue(new SString("$$op*"));
+            var overload = GetValue("$$op*");
             if (overload == null) base.Mul(other);
 
             var ret = overload.Call(new Scope(0), new List<SValue>() { this, this, other }); // TODO: Use proper scope; dont forget to reset state then
@@ -134,7 +138,7 @@ namespace spaghetto {
 
         public override SValue Div(SValue other)
         {
-            var overload = GetValue(new SString("$$op/"));
+            var overload = GetValue("$$op/");
             if (overload == null) base.Div(other);
 
             var ret = overload.Call(new Scope(0), new List<SValue>() { this, this, other }); // TODO: Use proper scope; dont forget to reset state then

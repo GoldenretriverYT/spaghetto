@@ -32,17 +32,17 @@ namespace spaghetto.Parsing.Nodes
                     if (func.IsClassInstanceMethod) {
                         if (func.ExpectedArgs.IndexOf("self") == -1) func.ExpectedArgs.Insert(0, "self");
 
-                        @class.InstanceBaseTable.Add((new SString(func.FunctionName), func));
+                        @class.InstanceBaseTable.Add((func.FunctionName, func));
                     } else {
-                        @class.StaticTable.Add((new SString(func.FunctionName), func));
+                        @class.StaticTable.Add((func.FunctionName, func));
                     }
                 } else if (bodyNode is ClassPropDefinitionNode cpdn) {
                     var val = cpdn.Expression.Evaluate(scope);
 
                     if(!cpdn.IsStatic) {
-                        @class.InstanceBaseTable.Add((new SString(cpdn.Name.Text), val));
+                        @class.InstanceBaseTable.Add((cpdn.Name.Text, val));
                     }else {
-                        @class.StaticTable.Add((new SString(cpdn.Name.Text), val));
+                        @class.StaticTable.Add((cpdn.Name.Text, val));
                     }
                 } else {
                     throw new Exception("Unexpected node in class definition");

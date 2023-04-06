@@ -3,7 +3,7 @@
         public static SClass CreateClass() {
             var @class = new SClass("list");
 
-            @class.StaticTable.Add((new SString("length"), new SNativeFunction(
+            @class.StaticTable.Add(("length", new SNativeFunction(
                 impl: (Scope scope, List<SValue> args) => {
                     if (args[0] is not SList lst) throw new Exception("Expected argument 0 to be a list");
                     return new SInt(lst.Value.Count);
@@ -11,7 +11,7 @@
                 expectedArgs: new() { "list" }
             )));
 
-            @class.StaticTable.Add((new SString("contains"), new SNativeFunction(
+            @class.StaticTable.Add(("contains", new SNativeFunction(
                 impl: (Scope scope, List<SValue> args) => {
                     if (args[0] is not SList lst) throw new Exception("Expected argument 0 to be a list");
                     

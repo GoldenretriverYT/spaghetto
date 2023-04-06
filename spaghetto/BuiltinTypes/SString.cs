@@ -37,6 +37,11 @@
             return Value == otherString.Value ? SInt.One : SInt.Zero;
         }
 
+        public bool SurelyStringEquals(string other)
+        {
+            return Value == other;
+        }
+
         public override bool IsTruthy() {
             return Value != null;
         }

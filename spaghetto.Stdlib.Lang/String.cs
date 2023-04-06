@@ -3,7 +3,7 @@
         public static SClass CreateClass() {
             var @class = new SClass("string");
 
-            @class.StaticTable.Add((new SString("getChars"), new SNativeFunction(
+            @class.StaticTable.Add(("getChars", new SNativeFunction(
                 impl: (Scope scope, List<SValue> args) => {
                     if (args[0] is not SString str) throw new Exception("Expected argument 0 to be a string");
 
@@ -14,7 +14,7 @@
                 expectedArgs: new() { "string" }
             )));
 
-            @class.StaticTable.Add((new SString("split"), new SNativeFunction(
+            @class.StaticTable.Add(("split", new SNativeFunction(
                 impl: (Scope scope, List<SValue> args) => {
                     if (args[0] is not SString str) throw new Exception("Expected argument 0 to be a string");
                     if (args[1] is not SString splitter) throw new Exception("Expected argument 1 to be a string");
@@ -26,7 +26,7 @@
                 expectedArgs: new() { "string", "char" }
             )));
 
-            @class.StaticTable.Add((new SString("length"), new SNativeFunction(
+            @class.StaticTable.Add(("length", new SNativeFunction(
                impl: (Scope scope, List<SValue> args) => {
                    if (args[0] is not SString str) throw new Exception("Expected argument 0 to be a string");
 
@@ -35,7 +35,7 @@
                expectedArgs: new() { "string" }
             )));
 
-            @class.StaticTable.Add((new SString("substring"), new SNativeFunction(
+            @class.StaticTable.Add(("substring", new SNativeFunction(
                impl: (Scope scope, List<SValue> args) => {
                    if (args[0] is not SString str) throw new Exception("Expected argument 0 to be a string");
                    if (args[1] is not SInt offset) throw new Exception("Expected argument 1 to be an int");
@@ -46,7 +46,7 @@
                expectedArgs: new() { "string", "start", "length" }
             )));
 
-            @class.StaticTable.Add((new SString("takeafter"), new SNativeFunction(
+            @class.StaticTable.Add(("takeafter", new SNativeFunction(
                 impl: (Scope scope, List<SValue> args) => {
                     if (args[0] is not SString str) throw new Exception("Expected argument 0 to be a string");
                     if (args[1] is not SInt offset) throw new Exception("Expected argument 1 to be an int");
@@ -56,7 +56,7 @@
                 expectedArgs: new() { "string", "start" }
             )));
 
-            @class.StaticTable.Add((new SString("EMPTY"), new SString(string.Empty) { IsConstant = true }));
+            @class.StaticTable.Add(("EMPTY", new SString(string.Empty) { IsConstant = true }));
 
             return @class;
         }

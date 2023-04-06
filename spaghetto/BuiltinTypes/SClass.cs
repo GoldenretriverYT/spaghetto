@@ -1,8 +1,8 @@
 ﻿namespace spaghetto {
     // TODO: Allow creation if Dictionaries
     public class SClass : SValue {
-        public List<(SValue key, SValue val)> StaticTable { get; set; } = new();
-        public List<(SValue key, SValue val)> InstanceBaseTable { get; set; } = new();
+        public List<(string key, SValue val)> StaticTable { get; set; } = new();
+        public List<(string key, SValue val)> InstanceBaseTable { get; set; } = new();
 
         public string Name { get; set; } = "";
         public bool FixedProps { get; set; } = false;
@@ -24,8 +24,10 @@
         }
 
         public override SValue Dot(SValue other) {
+            if (other is not SString key) throw NotSupportedBetween(other, "Dot");
+
             foreach(var kvp in StaticTable) {
-                if (kvp.key.Equals(other).IsTruthy()) return kvp.val;
+                if (kvp.key == key.Value) return kvp.val;
             }
 
             return SValue.Null;

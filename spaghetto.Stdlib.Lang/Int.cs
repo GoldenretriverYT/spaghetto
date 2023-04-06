@@ -3,7 +3,7 @@
         public static SClass CreateClass() {
             var @class = new SClass("int");
 
-            @class.StaticTable.Add((new SString("parse"), new SNativeFunction(
+            @class.StaticTable.Add(("parse", new SNativeFunction(
                 impl: (Scope scope, List<SValue> args) => {
                     if (args[0] is not SString str) throw new Exception("Expected argument 0 to be a string");
                     if (!int.TryParse(str.Value, out int valInt)) throw new Exception("Invalid number!");
@@ -13,8 +13,8 @@
                 expectedArgs: new() { "toParse" }
             )));
 
-            @class.StaticTable.Add((new SString("MIN_VALUE"), new SInt(int.MinValue) { IsConstant = true }));
-            @class.StaticTable.Add((new SString("MAX_VALUE"), new SInt(int.MaxValue) { IsConstant = true }));
+            @class.StaticTable.Add(("MIN_VALUE", new SInt(int.MinValue) { IsConstant = true }));
+            @class.StaticTable.Add(("MAX_VALUE", new SInt(int.MaxValue) { IsConstant = true }));
 
             return @class;
         }

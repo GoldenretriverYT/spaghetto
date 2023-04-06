@@ -8,7 +8,7 @@ namespace spaghetto.Stdlib.Interop
         {
             var @class = new SClass("NETInterop");
 
-            @class.StaticTable.Add((new SString("getNativeValue"), new SNativeFunction(
+            @class.StaticTable.Add(("getNativeValue", new SNativeFunction(
                impl: (Scope scope, List<SValue> args) =>
                {
                    switch (args[0].BuiltinName) {
@@ -25,7 +25,7 @@ namespace spaghetto.Stdlib.Interop
                expectedArgs: new() { "val" }
             )));
 
-            @class.StaticTable.Add((new SString("getType"), new SNativeFunction(
+            @class.StaticTable.Add(("getType", new SNativeFunction(
                 impl: (Scope scope, List<SValue> args) =>
                 {
                     if (args[0] is not SString typeName) throw new Exception("Arg 0 must be string");
@@ -35,7 +35,7 @@ namespace spaghetto.Stdlib.Interop
                 expectedArgs: new() { "name" }
             )));
 
-            @class.StaticTable.Add((new SString("getMethod"), new SNativeFunction(
+            @class.StaticTable.Add(("getMethod", new SNativeFunction(
                 impl: (Scope scope, List<SValue> args) =>
                 {
                     if (args[0] is not SNativeObject type) throw new Exception("Arg 0 must be native object");
@@ -56,7 +56,7 @@ namespace spaghetto.Stdlib.Interop
                 expectedArgs: new() { "type", "name", "argTypes" }
             )));
 
-            @class.StaticTable.Add((new SString("invokeStatic"), new SNativeFunction(
+            @class.StaticTable.Add(("invokeStatic", new SNativeFunction(
                impl: (Scope scope, List<SValue> args) =>
                {
                    if (args[0] is not SNativeObject method) throw new Exception("Arg 0 must be native object");
@@ -76,7 +76,7 @@ namespace spaghetto.Stdlib.Interop
                expectedArgs: new() { "method", "list of args" }
             )));
 
-            @class.StaticTable.Add((new SString("invoke"), new SNativeFunction(
+            @class.StaticTable.Add(("invoke", new SNativeFunction(
                impl: (Scope scope, List<SValue> args) =>
                {
                    if (args[0] is not SNativeObject method) throw new Exception("Arg 0 must be native object");
@@ -100,7 +100,7 @@ namespace spaghetto.Stdlib.Interop
                expectedArgs: new() { "method", "instance", "list of args" }
             )));
 
-            @class.StaticTable.Add((new SString("instantiate"), new SNativeFunction(
+            @class.StaticTable.Add(("instantiate", new SNativeFunction(
                impl: (Scope scope, List<SValue> args) =>
                {
                    if (args[0] is not SNativeObject method) throw new Exception("Arg 0 must be native object");

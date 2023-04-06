@@ -3,7 +3,7 @@
         public static SClass CreateClass() {
             var @class = new SClass("File");
 
-            @class.StaticTable.Add((new SString("exists"), new SNativeFunction(
+            @class.StaticTable.Add(("exists", new SNativeFunction(
                impl: (Scope scope, List<SValue> args) => {
                    if (args[0] is not SString str) throw new Exception("Expected argument 0 to be a string");
                    if (!System.IO.File.Exists(str.Value)) return SInt.Zero;
@@ -13,7 +13,7 @@
                expectedArgs: new() { "path" }
            )));
 
-            @class.StaticTable.Add((new SString("readtext"), new SNativeFunction(
+            @class.StaticTable.Add(("readtext", new SNativeFunction(
                 impl: (Scope scope, List<SValue> args) => {
                     if (args[0] is not SString str) throw new Exception("Expected argument 0 to be a string");
                     if (!System.IO.File.Exists(str.Value)) throw new Exception("File not found!");
@@ -23,7 +23,7 @@
                 expectedArgs: new() { "path" }
             )));
 
-            @class.StaticTable.Add((new SString("writetext"), new SNativeFunction(
+            @class.StaticTable.Add(("writetext", new SNativeFunction(
                 impl: (Scope scope, List<SValue> args) => {
                     if (args[0] is not SString str) throw new Exception("Expected argument 0 to be a string");
                     if (args[1] is not SString strData) throw new Exception("Expected argument 1 to be a string");
@@ -35,7 +35,7 @@
                 expectedArgs: new() { "path", "data" }
             )));
 
-            @class.InstanceBaseTable.Add((new SString("$$ctor"), new SNativeFunction(
+            @class.InstanceBaseTable.Add(("$$ctor", new SNativeFunction(
                 impl: (Scope scope, List<SValue> args) =>
                 {
                     if (args[0] is not SClassInstance self) throw new Exception("unexpected error!");
@@ -49,7 +49,7 @@
                 expectedArgs: new() { "self", "path" }
             )));
 
-            @class.InstanceBaseTable.Add((new SString("getSize"), new SNativeFunction(
+            @class.InstanceBaseTable.Add(("getSize", new SNativeFunction(
                 impl: (Scope scope, List<SValue> args) =>
                 {
                     if (args[0] is not SClassInstance self) throw new Exception("unexpected error!");

@@ -5,7 +5,7 @@ namespace spaghetto.Stdlib.Lang {
         public static SClass CreateClass() {
             var @class = new SClass("float");
 
-            @class.StaticTable.Add((new SString("parse"), new SNativeFunction(
+            @class.StaticTable.Add(("parse", new SNativeFunction(
                 impl: (Scope scope, List<SValue> args) => {
                     if (args[0] is not SString str) throw new Exception("Expected argument 0 to be a string");
                     if (!float.TryParse(str.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out float valFloat)) throw new Exception("Invalid number!");
@@ -15,8 +15,8 @@ namespace spaghetto.Stdlib.Lang {
                 expectedArgs: new() { "toParse" }
             )));
 
-            @class.StaticTable.Add((new SString("MIN_VALUE"), new SFloat(float.MinValue) { IsConstant = true }));
-            @class.StaticTable.Add((new SString("MAX_VALUE"), new SFloat(float.MaxValue) { IsConstant = true }));
+            @class.StaticTable.Add(("MIN_VALUE", new SFloat(float.MinValue) { IsConstant = true }));
+            @class.StaticTable.Add(("MAX_VALUE", new SFloat(float.MaxValue) { IsConstant = true }));
 
             return @class;
         }

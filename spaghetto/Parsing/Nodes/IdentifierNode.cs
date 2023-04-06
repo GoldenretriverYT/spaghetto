@@ -13,7 +13,7 @@
 
         public override SValue Evaluate(Scope scope)
         {
-            return scope.Get((string)Token.Value) ?? SValue.Null;
+            return scope.Get(Token.Text) ?? SValue.Null;
         }
 
         public override IEnumerable<SyntaxNode> GetChildren()

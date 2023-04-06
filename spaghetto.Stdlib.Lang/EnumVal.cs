@@ -3,7 +3,7 @@
         public static SClass CreateClass() {
             var @class = new SClass("EnumVal");
 
-            @class.InstanceBaseTable.Add((new SString("$$ctor"), new SNativeFunction(
+            @class.InstanceBaseTable.Add(("$$ctor", new SNativeFunction(
                 impl: (Scope scope, List<SValue> args) =>
                 {
                     if (args[0] is not SClassInstance self) throw new Exception("unexpected error!");
@@ -16,7 +16,7 @@
                     foreach(var v in entries.Value) {
                         if (v is not SString str) throw new Exception("Expected argument 0s list to only be strings");
 
-                        self.InstanceTable.Add((str, new SInt(i)));
+                        self.InstanceTable.Add((str.Value, new SInt(i)));
                         enumToStringLookup.Add((i, str));
 
                         i++;
@@ -28,7 +28,7 @@
                 expectedArgs: new() { "self", "valueList" }
             )));
 
-            @class.InstanceBaseTable.Add((new SString("getName"), new SNativeFunction(
+            @class.InstanceBaseTable.Add(("getName", new SNativeFunction(
                 impl: (Scope scope, List<SValue> args) =>
                 {
                     if (args[0] is not SClassInstance self) throw new Exception("unexpected error!");
