@@ -238,7 +238,13 @@ namespace spaghetto {
             }
 
             Position++;
-            return new(SyntaxType.String, startPos, str, str);
+
+            if (Current == 'i') {
+                Position++;
+                return new(SyntaxType.Identifier, startPos, str, str);
+            }else {
+                return new(SyntaxType.String, startPos, str, str);
+            }
         }
 
         private SyntaxToken ParseNumber() {
