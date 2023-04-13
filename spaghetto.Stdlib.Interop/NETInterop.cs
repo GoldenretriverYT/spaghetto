@@ -25,6 +25,25 @@ namespace spaghetto.Stdlib.Interop
                expectedArgs: new() { "val" }
             )));
 
+            @class.StaticTable.Add(("getSpagValue", new SNativeFunction(
+               impl: (Scope scope, List<SValue> args) =>
+               {
+                   if (args[0] is not SNativeObject nativeObject) throw new Exception("Arg 0 must be native object");
+
+                   switch (nativeObject.Value.GetType().Name) {
+                       case "Int32":
+                           return new SInt((int)nativeObject.Value);
+                       case "Single":
+                           return new SFloat((float)nativeObject.Value);
+                       case "String":
+                           return new SString((string)nativeObject.Value);
+                   }
+
+                   return SNull.Null;
+               },
+               expectedArgs: new() { "val" }
+            )));
+
             @class.StaticTable.Add(("getType", new SNativeFunction(
                 impl: (Scope scope, List<SValue> args) =>
                 {

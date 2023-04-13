@@ -23,6 +23,16 @@
             return $"<NativeObject<T={Value?.GetType().Name ?? "Null"}> value={Value ?? "Null"}>";
         }
 
+        public override SValue Dot(SValue other)
+        {
+            if (other is not SString ident) throw NotSupportedBetween(other, "Dot");
+
+            var field = Value.GetType().GetField(ident.Value);
+            if (field == null) return SNull.Null;
+
+            return new SNativeObject(field.GetValue(Value));
+        }
+
         public override SString ToSpagString() {
             return new SString("<native object>");
         }
