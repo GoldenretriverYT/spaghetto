@@ -2,7 +2,7 @@
   "profiles": {
     "spaghettoCLI": {
       "commandName": "Project",
-      "commandLineArgs": "--lib=../../../../spaghetto.Stdlib.Forms/bin/Debug/net6.0/spaghetto.Stdlib.Forms.dll"
+      "commandLineArgs": "--lib=../../../../spaghetto.Stdlib.Forms/bin/Debug/net6.0-windows/spaghetto.Stdlib.Forms.dll"
     }
   }
 }
