@@ -2,24 +2,24 @@
 {
     internal class IntLiteralNode : SyntaxNode
     {
-        private SyntaxToken syntaxToken;
+        public SyntaxToken intToken;
 
         public IntLiteralNode(SyntaxToken syntaxToken) : base(syntaxToken.Position, syntaxToken.EndPosition)
         {
-            this.syntaxToken = syntaxToken;
+            this.intToken = syntaxToken;
         }
 
         public override NodeType Type => NodeType.IntLiteral;
 
         public override SValue Evaluate(Scope scope)
         {
-            var sint = new SInt((int)syntaxToken.Value);
+            var sint = new SInt((int)intToken.Value);
             return sint;
         }
 
         public override IEnumerable<SyntaxNode> GetChildren()
         {
-            yield return new TokenNode(syntaxToken);
+            yield return new TokenNode(intToken);
         }
 
         public override string ToString()
