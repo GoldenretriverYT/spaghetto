@@ -1,7 +1,8 @@
 {
   "profiles": {
     "spaghettoCLI": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "--lib=../../../../spaghetto.Stdlib.Forms/bin/Debug/net6.0/spaghetto.Stdlib.Forms.dll"
     }
   }
 }

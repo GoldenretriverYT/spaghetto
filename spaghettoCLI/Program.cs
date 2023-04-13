@@ -1,5 +1,6 @@
 ﻿using spaghetto;
 using spaghetto.Parsing.Nodes;
+using System.Reflection;
 using System.Text;
 
 namespace spaghettoCLI
@@ -8,7 +9,16 @@ namespace spaghettoCLI
         static bool showLexOutput = false, showParseOutput = false, timings = false, rethrow = false, csstack = false;
         static Interpreter interpreter;
 
+        static List<Assembly> assemblies = new();
+
         static void Main(string[] args) {
+            for (var i = 0; i < args.Length; i++) {
+                string[] subArgs = args[i].Split('=');
+                if (args[i].StartsWith("--lib=")) {
+                    assemblies.Add(Assembly.LoadFrom(subArgs[1]));
+                }
+            }
+
             InitInterpreter();
 
             while (true) {
@@ -61,6 +71,19 @@ namespace spaghettoCLI
             spaghetto.Stdlib.Lang.Lib.Mount(interpreter.GlobalScope);
             spaghetto.Stdlib.IO.Lib.Mount(interpreter.GlobalScope);
             spaghetto.Stdlib.Interop.Lib.Mount(interpreter.GlobalScope);
+
+            foreach(var assembly in assemblies) {
+                foreach(var type in assembly.GetTypes().Where((x) => x.BaseType == typeof(ExternLibMain))) {
+                    var instance = Activator.CreateInstance(type);
+                    
+                    if(instance is not ExternLibMain elm) {
+                        Console.WriteLine("Fatal failure when importing " + type.Name + " from " + assembly.FullName);
+                        continue;
+                    }
+
+                    elm.Mount(interpreter.GlobalScope);
+                } 
+            }
         }
 
         public static void RunCode(Interpreter interpreter, string text) {

@@ -21,9 +21,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "spaghettoPacker", "spaghett
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PerfTest", "PerfTest\PerfTest.csproj", "{39D90083-FC05-4C82-8AEA-23AFB2B7C7FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spaghetto.Stdlib.Interop", "spaghetto.Stdlib.Interop\spaghetto.Stdlib.Interop.csproj", "{4333573D-CE80-40AD-A4BB-A4458C9B44CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "spaghetto.Stdlib.Interop", "spaghetto.Stdlib.Interop\spaghetto.Stdlib.Interop.csproj", "{4333573D-CE80-40AD-A4BB-A4458C9B44CD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spaghetto.Stdlib.Reflection", "spaghetto.Stdlib.Reflection\spaghetto.Stdlib.Reflection.csproj", "{E4F7D8DF-C726-47E1-BED6-B45FE9DCDBB2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "spaghetto.Stdlib.Reflection", "spaghetto.Stdlib.Reflection\spaghetto.Stdlib.Reflection.csproj", "{E4F7D8DF-C726-47E1-BED6-B45FE9DCDBB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "spaghetto.Stdlib.Forms", "spaghetto.Stdlib.Forms\spaghetto.Stdlib.Forms.csproj", "{E879C7B9-8B44-4C46-922A-86EBDB8312AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -67,6 +69,10 @@ Global
 		{E4F7D8DF-C726-47E1-BED6-B45FE9DCDBB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4F7D8DF-C726-47E1-BED6-B45FE9DCDBB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4F7D8DF-C726-47E1-BED6-B45FE9DCDBB2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E879C7B9-8B44-4C46-922A-86EBDB8312AB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E879C7B9-8B44-4C46-922A-86EBDB8312AB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E879C7B9-8B44-4C46-922A-86EBDB8312AB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E879C7B9-8B44-4C46-922A-86EBDB8312AB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -77,6 +83,7 @@ Global
 		{B9093756-EE3F-4265-815E-6DED16CAD141} = {4F7301E1-43A3-41F0-8AC4-CD1E39DE4CB4}
 		{4333573D-CE80-40AD-A4BB-A4458C9B44CD} = {D2C74680-6182-4352-808D-C3AA9AE91E6D}
 		{E4F7D8DF-C726-47E1-BED6-B45FE9DCDBB2} = {D2C74680-6182-4352-808D-C3AA9AE91E6D}
+		{E879C7B9-8B44-4C46-922A-86EBDB8312AB} = {D2C74680-6182-4352-808D-C3AA9AE91E6D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {EAB579D2-7F8F-4D85-A6AD-CA563DF0667D}
