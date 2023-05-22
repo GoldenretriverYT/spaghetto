@@ -69,7 +69,7 @@ statement     : KEYWORD:return expr?
               : expr
               : SEMICOLON
               
-expression    : (KEYWORD:const)? KEYWORD:var IDENTIFIER (EQUALS expression)?
+expression    : (KEYWORD:const)? KEYWORD:var IDENTIFIER COLON IDENTIFIER (EQUALS expression)?
               : IDENTIFIER equtoks expression
               : IDENTIFIER PLUSPLUS|MINUSMINUS
               : comp-expr ((&& | ||) comp-expr)*
@@ -118,7 +118,7 @@ while-expr    : KEYWORD:while expr
                 scoped-or-expr
               
 func-def      : KEYWORD:func IDENTIFIER
-                LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
+                LPAREN (IDENTIFIER COLON IDENTIFIER (COMMA IDENTIFIER COLON IDENTIFIER)*)? RPAREN
                 (scoped-statements | ARROW scoped-or-expr)
 
 class-def     : KEYWORD:class KEYWORD:fixedprops? IDENTIFIER LBRACE class-body RBRACE
@@ -129,7 +129,7 @@ class-funcdef : KEYWORD:func KEYWORD:static? IDENTIFIER func-args scoped-stateme
 class-opdef   : KEYWORD:op (
                     (PLUS|MINUS|MUL|DIV|IDX|EQUALSEQUALS|NOTEQUALS|LESSTHAN|LESSTHANEQU|GREATERTHAN|GREATERTHANEQU)
                 ) LPAREN IDENTIFIER COMMA IDENTIFIER RPAREN scoped-statements
-class-propdef : KEYWORD:prop KEYWORD:static? IDENTIFIER EQUALS expression
+class-propdef : KEYWORD:prop KEYWORD:static? IDENTIFIER COLON IDENTIFIER EQUALS expression
 
-func-args     : LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
+func-args     : LPAREN (IDENTIFIER COLON IDENTIFIER (COMMA IDENTIFIER COLON IDENTIFIER)*)? RPAREN
 instantiate   : KEYWORD:new IDENTIFIER LPAREN ((expr (COMMA expr))*)? RPAREN
