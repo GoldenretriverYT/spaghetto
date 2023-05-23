@@ -3,17 +3,24 @@
     internal class IdentifierNode : SyntaxNode
     {
         public SyntaxToken Token { get; private set; }
+        public bool NonNull { get; }
 
         public IdentifierNode(SyntaxToken syntaxToken) : base(syntaxToken.Position, syntaxToken.EndPosition)
         {
             Token = syntaxToken;
         }
 
+        public IdentifierNode(SyntaxToken syntaxToken, bool nonNull) : base(syntaxToken.Position, syntaxToken.EndPosition)
+        {
+            Token = syntaxToken;
+            NonNull = nonNull;
+        }
+
         public override NodeType Type => NodeType.Identifier;
 
         public override SValue Evaluate(Scope scope)
         {
-            return scope.Get(Token.Text) ?? SValue.Null;
+            return scope.Get(Token.Text) ?? (NonNull ? throw new Exception("Non-null identifier " + Token.Text + " resolved to null!") : SValue.Null);
         }
 
         public override IEnumerable<SyntaxNode> GetChildren()

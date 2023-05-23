@@ -420,8 +420,16 @@ namespace spaghetto.Parsing {
                 Position++;
                 return new StringLiteralNode(Peek(-1));
             } else if (Current.Type is SyntaxType.Identifier) {
+                var peekOffset = -1;
                 Position++;
-                return new IdentifierNode(Peek(-1));
+
+                bool nonNull = Current.Type == SyntaxType.Bang;
+                if(nonNull) {
+                    Position++;
+                    peekOffset--;
+                }
+
+                return new IdentifierNode(Peek(peekOffset), nonNull);
             } else if (Current.Type is SyntaxType.LParen) {
                 Position++;
                 var expr = ParseExpression();

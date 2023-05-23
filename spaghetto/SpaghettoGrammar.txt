@@ -91,7 +91,7 @@ call          : cast (DOT IDENTIFIER|call)*? (LPAREN (expr (COMMA expr)*)? RPARE
 cast          : (LessThan IDENTIFIER:int|float|string|list GreaterThan) cast
               : atom
 
-atom          : INT|FLOAT|STRING|IDENTIFIER
+atom          : INT|FLOAT|STRING|IDENTIFIER BANG?
               : LPAREN expr RPAREN
               : list-expr
               : dict-expr
