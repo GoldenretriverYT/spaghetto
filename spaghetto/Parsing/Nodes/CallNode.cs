@@ -19,11 +19,7 @@ namespace spaghetto.Parsing.Nodes
         {
             var toCall = ToCallNode.Evaluate(scope) ?? SValue.Null;
             var args = EvaluateArgs(scope);
-            try {
-                return toCall.Call(scope, args);
-            }catch(Exception ex) {
-                return SValue.Null;
-            }
+            return toCall.Call(scope, args);
         }
 
         public List<SValue> EvaluateArgs(Scope scope)
