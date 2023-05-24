@@ -5,6 +5,14 @@
 
         public SList() { }
 
+        public SList(byte[] array)
+        {
+            Value = new List<SValue>();
+
+            foreach (var val in array)
+                Value.Add(new SInt(val));
+        }
+
         public override SString ToSpagString() {
             return new SString("[" + string.Join(", ", Value.Select((v) => v.ToSpagString().Value)) + "]");
         }

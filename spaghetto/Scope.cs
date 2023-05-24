@@ -21,6 +21,24 @@
             CreatedPosition = startPos;
         }
 
+        public Scope Clone()
+        {
+            var newScope = new Scope(CreatedPosition);
+            newScope.ParentScope = ParentScope;
+            newScope.State = State;
+            newScope.ReturnValue = ReturnValue;
+
+            foreach (var (key, value) in Table) {
+                newScope.Table[key] = value;
+            }
+
+            foreach (var (key, value) in ExportTable) {
+                newScope.ExportTable[key] = value;
+            }
+
+            return newScope;
+        }
+
         public SValue Get(string key)
         {
             if (Table.TryGetValue(key, out SValue val)) return val;
@@ -31,7 +49,8 @@
 
         public void Set(string key, SValue value)
         {
-            if (Table.ContainsKey(key)) throw new Exception("Scope.Set can not be used to overwrite values.");
+            if (Table.ContainsKey(key)) throw new Exception(
+                "INTERNAL: Scope.Set can not be used to overwrite values");
             Table[key] = value;
         }
 

@@ -15,6 +15,12 @@ namespace spaghetto
             FunctionName = functionName;
             ExpectedArgs = args;
             Callback = callback;
+
+            // If the scope is the global scope, we need to clone it as otherwise we would have a reference to the global scope
+            // and any changes to the scope would be reflected in the global scope
+            if (DefiningScope.ParentScope == null) {
+                DefiningScope = DefiningScope.Clone();
+            }
         }
 
         public override SValue Call(Scope scope, List<SValue> args) {
