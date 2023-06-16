@@ -52,7 +52,6 @@ namespace spaghetto
 
     public class GoofyAhhEvaluator {
         public static SValue Evaluate(Scope scope, SyntaxNode node) {
-            Console.WriteLine("evaluating lol!");
             switch (node.Type) {
                 case NodeType.AssignVariable:
                     return EvaluateAssignVariableNode(scope, node as AssignVariableNode);
