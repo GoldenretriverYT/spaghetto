@@ -2,8 +2,8 @@
 {
     internal class WhileNode : SyntaxNode
     {
-        private SyntaxNode condNode;
-        private SyntaxNode block;
+        public SyntaxNode condNode;
+        public SyntaxNode block;
 
         public WhileNode(SyntaxNode condNode, SyntaxNode block) : base(condNode.EndPosition, block.EndPosition)
         {

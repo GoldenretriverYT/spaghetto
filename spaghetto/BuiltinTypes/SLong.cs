@@ -17,28 +17,28 @@
         }
 
         public override SValue Add(SValue other) {
-            if (other is not SLong otherLong) throw new Exception("Can not perform Add on SLong and " + other.BuiltinName.ToString());
+            if (other is not SLong otherLong) throw new Exception("Can not perform Add on SLong and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
 
             return new SLong(Value + otherLong.Value);
         }
 
         public override SValue Sub(SValue other) {
-            if (other is not SLong otherLong) throw new Exception("Can not perform Sub on SLong and " + other.BuiltinName.ToString());
+            if (other is not SLong otherLong) throw new Exception("Can not perform Sub on SLong and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
             return new SLong(Value - otherLong.Value);
         }
 
         public override SValue Mul(SValue other) {
-            if (other is not SLong otherLong) throw new Exception("Can not perform Mul SLong and " + other.BuiltinName.ToString());
+            if (other is not SLong otherLong) throw new Exception("Can not perform Mul SLong and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
             return new SLong(Value * otherLong.Value);
         }
 
         public override SValue Div(SValue other) {
-            if (other is not SLong otherLong) throw new Exception("Can not perform Div SLong and " + other.BuiltinName.ToString());
+            if (other is not SLong otherLong) throw new Exception("Can not perform Div SLong and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
             return new SLong(Value / otherLong.Value);
         }
 
         public override SValue Mod(SValue other) {
-            if (other is not SLong otherLong) throw new Exception("Can not perform Mod SLong and " + other.BuiltinName.ToString());
+            if (other is not SLong otherLong) throw new Exception("Can not perform Mod SLong and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
             return new SLong(Value % otherLong.Value);
         }
 
@@ -93,7 +93,7 @@
         }
 
         public override string ToString() {
-            return $"<{BuiltinName.ToString()} value={Value}>";
+            return $"<{SBuiltinTypeHelper.ToStr(BuiltinName)} value={Value}>";
         }
 
         public override SString ToSpagString() {

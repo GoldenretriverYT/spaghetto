@@ -18,7 +18,7 @@ namespace SpaghettoCosmosTestKernel
             string sel = Console.ReadLine();    
 
             if(sel == "1") {
-                KeyboardManager.SetKeyLayout(new US_Standard());
+                KeyboardManager.SetKeyLayout(new USStandardLayout());
             }else if(sel == "2") {
                 KeyboardManager.SetKeyLayout(new DE_Fixed());
             }

@@ -287,7 +287,13 @@ namespace spaghetto {
         }
 
         public override string ToString() {
-            return Type.ToString().PadRight(16) + " at " + Position.ToString().PadRight(3) + " with val: " + (Value ?? "null").ToString().PadRight(16) + " text: " + Text.ToString().PadRight(16);
+            return Type.ToStringNew().PadRight(16) + " at " + Position.ToString().PadRight(3) + " with val: " + (Value ?? "null").ToString().PadRight(16) + " text: " + Text.ToString().PadRight(16);
+        }
+    }
+
+    public static class SyntaxTypeExtensions {
+        public static string ToStringNew(this SyntaxType st) {
+            return "not implemented";
         }
     }
 

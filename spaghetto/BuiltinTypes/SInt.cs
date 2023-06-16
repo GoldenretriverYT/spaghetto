@@ -19,28 +19,28 @@ namespace spaghetto {
         }
 
         public override SValue Add(SValue other) {
-            if (other is not SInt otherInt) throw new Exception("Can not perform Add on SInt and " + other.BuiltinName.ToString());
+            if (other is not SInt otherInt) throw new Exception("Can not perform Add on SInt and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
 
             return new SInt(Value + otherInt.Value);
         }
 
         public override SValue Sub(SValue other) {
-            if (other is not SInt otherInt) throw new Exception("Can not perform Sub on SInt and " + other.BuiltinName.ToString());
+            if (other is not SInt otherInt) throw new Exception("Can not perform Sub on SInt and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
             return new SInt(Value - otherInt.Value);
         }
 
         public override SValue Mul(SValue other) {
-            if (other is not SInt otherInt) throw new Exception("Can not perform Mul on SInt and " + other.BuiltinName.ToString());
+            if (other is not SInt otherInt) throw new Exception("Can not perform Mul on SInt and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
             return new SInt(Value * otherInt.Value);
         }
 
         public override SValue Div(SValue other) {
-            if (other is not SInt otherInt) throw new Exception("Can not perform Div on SInt and " + other.BuiltinName.ToString());
+            if (other is not SInt otherInt) throw new Exception("Can not perform Div on SInt and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
             return new SInt(Value / otherInt.Value);
         }
 
         public override SValue Mod(SValue other) {
-            if (other is not SInt otherInt) throw new Exception("Can not perform Mod on SInt and " + other.BuiltinName.ToString());
+            if (other is not SInt otherInt) throw new Exception("Can not perform Mod on SInt and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
             return new SInt(Value % otherInt.Value);
         }
 
@@ -95,7 +95,7 @@ namespace spaghetto {
         }
 
         public override string ToString() {
-            return $"<{BuiltinName.ToString()} value={Value}>";
+            return $"<{SBuiltinTypeHelper.ToStr(BuiltinName)} value={Value}>";
         }
 
         public override SString ToSpagString() {

@@ -11,8 +11,60 @@
             this.ident = ident;
             this.node = node;
 
-            // TODO: Allow for cast to classes
-            if (!Enum.TryParse<SBuiltinType>(ident.Text, true, out type)) throw new Exception("Unknown type " + ident.Text + "; only builtin types supported right now.");
+
+            // Int,
+            // Float,
+            // List,
+            // Null,
+            // NativeFunc,
+            // Function,
+            // NativeLibraryImporter,
+            // Dictionary,
+            // Class,
+            // NativeObject,
+            // ClassInstance,
+            // Long,
+
+            switch(ident.Text.ToLower()) {
+                case "string":
+                    type = SBuiltinType.String;
+                    break;
+                case "int":
+                    type = SBuiltinType.Int;
+                    break;
+                case "list":
+                    type = SBuiltinType.List;
+                    break;
+                case "null":
+                    type = SBuiltinType.Null;
+                    break;
+                case "nativefunc":
+                    type = SBuiltinType.NativeFunc;
+                    break;
+                case "function":
+                    type = SBuiltinType.Function;
+                    break;
+                case "nativelibraryimporter":
+                    type = SBuiltinType.NativeLibraryImporter;
+                    break;
+                case "dictionary":
+                    type = SBuiltinType.Dictionary;
+                    break;
+                case "class":
+                    type = SBuiltinType.Class;
+                    break;
+                case "nativeobject":
+                    type = SBuiltinType.NativeObject;
+                    break;
+                case "classinstance":
+                    type = SBuiltinType.ClassInstance;
+                    break;
+                case "long":
+                    type = SBuiltinType.Long;
+                    break;
+                default:
+                    throw new Exception("Unknown type " + ident.Text + "; only builtin types supported right now.");
+            }
         }
 
         public override NodeType Type => NodeType.Cast;

@@ -101,24 +101,24 @@ namespace spaghetto {
 
         public override string ToString()
         {
-            return BuiltinName.ToString();
+            return SBuiltinTypeHelper.ToStr(BuiltinName);
         }
 
         public virtual SString ToSpagString()
         {
-            return new SString("<unknown of type " + BuiltinName.ToString() + ">");
+            return new SString("<unknown of type " + SBuiltinTypeHelper.ToStr(BuiltinName) + ">");
         }
 
         protected NotImplementedException NotSupportedBetween(SValue other, string type) {
-            return new NotImplementedException(type + " not supported between " + BuiltinName.ToString() + " and " + other.BuiltinName.ToString());
+            return new NotImplementedException(type + " not supported between " + SBuiltinTypeHelper.ToStr(BuiltinName) + " and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
         }
 
         protected NotImplementedException NotSupportedOn(string type) {
-            return new NotImplementedException(type + " is not supported on " + BuiltinName.ToString());
+            return new NotImplementedException(type + " is not supported on " + SBuiltinTypeHelper.ToStr(BuiltinName));
         }
 
         protected ArgumentException CastInvalid(string type) {
-            return new ArgumentException(BuiltinName.ToString() + " can not be cast to " + type);
+            return new ArgumentException(SBuiltinTypeHelper.ToStr(BuiltinName) + " can not be cast to " + type);
         }
 
         internal void CopyMeta(ref SValue other) {

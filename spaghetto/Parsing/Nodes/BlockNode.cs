@@ -3,7 +3,7 @@
     internal class BlockNode : SyntaxNode
     {
         private List<SyntaxNode> nodes;
-        private readonly bool createNewScope;
+        public readonly bool createNewScope;
 
         public BlockNode(SyntaxToken startTok, SyntaxToken endTok, List<SyntaxNode> nodes, bool createNewScope = true) : base(startTok.Position, endTok.Position)
         {

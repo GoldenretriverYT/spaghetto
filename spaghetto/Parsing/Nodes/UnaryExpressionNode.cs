@@ -2,8 +2,8 @@
 {
     internal class UnaryExpressionNode : SyntaxNode
     {
-        private SyntaxToken token;
-        private SyntaxNode rhs;
+        public SyntaxToken token;
+        public SyntaxNode rhs;
 
         public UnaryExpressionNode(SyntaxToken token, SyntaxNode rhs) : base(token.Position, rhs.EndPosition)
         {
