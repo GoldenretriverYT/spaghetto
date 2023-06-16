@@ -13,11 +13,6 @@
             Token = token;
         }
 
-        public override SValue Evaluate(Scope scope)
-        {
-            throw new NotImplementedException();
-        }
-
         public override IEnumerable<SyntaxNode> GetChildren()
         {
             return Enumerable.Empty<SyntaxNode>();

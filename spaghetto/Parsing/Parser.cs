@@ -705,9 +705,9 @@ namespace spaghetto.Parsing {
     }
 
     internal class RepeatNode : SyntaxNode {
-        private SyntaxNode timesExpr;
-        private SyntaxNode block;
-        private bool keepScope = false;
+        public SyntaxNode timesExpr;
+        public SyntaxNode block;
+        public bool keepScope = false;
 
         public RepeatNode(SyntaxNode timesExpr, SyntaxNode block, bool keepScope = false) : base(timesExpr.StartPosition, block.EndPosition) {
             this.timesExpr = timesExpr;
@@ -716,28 +716,6 @@ namespace spaghetto.Parsing {
         }
 
         public override NodeType Type => NodeType.Repeat;
-
-        public override SValue Evaluate(Scope scope) {
-            var timesRaw = timesExpr.Evaluate(scope);
-            if (timesRaw is not SInt timesSInt) throw new Exception("Repeat x times expression must evaluate to SInt");
-            var times = timesSInt.Value;
-
-            if (keepScope) {
-                if (block is not BlockNode blockNode) throw new Exception("Kept-scope repeat expressions must have a full body.");
-
-                for (int i = 0; i < times; i++) {
-                    foreach(var n in blockNode.Nodes) {
-                        n.Evaluate(scope);
-                    }
-                }
-            } else {
-                for (int i = 0; i < times; i++) {
-                    block.Evaluate(scope);
-                }
-            }
-
-            return SValue.Null;
-        }
 
         public override IEnumerable<SyntaxNode> GetChildren() {
             yield return timesExpr;

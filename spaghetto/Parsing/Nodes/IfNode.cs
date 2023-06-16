@@ -8,21 +8,6 @@
 
         public override NodeType Type => NodeType.If;
 
-        public override SValue Evaluate(Scope scope)
-        {
-            foreach ((SyntaxNode cond, SyntaxNode block) in Conditions)
-            {
-                var condRes = cond.Evaluate(scope);
-
-                if (condRes.IsTruthy())
-                {
-                    return block.Evaluate(new Scope(scope, StartPosition));
-                }
-            }
-
-            return SValue.Null;
-        }
-
         public override IEnumerable<SyntaxNode> GetChildren()
         {
             foreach (var (cond, block) in Conditions)

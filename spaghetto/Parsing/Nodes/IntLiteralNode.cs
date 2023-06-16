@@ -11,12 +11,6 @@
 
         public override NodeType Type => NodeType.IntLiteral;
 
-        public override SValue Evaluate(Scope scope)
-        {
-            var sint = new SInt((int)intToken.Value);
-            return sint;
-        }
-
         public override IEnumerable<SyntaxNode> GetChildren()
         {
             yield return new TokenNode(intToken);

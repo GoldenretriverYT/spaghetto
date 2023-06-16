@@ -4,9 +4,9 @@ namespace spaghetto.Parsing.Nodes
 {
     internal class FunctionDefinitionNode : SyntaxNode
     {
-        private SyntaxToken? nameToken;
-        private List<SyntaxToken> args;
-        private SyntaxNode block;
+        public SyntaxToken? nameToken;
+        public List<SyntaxToken> args;
+        public SyntaxNode block;
 
         public FunctionDefinitionNode(SyntaxToken? nameToken, List<SyntaxToken> args, SyntaxNode block)
             : base(nameToken != null ? nameToken.Value.Position : args.GetStartingPosition(block.StartPosition), block.EndPosition) // either nametoken start, args start or finally block start
@@ -17,13 +17,6 @@ namespace spaghetto.Parsing.Nodes
         }
 
         public override NodeType Type => NodeType.FunctionDefinition;
-
-        public override SValue Evaluate(Scope scope)
-        {
-            var f = new SFunction(scope, nameToken?.Text ?? "<anonymous>", args.Select((v) => v.Text).ToList(), block);
-            if (nameToken != null) scope.Set(nameToken.Value.Text, f);
-            return f;
-        }
 
         public override IEnumerable<SyntaxNode> GetChildren()
         {

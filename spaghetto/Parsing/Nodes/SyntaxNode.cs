@@ -7,7 +7,6 @@
 
         public abstract NodeType Type { get; }
 
-        public abstract SValue Evaluate(Scope scope);
         public abstract IEnumerable<SyntaxNode> GetChildren();
 
         public SyntaxNode(int startPos, int endPos) {

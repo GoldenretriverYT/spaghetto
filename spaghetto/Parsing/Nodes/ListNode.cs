@@ -2,7 +2,7 @@
 {
     internal class ListNode : SyntaxNode
     {
-        private List<SyntaxNode> list;
+        public List<SyntaxNode> list;
 
         public ListNode(List<SyntaxNode> list, SyntaxToken lsqBracket, SyntaxToken rsqBracket) : base(lsqBracket.Position, rsqBracket.EndPosition)
         {
@@ -10,18 +10,6 @@
         }
 
         public override NodeType Type => NodeType.List;
-
-        public override SValue Evaluate(Scope scope)
-        {
-            SList sList = new();
-
-            foreach (var n in list)
-            {
-                sList.Value.Add(n.Evaluate(scope));
-            }
-
-            return sList;
-        }
 
         public override IEnumerable<SyntaxNode> GetChildren()
         {

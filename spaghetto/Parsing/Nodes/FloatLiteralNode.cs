@@ -2,7 +2,7 @@
 {
     internal class FloatLiteralNode : SyntaxNode
     {
-        private SyntaxToken syntaxToken;
+        public SyntaxToken syntaxToken;
 
         public FloatLiteralNode(SyntaxToken syntaxToken) : base(syntaxToken.Position, syntaxToken.EndPosition)
         {
@@ -10,11 +10,6 @@
         }
 
         public override NodeType Type => NodeType.FloatLiteral;
-
-        public override SValue Evaluate(Scope scope)
-        {
-            return new SFloat((float)syntaxToken.Value);
-        }
 
         public override IEnumerable<SyntaxNode> GetChildren()
         {

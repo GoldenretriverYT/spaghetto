@@ -15,10 +15,6 @@
 
         public override NodeType Type => NodeType.ClassPropertyDefinition;
 
-        public override SValue Evaluate(Scope scope) {
-            throw new NotImplementedException("This should not be called!");
-        }
-
         public override IEnumerable<SyntaxNode> GetChildren() {
             yield return new TokenNode(Name);
             yield return Expression;

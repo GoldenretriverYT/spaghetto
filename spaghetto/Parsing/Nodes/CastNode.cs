@@ -2,28 +2,14 @@
 {
     internal class CastNode : SyntaxNode
     {
-        private SyntaxToken ident;
-        private SyntaxNode node;
+        public SyntaxToken ident;
+        public SyntaxNode node;
         public SBuiltinType type;
 
         public CastNode(SyntaxToken ident, SyntaxNode node) : base(ident.Position, node.EndPosition)
         {
             this.ident = ident;
             this.node = node;
-
-
-            // Int,
-            // Float,
-            // List,
-            // Null,
-            // NativeFunc,
-            // Function,
-            // NativeLibraryImporter,
-            // Dictionary,
-            // Class,
-            // NativeObject,
-            // ClassInstance,
-            // Long,
 
             switch(ident.Text.ToLower()) {
                 case "string":
@@ -68,11 +54,6 @@
         }
 
         public override NodeType Type => NodeType.Cast;
-
-        public override SValue Evaluate(Scope scope)
-        {
-            return node.Evaluate(scope).CastToBuiltin(type);
-        }
 
         public override IEnumerable<SyntaxNode> GetChildren()
         {

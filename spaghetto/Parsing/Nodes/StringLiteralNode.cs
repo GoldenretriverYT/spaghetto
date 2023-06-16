@@ -2,7 +2,7 @@
 {
     internal class StringLiteralNode : SyntaxNode
     {
-        private SyntaxToken syntaxToken;
+        public SyntaxToken syntaxToken;
 
         public StringLiteralNode(SyntaxToken syntaxToken) : base(syntaxToken.Position, syntaxToken.EndPosition)
         {
@@ -10,11 +10,6 @@
         }
 
         public override NodeType Type => NodeType.StringLiteral;
-
-        public override SValue Evaluate(Scope scope)
-        {
-            return new SString((string)syntaxToken.Value);
-        }
 
         public override IEnumerable<SyntaxNode> GetChildren()
         {

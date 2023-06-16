@@ -32,7 +32,7 @@ namespace spaghetto
                 funcScope.Set(ExpectedArgs[i], args[i]);
             }
 
-            Callback.Evaluate(funcScope);
+            GoofyAhhEvaluator.Evaluate(funcScope, Callback);
             scope.SetState(ScopeState.None);
 
             return funcScope.ReturnValue;

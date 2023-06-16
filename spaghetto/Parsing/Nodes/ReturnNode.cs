@@ -15,19 +15,6 @@
 
         public override NodeType Type => NodeType.Return;
 
-        public override SValue Evaluate(Scope scope)
-        {
-            if (ReturnValueNode != null)
-            {
-                var v = ReturnValueNode.Evaluate(scope);
-                scope.SetReturnValue(v);
-            }
-
-            scope.SetState(ScopeState.ShouldReturn);
-
-            return SValue.Null;
-        }
-
         public override IEnumerable<SyntaxNode> GetChildren()
         {
             if (ReturnValueNode == null) yield break;

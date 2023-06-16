@@ -2,7 +2,7 @@
 {
     internal class NativeImportNode : SyntaxNode
     {
-        private SyntaxToken ident;
+        public SyntaxToken ident;
 
         public NativeImportNode(SyntaxToken ident) : base(ident.Position, ident.EndPosition)
         {
@@ -10,32 +10,6 @@
         }
 
         public override NodeType Type => NodeType.NativeImport;
-
-        public override SValue Evaluate(Scope scope)
-        {
-            if(ident.Text == "all") {
-                var rootScope = scope.GetRoot();
-
-                foreach(var kvp in rootScope.Table.ToList()) {
-                    if(kvp.Key.StartsWith("nlimporter$$")) {
-                        if (kvp.Value is not SNativeLibraryImporter importerFromAllLoop) throw new Exception("Found unexpexted type in root tables nlimporters!");
-                        importerFromAllLoop.Import(scope);
-                    }
-                }
-
-                return SValue.Null;
-            }
-
-            var val = scope.Get("nlimporter$$" + ident.Text);
-
-            if (val == null || val is not SNativeLibraryImporter importer)
-            {
-                throw new Exception("Native library " + ident.Text + " not found!");
-            }
-
-            importer.Import(scope);
-            return SValue.Null;
-        }
 
         public override IEnumerable<SyntaxNode> GetChildren()
         {
