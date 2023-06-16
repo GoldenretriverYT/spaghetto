@@ -24,7 +24,7 @@
 
             foreach (var node in Nodes)
             {
-                var res = node.Evaluate(blockScope);
+                var res = node.EvaluateWithErrorCheck(blockScope);
 
                 if (!res.IsNull())
                 {

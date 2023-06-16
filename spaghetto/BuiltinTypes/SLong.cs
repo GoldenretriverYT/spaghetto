@@ -17,28 +17,28 @@
         }
 
         public override SValue Add(SValue other) {
-            if (other is not SLong otherLong) throw new Exception("Can not perform Add on SLong and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
+            if (other is not SLong otherLong) return Scope.Error("Can not perform Add on SLong and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
 
             return new SLong(Value + otherLong.Value);
         }
 
         public override SValue Sub(SValue other) {
-            if (other is not SLong otherLong) throw new Exception("Can not perform Sub on SLong and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
+            if (other is not SLong otherLong) return Scope.Error("Can not perform Sub on SLong and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
             return new SLong(Value - otherLong.Value);
         }
 
         public override SValue Mul(SValue other) {
-            if (other is not SLong otherLong) throw new Exception("Can not perform Mul SLong and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
+            if (other is not SLong otherLong) return Scope.Error("Can not perform Mul SLong and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
             return new SLong(Value * otherLong.Value);
         }
 
         public override SValue Div(SValue other) {
-            if (other is not SLong otherLong) throw new Exception("Can not perform Div SLong and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
+            if (other is not SLong otherLong) return Scope.Error("Can not perform Div SLong and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
             return new SLong(Value / otherLong.Value);
         }
 
         public override SValue Mod(SValue other) {
-            if (other is not SLong otherLong) throw new Exception("Can not perform Mod SLong and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
+            if (other is not SLong otherLong) return Scope.Error("Can not perform Mod SLong and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
             return new SLong(Value % otherLong.Value);
         }
 
@@ -79,7 +79,7 @@
                     return new SLong(Value);
                 case SBuiltinType.Float:
                     return new SFloat(Value);
-                default: throw CastInvalid("native " + other.ToString());
+                default: return CastInvalid("native " + other.ToString());
             }
         }
 

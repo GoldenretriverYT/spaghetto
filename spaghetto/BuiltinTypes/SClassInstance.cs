@@ -1,4 +1,5 @@
 ﻿using spaghetto.BuiltinTypes;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace spaghetto {
     public class SClassInstance : SValue {
@@ -21,7 +22,7 @@ namespace spaghetto {
         public void CallConstructor(Scope scope, List<SValue> args) {
             var ctor = Dot(new SString("$$ctor"));
 
-            if (ctor.IsNull()) throw new Exception("Class " + Class.Name + " does not have a constructor and can therefore not be instantiated.");
+            if (ctor.IsNull()) Scope.Error("Class " + Class.Name + " does not have a constructor and can therefore not be instantiated.");
 
             var newArgs = new List<SValue> { this };
             newArgs.AddRange(args);
@@ -45,7 +46,11 @@ namespace spaghetto {
                 //  SUBTODO: If this is done, dont forget to reset Scope.State!
                 var ret = toStringFunc.Call(new Scope(0), new() { this });
 
-                if (ret is not SString str) throw new Exception("A classes toString function must return a string!");
+                if (ret is not SString str) {
+                    Scope.Error("A classes toString function must return a string!");
+                    return new SString();
+                }
+
                 return str;
             }
         }
@@ -55,22 +60,22 @@ namespace spaghetto {
         }
 
         public override SValue Dot(SValue other) {
-            if (other is not SString key) throw NotSupportedBetween(other, "Dot");
+            if (other is not SString key) return NotSupportedBetween(other, "Dot");
 
             var val = GetValue(key.Value);
-            if (Class.FixedProps && val.IsNull()) throw new Exception($"Property {other.ToSpagString().Value} not found!");
+            if (Class.FixedProps && val.IsNull()) return Scope.Error($"Property {other.ToSpagString().Value} not found!");
              
             return val;
         }
 
 
         public override SValue DotAssignment(SValue key, SValue other) {
-            if (key is not SString keyVal) throw NotSupportedBetween(key, "DotAssignment");
+            if (key is not SString keyVal) return NotSupportedBetween(key, "DotAssignment");
 
             // todo: get rid of the code duplication
             foreach (var kvp in Class.StaticTable) {
                 if (kvp.key == keyVal.Value) {
-                    if (kvp.val.IsConstant) throw new Exception($"Tried to overwrite constant value {kvp.key}!");
+                    if (kvp.val.IsConstant) return Scope.Error($"Tried to overwrite constant value {kvp.key}!");
 
                     InstanceTable.Remove(kvp);
                     InstanceTable.Add((keyVal.Value, other));
@@ -80,7 +85,7 @@ namespace spaghetto {
 
             foreach (var kvp in InstanceTable) {
                 if (kvp.key == keyVal.Value) {
-                    if (kvp.val.IsConstant) throw new Exception($"Tried to overwrite constant value {kvp.key}!");
+                    if (kvp.val.IsConstant) return Scope.Error($"Tried to overwrite constant value {kvp.key}!");
 
                     InstanceTable.Remove(kvp);
                     InstanceTable.Add((keyVal.Value, other));
@@ -88,7 +93,7 @@ namespace spaghetto {
                 }
             }
 
-            if (Class.FixedProps) throw new Exception($"Property {key.ToSpagString().Value} not found!");
+            if (Class.FixedProps) return Scope.Error($"Property {key.ToSpagString().Value} not found!");
             InstanceTable.Add((keyVal.Value, other));
             return other;
         }

@@ -19,7 +19,7 @@
         {
             if (ReturnValueNode != null)
             {
-                var v = ReturnValueNode.Evaluate(scope);
+                var v = ReturnValueNode.EvaluateWithErrorCheck(scope);
                 scope.SetReturnValue(v);
             }
 

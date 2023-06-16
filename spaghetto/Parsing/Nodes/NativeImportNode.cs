@@ -18,7 +18,7 @@
 
                 foreach(var kvp in rootScope.Table.ToList()) {
                     if(kvp.Key.StartsWith("nlimporter$$")) {
-                        if (kvp.Value is not SNativeLibraryImporter importerFromAllLoop) throw new Exception("Found unexpexted type in root tables nlimporters!");
+                        if (kvp.Value is not SNativeLibraryImporter importerFromAllLoop) return Scope.Error("Found unexpexted type in root tables nlimporters!");
                         importerFromAllLoop.Import(scope);
                     }
                 }
@@ -30,7 +30,7 @@
 
             if (val == null || val is not SNativeLibraryImporter importer)
             {
-                throw new Exception("Native library " + ident.Text + " not found!");
+                return Scope.Error("Native library " + ident.Text + " not found!");
             }
 
             importer.Import(scope);

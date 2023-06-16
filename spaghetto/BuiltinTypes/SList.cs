@@ -1,4 +1,6 @@
-﻿namespace spaghetto {
+﻿using static System.Formats.Asn1.AsnWriter;
+
+namespace spaghetto {
     public class SList : SValue {
         public List<SValue> Value { get; set; } = new();
         public override SBuiltinType BuiltinName => SBuiltinType.List;
@@ -14,9 +16,9 @@
         }
 
         public override SValue Idx(SValue other) {
-            if (other is not SInt otherInt) throw new Exception("Can only index SList with integers, got " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
+            if (other is not SInt otherInt) return Scope.Error("Can only index SList with integers, got " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
 
-            if (otherInt.Value < 0 || otherInt.Value > Value.Count - 1) throw new Exception("Out of bounds access. SList had " + Value.Count + " elements, but index " + otherInt.Value + " was accessed");
+            if (otherInt.Value < 0 || otherInt.Value > Value.Count - 1) return Scope.Error("Out of bounds access. SList had " + Value.Count + " elements, but index " + otherInt.Value + " was accessed");
             return Value[otherInt.Value];
         }
 
@@ -26,9 +28,9 @@
         }
 
         public override SValue Sub(SValue other) {
-            if (other is not SInt otherInt) throw new Exception("Can only index SList with integers, got " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
+            if (other is not SInt otherInt) return Scope.Error("Can only index SList with integers, got " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
 
-            if (otherInt.Value < 0 || otherInt.Value > Value.Count - 1) throw new Exception("Out of bounds access. SList had " + Value.Count + " elements, but index " + otherInt.Value + " was accessed");
+            if (otherInt.Value < 0 || otherInt.Value > Value.Count - 1) return Scope.Error("Out of bounds access. SList had " + Value.Count + " elements, but index " + otherInt.Value + " was accessed");
             Value.RemoveAt(otherInt.Value);
 
             return this;

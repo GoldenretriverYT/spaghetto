@@ -18,13 +18,13 @@ namespace spaghetto.Parsing.Nodes
         public override SValue Evaluate(Scope scope)
         {
             var @class = scope.Get(ident.Text);
-            if (@class == null || @class is not SClass sclass) throw new Exception("Class " + ident.Text + " not found!");
+            if (@class == null || @class is not SClass sclass) return Scope.Error("Class " + ident.Text + " not found!");
 
 
             var instance = new SClassInstance(sclass);
 
             List<SValue> args = new() { instance };
-            foreach (var n in argumentNodes) args.Add(n.Evaluate(scope));
+            foreach (var n in argumentNodes) args.Add(n.EvaluateWithErrorCheck(scope));
 
             instance.CallConstructor(scope, args);
 

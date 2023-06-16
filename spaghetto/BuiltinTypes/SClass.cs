@@ -24,7 +24,7 @@
         }
 
         public override SValue Dot(SValue other) {
-            if (other is not SString key) throw NotSupportedBetween(other, "Dot");
+            if (other is not SString key) return NotSupportedBetween(other, "Dot");
 
             foreach(var kvp in StaticTable) {
                 if (kvp.key == key.Value) return kvp.val;

@@ -1,4 +1,6 @@
-﻿namespace spaghetto.Parsing.Nodes
+﻿using static System.Formats.Asn1.AsnWriter;
+
+namespace spaghetto.Parsing.Nodes
 {
     internal class CastNode : SyntaxNode
     {
@@ -71,7 +73,7 @@
 
         public override SValue Evaluate(Scope scope)
         {
-            return node.Evaluate(scope).CastToBuiltin(type);
+            return node.EvaluateWithErrorCheck(scope).CastToBuiltin(type);
         }
 
         public override IEnumerable<SyntaxNode> GetChildren()

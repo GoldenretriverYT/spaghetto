@@ -1,4 +1,6 @@
-﻿namespace spaghetto
+﻿using static System.Formats.Asn1.AsnWriter;
+
+namespace spaghetto
 {
     public class Scope
     {
@@ -8,6 +10,9 @@
 
         public ScopeState State { get; private set; } = ScopeState.None;
         public SValue ReturnValue { get; set; } = SValue.Null;
+
+        public static bool HasErrored = false;
+        public static string ErrorMessage = "";
 
         public int CreatedPosition { get; private set; }
 
@@ -49,7 +54,7 @@
 
         public void Set(string key, SValue value)
         {
-            if (Table.ContainsKey(key)) throw new Exception(
+            if (Table.ContainsKey(key)) Error(
                 "INTERNAL: Scope.Set can not be used to overwrite values");
             Table[key] = value;
         }
@@ -62,14 +67,14 @@
                 }
                     
 
-                if (origVal.IsConstant) throw new InvalidOperationException("Tried to assign to constant variable.");
+                if (origVal.IsConstant) return new InvalidOperationException("Tried to assign to constant variable.");
 
                 origVal.CopyMeta(ref value);
                 Table[key] = value;
                 return null;
             }
 
-            if (ParentScope == null) throw new Exception("Could not update field " + key + ": Not found");
+            if (ParentScope == null) return new Exception("Could not update field " + key + ": Not found");
             return ParentScope.Update(key, value);
         }
 
@@ -98,6 +103,13 @@
         public void SetReturnValue(SValue val) {
             ReturnValue = val;
             ParentScope?.SetReturnValue(val);
+        }
+
+        public static SValue Error(string msg) {
+            HasErrored = true;
+            ErrorMessage = msg;
+
+            return SValue.Null;
         }
 
         /*public string GetScopeStrace() {

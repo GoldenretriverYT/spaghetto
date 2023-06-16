@@ -17,7 +17,7 @@
 
             foreach (var n in list)
             {
-                sList.Value.Add(n.Evaluate(scope));
+                sList.Value.Add(n.EvaluateWithErrorCheck(scope));
             }
 
             return sList;

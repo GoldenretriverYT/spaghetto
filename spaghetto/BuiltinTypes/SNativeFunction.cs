@@ -23,7 +23,7 @@ namespace spaghetto {
         /// <param name="args"></param>
         /// <returns></returns>
         public override SValue Call(Scope scope, List<SValue> args) {
-            if (args.Count != ExpectedArgs.Count) throw new Exception("Expected " + ExpectedArgs.Count + " arguments. (" + string.Join(", ", ExpectedArgs) + ")");
+            if (args.Count != ExpectedArgs.Count) Scope.Error("Expected " + ExpectedArgs.Count + " arguments. (" + string.Join(", ", ExpectedArgs) + ")");
 
             return Impl(scope, args);
         }

@@ -27,12 +27,12 @@
         {
             if (scope.Get(ident.Value.ToString()) != null)
             {
-                throw new InvalidOperationException("Can not initiliaze the same variable twice!");
+                return Scope.Error("Can not initiliaze the same variable twice!");
             }
 
             if (expr != null)
             {
-                var val = expr.Evaluate(scope);
+                var val = expr.EvaluateWithErrorCheck(scope);
                 val.TypeIsFixed = isFixedType;
                 val.IsConstant = isConst;
 
@@ -41,7 +41,7 @@
             }
             else
             {
-                if (isFixedType) throw new InvalidOperationException("Tried to initiliaze a fixed type variable with no value; this is not permitted. Use var% instead.");
+                if (isFixedType) return Scope.Error("Tried to initiliaze a fixed type variable with no value; this is not permitted. Use var% instead.");
                 var nul = new SNull();
                 nul.TypeIsFixed = isFixedType;
                 nul.IsConstant = isConst;

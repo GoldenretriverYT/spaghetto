@@ -20,7 +20,7 @@
             var dict = new SDictionary();
             
             foreach(var ent in this.dict) {
-                dict.Value.Add((new SString(ent.tok.Text), ent.expr.Evaluate(scope)));
+                dict.Value.Add((new SString(ent.tok.Text), ent.expr.EvaluateWithErrorCheck(scope)));
             }
 
             return dict;

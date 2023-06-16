@@ -17,8 +17,10 @@
 
         public override SValue Evaluate(Scope scope)
         {
-            var leftRes = left.Evaluate(scope);
-            var rightRes = right.Evaluate(scope);
+            var leftRes = left.EvaluateWithErrorCheck(scope);
+            if (leftRes == SValue.Error) return leftRes;
+            var rightRes = right.EvaluateWithErrorCheck(scope);
+            if (rightRes == SValue.Error) return leftRes;
 
             switch (operatorToken.Type)
             {
@@ -51,7 +53,7 @@
                 case SyntaxType.OrOr:
                     return new SInt((leftRes.IsTruthy() || rightRes.IsTruthy()) ? 1 : 0);
                 default:
-                    throw new NotImplementedException($"Operator {operatorToken.Type} does not have an implementation for binary expressions.");
+                    return Scope.Error($"Operator {operatorToken.Type} does not have an implementation for binary expressions.");
             }
         }
 

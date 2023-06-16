@@ -718,21 +718,22 @@ namespace spaghetto.Parsing {
         public override NodeType Type => NodeType.Repeat;
 
         public override SValue Evaluate(Scope scope) {
-            var timesRaw = timesExpr.Evaluate(scope);
-            if (timesRaw is not SInt timesSInt) throw new Exception("Repeat x times expression must evaluate to SInt");
+            var timesRaw = timesExpr.EvaluateWithErrorCheck(scope);
+            if(timesRaw == SValue.Error) return SValue.Error;
+            if (timesRaw is not SInt timesSInt) return Scope.Error("Repeat x times expression must evaluate to SInt");
             var times = timesSInt.Value;
 
             if (keepScope) {
-                if (block is not BlockNode blockNode) throw new Exception("Kept-scope repeat expressions must have a full body.");
+                if (block is not BlockNode blockNode) return Scope.Error("Kept-scope repeat expressions must have a full body.");
 
                 for (int i = 0; i < times; i++) {
                     foreach(var n in blockNode.Nodes) {
-                        n.Evaluate(scope);
+                        if(n.EvaluateWithErrorCheck(scope) == SValue.Error) return SValue.Error;
                     }
                 }
             } else {
                 for (int i = 0; i < times; i++) {
-                    block.Evaluate(scope);
+                    if(block.EvaluateWithErrorCheck(scope) == SValue.Error) return SValue.Error;
                 }
             }
 

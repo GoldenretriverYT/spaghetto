@@ -20,10 +20,11 @@
         {
             if (scope.Get(Ident.Value.ToString()) == null)
             {
-                throw new InvalidOperationException("Can not assign to a non-existant identifier");
+                return Scope.Error("Can not assign to a non-existant identifier");
             }
 
-            var val = Expr.Evaluate(scope);
+            var val = Expr.EvaluateWithErrorCheck(scope);
+            if (val == SValue.Error) return SValue.Error;
             var key = Ident.Value.ToString();
 
             if (!scope.Update(key, val, out Exception ex)) throw ex;

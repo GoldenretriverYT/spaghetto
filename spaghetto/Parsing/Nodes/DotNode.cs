@@ -18,7 +18,7 @@ namespace spaghetto.Parsing.Nodes
 
         public override SValue Evaluate(Scope scope)
         {
-            var currentValue = CallNode.Evaluate(scope);
+            var currentValue = CallNode.EvaluateWithErrorCheck(scope);
 
             foreach (var node in NextNodes)
             {
@@ -28,7 +28,7 @@ namespace spaghetto.Parsing.Nodes
                     currentValue = currentValue.Dot(new SString(ident.Text));
                 }else if(node is AssignVariableNode avn) {
                     var ident = avn.Ident;
-                    return currentValue.DotAssignment(new SString(ident.Text), avn.Expr.Evaluate(scope));
+                    return currentValue.DotAssignment(new SString(ident.Text), avn.Expr.EvaluateWithErrorCheck(scope));
                 }
                 else if (node is CallNode cn)
                 {
@@ -47,12 +47,12 @@ namespace spaghetto.Parsing.Nodes
                     }
                     else
                     {
-                        throw new Exception("Tried to call a non identifier in dot node stack.");
+                        return Scope.Error("Tried to call a non identifier in dot node stack.");
                     }
                 }
                 else
                 {
-                    throw new Exception("Unexpected node in dot node stack!");
+                    return Scope.Error("Unexpected node in dot node stack!");
                 }
             }
 

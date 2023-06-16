@@ -1,4 +1,6 @@
-﻿namespace spaghetto {
+﻿using static System.Formats.Asn1.AsnWriter;
+
+namespace spaghetto {
     public class SFloat : SValue {
         public override SBuiltinType BuiltinName => SBuiltinType.Float;
         public float Value { get; set; }
@@ -12,32 +14,32 @@
         }
 
         public override SValue Add(SValue other) {
-            if (other is not SFloat otherInt) throw new Exception("Can not perform Add on SFloat and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
+            if (other is not SFloat otherInt) return Scope.Error("Can not perform Add on SFloat and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
             return new SFloat(Value + otherInt.Value);
         }
 
         public override SValue Sub(SValue other) {
-            if (other is not SFloat otherInt) throw new Exception("Can not perform Sub on SFloat and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
+            if (other is not SFloat otherInt) return Scope.Error("Can not perform Sub on SFloat and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
             return new SFloat(Value - otherInt.Value);
         }
 
         public override SValue Mul(SValue other) {
-            if (other is not SFloat otherInt) throw new Exception("Can not perform Mul on SFloat and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
+            if (other is not SFloat otherInt) return Scope.Error("Can not perform Mul on SFloat and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
             return new SFloat(Value * otherInt.Value);
         }
 
         public override SValue Div(SValue other) {
-            if (other is not SFloat otherInt) throw new Exception("Can not perform Div on SFloat and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
+            if (other is not SFloat otherInt) return Scope.Error("Can not perform Div on SFloat and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
             return new SFloat(Value / otherInt.Value);
         }
 
         public override SValue Mod(SValue other) {
-            if (other is not SFloat otherInt) throw new Exception("Can not perform Mod on SFloat and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
+            if (other is not SFloat otherInt) return Scope.Error("Can not perform Mod on SFloat and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
             return new SFloat(Value % otherInt.Value);
         }
 
         public override SValue Equals(SValue other) {
-            if (other is not SFloat otherInt) throw new Exception("Can not perform EqualsCheck on SFloat and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
+            if (other is not SFloat otherInt) return Scope.Error("Can not perform EqualsCheck on SFloat and " + SBuiltinTypeHelper.ToStr(other.BuiltinName));
             return new SInt(Value == otherInt.Value ? 1 : 0);
         }
 
@@ -53,7 +55,7 @@
                     return new SLong((long)Value);
                 case SBuiltinType.Float:
                     return new SFloat(Value);
-                default: throw CastInvalid("native " + other.ToString());
+                default: return CastInvalid("native " + other.ToString());
             }
         }
 

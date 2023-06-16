@@ -25,7 +25,7 @@
 
         public override SValue Dot(SValue other)
         {
-            if (other is not SString ident) throw NotSupportedBetween(other, "Dot");
+            if (other is not SString ident) return NotSupportedBetween(other, "Dot");
 
             var field = Value.GetType().GetField(ident.Value);
             if (field == null) return SNull.Null;

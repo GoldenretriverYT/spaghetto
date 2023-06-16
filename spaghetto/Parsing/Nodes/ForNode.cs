@@ -21,18 +21,18 @@
         {
             Scope forScope = new(scope, StartPosition);
             SValue lastVal = SValue.Null;
-            initialExpressionNode.Evaluate(forScope);
+            initialExpressionNode.EvaluateWithErrorCheck(forScope);
 
             while (true)
             {
-                if (!condNode.Evaluate(forScope).IsTruthy()) break;
-                var forBlockRes = block.Evaluate(forScope);
+                if (!condNode.EvaluateWithErrorCheck(forScope).IsTruthy()) break;
+                var forBlockRes = block.EvaluateWithErrorCheck(forScope);
                 if (!forBlockRes.IsNull()) lastVal = forBlockRes;
 
                 if (forScope.State == ScopeState.ShouldBreak) break;
                 if (forScope.State != ScopeState.None) forScope.SetState(ScopeState.None);
 
-                stepNode.Evaluate(forScope);
+                stepNode.EvaluateWithErrorCheck(forScope);
             }
 
             return lastVal;

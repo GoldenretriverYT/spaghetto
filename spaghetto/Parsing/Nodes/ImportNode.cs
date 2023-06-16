@@ -13,7 +13,7 @@
 
         public override SValue Evaluate(Scope scope)
         {
-            if (!File.Exists(path.Text)) throw new Exception($"Failed to import '{path.Text}': File not found");
+            if (!File.Exists(path.Text)) return Scope.Error($"Failed to import '{path.Text}': File not found");
             var text = File.ReadAllText(path.Text);
 
             Interpreter ip = new();
@@ -38,14 +38,14 @@
 
                 foreach (var kvp in ip.GlobalScope.ExportTable)
                 {
-                    if (scope.Get(kvp.Key) != null) throw new Exception($"Failed to import '{path.Text}': Import conflict; file exports '{kvp.Key}' but that identifier is already present in the current scope.");
+                    if (scope.Get(kvp.Key) != null) return Scope.Error($"Failed to import '{path.Text}': Import conflict; file exports '{kvp.Key}' but that identifier is already present in the current scope.");
 
                     scope.Set(kvp.Key, kvp.Value);
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception($"Failed to import '{path.Text}': {ex.Message}");
+                return Scope.Error($"Failed to import '{path.Text}': {ex.Message}");
             }
 
             return res.LastValue;

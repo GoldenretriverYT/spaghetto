@@ -17,7 +17,7 @@ namespace spaghetto.Parsing.Nodes
 
         public override SValue Evaluate(Scope scope)
         {
-            var toCall = ToCallNode.Evaluate(scope) ?? SValue.Null;
+            var toCall = ToCallNode.EvaluateWithErrorCheck(scope) ?? SValue.Null;
             var args = EvaluateArgs(scope);
             return toCall.Call(scope, args) ?? SValue.Null;
         }
@@ -26,7 +26,7 @@ namespace spaghetto.Parsing.Nodes
         {
             var args = new List<SValue>();
 
-            foreach (var n in argumentNodes) args.Add(n.Evaluate(scope));
+            foreach (var n in argumentNodes) args.Add(n.EvaluateWithErrorCheck(scope));
             return args;
         }
 

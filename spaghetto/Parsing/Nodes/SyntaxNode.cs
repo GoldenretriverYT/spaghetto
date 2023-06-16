@@ -8,6 +8,14 @@
         public abstract NodeType Type { get; }
 
         public abstract SValue Evaluate(Scope scope);
+        public SValue EvaluateWithErrorCheck(Scope scope) {
+            if(Scope.HasErrored) {
+                return SValue.Error;
+            }
+
+            return Evaluate(scope);
+        }
+
         public abstract IEnumerable<SyntaxNode> GetChildren();
 
         public SyntaxNode(int startPos, int endPos) {

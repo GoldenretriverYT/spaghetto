@@ -26,8 +26,8 @@ namespace spaghetto.Parsing.Nodes
             foreach (var bodyNode in body)
             {
                 if (bodyNode is ClassFunctionDefinitionNode cfdn) {
-                    var funcRaw = cfdn.Evaluate(scope);
-                    if (funcRaw is not SFunction func) throw new Exception("Expected ClassFunctionDefinitionNode to return SFunction");
+                    var funcRaw = cfdn.EvaluateWithErrorCheck(scope);
+                    if (funcRaw is not SFunction func) return Scope.Error("Expected ClassFunctionDefinitionNode to return SFunction");
 
                     if (func.IsClassInstanceMethod) {
                         if (func.ExpectedArgs.IndexOf("self") == -1) func.ExpectedArgs.Insert(0, "self");
@@ -37,7 +37,7 @@ namespace spaghetto.Parsing.Nodes
                         @class.StaticTable.Add((func.FunctionName, func));
                     }
                 } else if (bodyNode is ClassPropDefinitionNode cpdn) {
-                    var val = cpdn.Expression.Evaluate(scope);
+                    var val = cpdn.Expression.EvaluateWithErrorCheck(scope);
 
                     if(!cpdn.IsStatic) {
                         @class.InstanceBaseTable.Add((cpdn.Name.Text, val));
@@ -45,7 +45,7 @@ namespace spaghetto.Parsing.Nodes
                         @class.StaticTable.Add((cpdn.Name.Text, val));
                     }
                 } else {
-                    throw new Exception("Unexpected node in class definition");
+                    return Scope.Error("Unexpected node in class definition");
                 }
             }
 

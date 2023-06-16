@@ -14,6 +14,7 @@
         NativeObject,
         ClassInstance,
         Long,
+        Error,
     }
 
     public class SBuiltinTypeHelper {

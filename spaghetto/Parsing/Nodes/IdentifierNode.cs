@@ -20,7 +20,7 @@
 
         public override SValue Evaluate(Scope scope)
         {
-            return scope.Get(Token.Text) ?? (NonNull ? throw new Exception("Non-null identifier " + Token.Text + " resolved to null!") : SValue.Null);
+            return scope.Get(Token.Text) ?? (NonNull ? Scope.Error("Non-null identifier " + Token.Text + " resolved to null!") : SValue.Null);
         }
 
         public override IEnumerable<SyntaxNode> GetChildren()

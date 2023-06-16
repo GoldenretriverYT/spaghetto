@@ -12,11 +12,11 @@
         {
             foreach ((SyntaxNode cond, SyntaxNode block) in Conditions)
             {
-                var condRes = cond.Evaluate(scope);
+                var condRes = cond.EvaluateWithErrorCheck(scope);
 
                 if (condRes.IsTruthy())
                 {
-                    return block.Evaluate(new Scope(scope, StartPosition));
+                    return block.EvaluateWithErrorCheck(new Scope(scope, StartPosition));
                 }
             }
 

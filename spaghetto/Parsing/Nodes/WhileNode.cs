@@ -20,8 +20,8 @@
 
             while (true)
             {
-                if (!condNode.Evaluate(whileScope).IsTruthy()) break;
-                var whileBlockRes = block.Evaluate(whileScope);
+                if (!condNode.EvaluateWithErrorCheck(whileScope).IsTruthy()) break;
+                var whileBlockRes = block.EvaluateWithErrorCheck(whileScope);
                 if (!whileBlockRes.IsNull()) lastVal = whileBlockRes;
 
                 if (whileScope.State == ScopeState.ShouldBreak) break;

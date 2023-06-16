@@ -14,7 +14,7 @@
         public override SValue Evaluate(Scope scope)
         {
             var val = scope.Get(ident.Text);
-            if (val == null) throw new Exception("Can not export value of non-existent identifier");
+            if (val == null) return Scope.Error("Can not export value of non-existent identifier");
 
             scope.GetRoot().ExportTable.Add(ident.Text, val);
             return val;

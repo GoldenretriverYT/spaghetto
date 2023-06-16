@@ -17,9 +17,9 @@
         {
             switch (token.Type)
             {
-                case SyntaxType.Bang: return rhs.Evaluate(scope).Not();
-                case SyntaxType.Minus: return rhs.Evaluate(scope).ArithNot();
-                case SyntaxType.Plus: return rhs.Evaluate(scope);
+                case SyntaxType.Bang: return rhs.EvaluateWithErrorCheck(scope).Not();
+                case SyntaxType.Minus: return rhs.EvaluateWithErrorCheck(scope).ArithNot();
+                case SyntaxType.Plus: return rhs.EvaluateWithErrorCheck(scope);
                 default: throw new InvalidOperationException();
             }
         }
