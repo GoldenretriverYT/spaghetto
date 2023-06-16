@@ -27,12 +27,7 @@ namespace spaghetto
 
             Parser p = new(res.LexedTokens, text);
             res.AST = p.Parse();
-
-            try {
-                res.LastValue = GoofyAhhEvaluator.Evaluate(GlobalScope, res.AST);
-            } catch {
-                throw;
-            }
+            res.LastValue = GoofyAhhEvaluator.Evaluate(GlobalScope, res.AST);
         }
 
         public void Interpret(string text, ref TimingInterpreterResult res) {
@@ -57,6 +52,7 @@ namespace spaghetto
 
     public class GoofyAhhEvaluator {
         public static SValue Evaluate(Scope scope, SyntaxNode node) {
+            Console.WriteLine("evaluating lol!");
             switch (node.Type) {
                 case NodeType.AssignVariable:
                     return EvaluateAssignVariableNode(scope, node as AssignVariableNode);
