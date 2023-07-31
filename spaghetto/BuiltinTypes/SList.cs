@@ -18,7 +18,7 @@
         }
 
         public override string ToString() {
-            return $"<SString Value={string.Join(", ", Value)}>";
+            return $"<SList Value={string.Join(", ", Value)}>";
         }
 
         public override SValue Idx(SValue other) {

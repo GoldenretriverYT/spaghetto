@@ -26,7 +26,7 @@
             {
                 var res = node.Evaluate(blockScope);
 
-                if (!res.IsNull())
+                if (res != null && !res.IsNull())
                 {
                     lastVal = res;
                 }

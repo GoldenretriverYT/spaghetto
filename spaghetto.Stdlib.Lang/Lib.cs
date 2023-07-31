@@ -1,4 +1,8 @@
-﻿using spaghetto.Stdlib.IO;
+﻿using spaghetto.Helpers;
+using spaghetto.Stdlib.IO;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System.Xml.Schema;
 
 namespace spaghetto.Stdlib.Lang {
     /// <summary>
@@ -37,6 +41,21 @@ namespace spaghetto.Stdlib.Lang {
                     return new SLong(DateTimeOffset.UtcNow.ToUnixTimeMilliseconds());
                 },
                 expectedArgs: new() { }
+            ));
+
+            scope.Set("unsafe__scopedelete", new SNativeFunction(
+                impl: (Scope callingScope, List<SValue> args) => {
+                    WarnHelpers.PrintOnce("Warning: Using unsafe function 'unsafe__scopedeleted' is not recommended unless you know what you are doing. Usage can produce unexpected behaviour.");
+                    if (args[0] is not SString ident) throw new Exception("Expected argument 0 to be of type string");
+
+                    if(callingScope.Get(ident.Value) != null) {
+                        callingScope.Table.Remove(ident.Value);
+                        return SInt.One;
+                    }
+
+                    return SInt.Zero;
+                },
+                expectedArgs: new() { "identifierName" }
             ));
 
             scope.Set("eval", new SNativeFunction(

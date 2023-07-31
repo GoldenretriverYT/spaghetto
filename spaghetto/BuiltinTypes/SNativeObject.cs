@@ -37,4 +37,33 @@
             return new SString("<native object>");
         }
     }
+
+    /// <summary>
+    /// A wrapper class for native C# pointers
+    /// </summary>
+    public unsafe class SNativePointer : SValue {
+        public override SBuiltinType BuiltinName => SBuiltinType.NativePointer;
+        public void* Value { get; set; }
+
+        public SNativePointer() {
+            Value = null;
+        }
+
+        public SNativePointer(void* value) {
+            Value = value;
+        }
+
+        public override bool IsTruthy() {
+            return Value != null;
+        }
+
+        public override string ToString() {
+            if (Value == null) return "<NativePointer value=nullptr>";
+            return $"<NativePointer value={new IntPtr(Value).ToString("X16")}>";
+        }
+
+        public override SString ToSpagString() {
+            return new SString("<native object>");
+        }
+    }
 }
