@@ -18,9 +18,9 @@ namespace spaghetto
 
             // If the scope is the global scope, we need to clone it as otherwise we would have a reference to the global scope
             // and any changes to the scope would be reflected in the global scope
-            if (DefiningScope.ParentScope == null) {
-                DefiningScope = DefiningScope.Clone();
-            }
+            //if (DefiningScope.ParentScope == null) {
+            //    DefiningScope = DefiningScope.Clone();
+            //} // What, this makes no sense as the functions runs in another scope, so it doesn't matter if we change the global scope
         }
 
         public override SValue Call(Scope scope, List<SValue> args) {
