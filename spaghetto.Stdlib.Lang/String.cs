@@ -26,6 +26,17 @@
                 expectedArgs: new() { "string", "char" }
             )));
 
+            @class.StaticTable.Add(("replace", new SNativeFunction(
+                impl: (Scope scope, List<SValue> args) => {
+                    if (args[0] is not SString str) throw new Exception("Expected argument 0 to be a string");
+                    if (args[1] is not SString match) throw new Exception("Expected argument 1 to be a string");
+                    if (args[2] is not SString replacer) throw new Exception("Expected argument 2 to be a string");
+
+                    return new SString(str.Value.Replace(match.Value, replacer.Value));
+                },
+                expectedArgs: new() { "string", "match", "replacer" }
+            )));
+
             @class.StaticTable.Add(("length", new SNativeFunction(
                impl: (Scope scope, List<SValue> args) => {
                    if (args[0] is not SString str) throw new Exception("Expected argument 0 to be a string");
