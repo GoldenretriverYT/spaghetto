@@ -15,5 +15,6 @@
         ClassInstance,
         Long,
         NativePointer,
+        Object,
     }
 }

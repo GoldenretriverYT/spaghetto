@@ -106,7 +106,7 @@ namespace spaghetto {
 
         public virtual SString ToSpagString()
         {
-            return new SString("<unknown of type " + BuiltinName.ToString() + ">");
+            return new SString("<internaltype " + BuiltinName.ToString() + ">");
         }
 
         protected NotImplementedException NotSupportedBetween(SValue other, string type) {

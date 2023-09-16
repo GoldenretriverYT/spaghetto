@@ -123,13 +123,29 @@ namespace spaghetto.Parsing {
                 if (Current.Type == SyntaxType.Keyword && Current.Text == "native") {
                     Position++;
                     var ident = MatchToken(SyntaxType.Identifier);
-                    MatchTokenOptionally(SyntaxType.Semicolon, out _);
 
+                    if (Current.Type == SyntaxType.Keyword && Current.Text == "as") {
+                        Position++;
+                        var alias = MatchToken(SyntaxType.Identifier);
+                        MatchTokenOptionally(SyntaxType.Semicolon, out _);
+
+                        return new NativeImportNode(ident, alias);
+                    }
+
+                    MatchTokenOptionally(SyntaxType.Semicolon, out _);
                     return new NativeImportNode(ident);
                 } else {
                     var path = MatchToken(SyntaxType.String);
-                    MatchTokenOptionally(SyntaxType.Semicolon, out _);
 
+                    if (Current.Type == SyntaxType.Keyword && Current.Text == "as") {
+                        Position++;
+                        var alias = MatchToken(SyntaxType.Identifier);
+                        MatchTokenOptionally(SyntaxType.Semicolon, out _);
+
+                        return new ImportNode(path/*, alias*/);
+                    }
+
+                    MatchTokenOptionally(SyntaxType.Semicolon, out _);
                     return new ImportNode(path);
                 }
             } else if (Current.Type == SyntaxType.Keyword && Current.Text == "export") {

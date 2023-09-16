@@ -1,12 +1,16 @@
-﻿namespace spaghetto.Parsing.Nodes
+﻿using System.Diagnostics;
+
+namespace spaghetto.Parsing.Nodes
 {
     internal class NativeImportNode : SyntaxNode
     {
         private SyntaxToken ident;
+        private SyntaxToken? alias;
 
-        public NativeImportNode(SyntaxToken ident) : base(ident.Position, ident.EndPosition)
+        public NativeImportNode(SyntaxToken ident, SyntaxToken? alias = null) : base(ident.Position, ident.EndPosition)
         {
             this.ident = ident;
+            this.alias = alias;
         }
 
         public override NodeType Type => NodeType.NativeImport;
@@ -31,6 +35,24 @@
             if (val == null || val is not SNativeLibraryImporter importer)
             {
                 throw new Exception("Native library " + ident.Text + " not found!");
+            }
+
+            // To import with an alias, we first import it into a new empty scope,
+            // of which we then copy all elements into a new holder object that
+            // is then added to the scope.
+
+            if (alias.HasValue) {
+                var newScope = new Scope(0);
+                importer.Import(newScope);
+
+                var holder = new SObject();
+                foreach (var kvp in newScope.Table) {
+                    holder.Value[kvp.Key] = kvp.Value;
+                    holder.Value[kvp.Key].IsConstant = true;
+                }
+
+                scope.Set((string)alias.Value.Value, holder);
+                return SValue.Null;
             }
 
             importer.Import(scope);
