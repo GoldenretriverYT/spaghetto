@@ -139,10 +139,7 @@ namespace spaghetto.Parsing {
 
                     if (Current.Type == SyntaxType.Keyword && Current.Text == "as") {
                         Position++;
-                        var alias = MatchToken(SyntaxType.Identifier);
-                        MatchTokenOptionally(SyntaxType.Semicolon, out _);
-
-                        return new ImportNode(path/*, alias*/);
+                        throw MakeException("Import aliases are currently only supported for native imports");
                     }
 
                     MatchTokenOptionally(SyntaxType.Semicolon, out _);
