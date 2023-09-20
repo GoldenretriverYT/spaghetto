@@ -14,5 +14,9 @@
             StartPosition = startPos;
             EndPosition = endPos;
         }
+
+        public virtual string GenerateSource(int depth) {
+            throw new NotImplementedException(this.GetType().Name + " does not implement GenerateSource!");
+        }
     }
 }

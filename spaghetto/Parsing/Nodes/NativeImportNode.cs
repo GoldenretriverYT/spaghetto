@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using System.Text;
 
 namespace spaghetto.Parsing.Nodes
 {
@@ -62,6 +63,23 @@ namespace spaghetto.Parsing.Nodes
         public override IEnumerable<SyntaxNode> GetChildren()
         {
             yield return new TokenNode(ident);
+        }
+
+        override public string ToString() {
+            return "NativeImportNode:";
+        }
+
+        public override string GenerateSource(int depth) {
+            var sb = new StringBuilder("import native ");
+
+            sb.Append(ident.Text);
+
+            if(alias.HasValue) {
+                sb.Append(" as ");
+                sb.Append(alias.Value.Text);
+            }
+
+            return sb.Append(";").ToString();
         }
     }
 }

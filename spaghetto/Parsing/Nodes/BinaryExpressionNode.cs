@@ -1,4 +1,6 @@
-﻿namespace spaghetto.Parsing.Nodes
+﻿using System.Text;
+
+namespace spaghetto.Parsing.Nodes
 {
     internal class BinaryExpressionNode : SyntaxNode
     {
@@ -65,6 +67,24 @@
         public override string ToString()
         {
             return "BinaryExprNode: op=" + operatorToken.Type;
+        }
+
+        public override string GenerateSource(int depth) {
+            var sb = new StringBuilder();
+
+            string op = operatorToken.Text;
+
+            // if ++, --, etc. we still emit the 1 on the rhs, so remove the second sign
+
+            if (op == "++" || op == "--") {
+                op = op.Substring(0, 1);
+            }
+
+            sb.Append(left.GenerateSource(depth + 1));
+            sb.Append(op);
+            sb.Append(right.GenerateSource(depth + 1));
+
+            return sb.ToString();
         }
     }
 }

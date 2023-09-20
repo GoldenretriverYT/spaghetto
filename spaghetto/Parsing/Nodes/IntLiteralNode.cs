@@ -26,5 +26,9 @@
         {
             return "IntLitNode:";
         }
+
+        public override string GenerateSource(int depth) {
+            return intToken.Text;
+        }
     }
 }

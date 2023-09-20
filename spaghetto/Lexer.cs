@@ -218,14 +218,23 @@ namespace spaghetto {
             int startPos = Position;
 
             Position++;
+            
             while(!(Current == '"' && Peek(-1) != '\\') && Current != '\0') {
                 if (Current == '\\') {
+                    anotherEscapeChar:
                     Position++;
 
                     switch (Current) {
                         case '"': str += "\""; break;
                         case 'n': str += "\n"; break;
-                        case '\\': str += "\\"; break;
+                        case '\\': {
+                            str += "\\";
+                            Position++;
+                            if (Current == '"' || Current == '\0') goto done;
+                            if (Current == '\\') goto anotherEscapeChar;
+                            str += Current;
+                            break;
+                        }
                         case '0': str += "\0"; break;
                         default: throw new Exception("Invalid escape sequence");
                     }
@@ -236,6 +245,8 @@ namespace spaghetto {
                     Position++;
                 }
             }
+
+            done:
 
             Position++;
 

@@ -40,5 +40,9 @@
         {
             return "AssignVariableNode:";
         }
+
+        public override string GenerateSource(int depth) {
+            return Ident.Text + " = " + Expr.GenerateSource(depth + 1);
+        }
     }
 }

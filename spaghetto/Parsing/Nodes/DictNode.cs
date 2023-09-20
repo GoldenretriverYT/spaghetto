@@ -1,4 +1,6 @@
-﻿namespace spaghetto.Parsing.Nodes
+﻿using System.Text;
+
+namespace spaghetto.Parsing.Nodes
 {
     internal class DictNode : SyntaxNode
     {
@@ -29,6 +31,30 @@
         public override IEnumerable<SyntaxNode> GetChildren()
         {
             throw new NotImplementedException();
+        }
+
+        public override string ToString() {
+            return "DictNode:";
+        }
+
+        public override string GenerateSource(int depth) {
+            var sb = new StringBuilder();
+
+            sb.Append("{");
+
+            foreach(var dictEl in dict) {
+                sb.Append("\"");
+                sb.Append(dictEl.tok.Text);
+                sb.Append("\":");
+                sb.Append(dictEl.expr.GenerateSource(depth + 1));
+                sb.Append(",");
+            }
+
+            sb.Remove(sb.Length - 1, 1);
+
+            sb.Append("}");
+
+            return sb.ToString();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using spaghetto.BuiltinTypes;
 using spaghetto.Helpers;
+using System.Text;
 
 namespace spaghetto.Parsing.Nodes
 {
@@ -75,6 +76,20 @@ namespace spaghetto.Parsing.Nodes
         {
             var dn = new DotNode(CallNode);
             dn.NextNodes = this.NextNodes.ToList(); return dn;
+        }
+
+        public override string GenerateSource(int depth) {
+            var sb = new StringBuilder();
+
+            sb.Append(CallNode.GenerateSource(depth + 1));
+            if (NextNodes.Count > 0) sb.Append(".");
+
+            foreach (var n in NextNodes) {
+                sb.Append(n.GenerateSource(depth + 1));
+                if (n != NextNodes.Last()) sb.Append(".");
+            }
+
+            return sb.ToString();
         }
     }
 }

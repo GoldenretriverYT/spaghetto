@@ -36,5 +36,13 @@
             yield return condNode;
             yield return block;
         }
+
+        public override string ToString() {
+            return "WhileNode:";
+        }
+
+        public override string GenerateSource(int depth) {
+            return $"while ({condNode.GenerateSource(depth + 1)}) {block.GenerateSource(depth + 1)}";
+        }
     }
 }

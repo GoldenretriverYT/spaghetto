@@ -25,5 +25,9 @@
         {
             return "FloatLitNode:";
         }
+
+        public override string GenerateSource(int depth) {
+            return syntaxToken.Text;
+        }
     }
 }

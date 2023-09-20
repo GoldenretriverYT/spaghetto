@@ -1,4 +1,5 @@
 ﻿using spaghetto.Helpers;
+using System.Text;
 
 namespace spaghetto.Parsing.Nodes
 {
@@ -30,6 +31,25 @@ namespace spaghetto.Parsing.Nodes
             if (nameToken != null) yield return new TokenNode(nameToken.Value);
             foreach (var t in args) yield return new TokenNode(t);
             yield return block;
+        }
+
+        public override string GenerateSource(int depth) {
+            var sb = new StringBuilder();
+            
+            if (nameToken != null) {
+                sb.Append("func ");
+                sb.Append(nameToken.Value.Text);
+            } else {
+                sb.Append("func");
+            }
+
+            sb.Append("(");
+            sb.Append(string.Join(", ", args.Select((v) => v.Text)));
+            sb.Append(") ");
+
+            sb.Append(block.GenerateSource(depth + 1));
+
+            return sb.ToString();
         }
     }
 }

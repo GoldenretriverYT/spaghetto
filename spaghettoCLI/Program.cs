@@ -6,7 +6,7 @@ using System.Text;
 namespace spaghettoCLI
 {
     public class Program {
-        static bool showLexOutput = false, showParseOutput = false, timings = false, rethrow = false, csstack = false;
+        static bool showLexOutput = false, showParseOutput = false, timings = false, rethrow = false, csstack = false, sourceGen = false;
         static Interpreter interpreter;
 
         static List<Assembly> assemblies = new();
@@ -52,6 +52,11 @@ namespace spaghettoCLI
                     if (text.StartsWith("#cs")) {
                         csstack = !csstack;
                         Console.WriteLine("csstack: " + csstack);
+                    }
+
+                    if (text.StartsWith("#sg")) {
+                        sourceGen = !sourceGen;
+                        Console.WriteLine("sourceGen: " + sourceGen);
                     }
 
                     if (text.StartsWith("#reset")) {
@@ -128,7 +133,12 @@ namespace spaghettoCLI
                 PrintTree(res.Result.AST);
             }
 
-            if(showLexOutput && res.Result.LexedTokens != null) {
+            if (sourceGen && res.Result.AST != null) {
+                Console.WriteLine("SourceGen:");
+                Console.WriteLine(res.Result.AST.GenerateSource(0));
+            }
+
+            if (showLexOutput && res.Result.LexedTokens != null) {
                 foreach (var tok in res.Result.LexedTokens) Console.WriteLine("  " + tok.ToString());
             }
         }

@@ -27,5 +27,9 @@
             yield return new TokenNode(ident);
             yield return node;
         }
+
+        public override string GenerateSource(int depth) {
+            return "<" + ident.Text + ">(" + node.GenerateSource(depth + 1) + ")";
+        }
     }
 }

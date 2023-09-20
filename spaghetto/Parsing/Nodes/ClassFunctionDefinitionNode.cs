@@ -1,4 +1,6 @@
-﻿namespace spaghetto.Parsing.Nodes
+﻿using System.Text;
+
+namespace spaghetto.Parsing.Nodes
 {
     internal class ClassFunctionDefinitionNode : SyntaxNode
     {
@@ -39,6 +41,17 @@
             yield return new TokenNode(name);
             foreach (var tok in args) yield return new TokenNode(tok);
             yield return body;
+        }
+
+        public override string GenerateSource(int depth) {
+            var sb = new StringBuilder();
+            sb.Append("func ");
+            sb.Append(name.Text);
+            sb.Append("(");
+            sb.Append(string.Join(", ", args.Select((v) => v.Text)));
+            sb.Append(") ");
+            sb.Append(body.GenerateSource(depth + 1));
+            return sb.ToString();
         }
     }
 }

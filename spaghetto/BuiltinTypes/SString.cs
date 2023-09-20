@@ -26,6 +26,11 @@
             return new SString(Value + @string.Value);
         }
 
+        public override SValue Mul(SValue other) {
+            if (other is not SInt @int) throw NotSupportedBetween(other, "Mul");
+            return new SString(string.Concat(Enumerable.Repeat(Value, @int.Value)));
+        }
+
         public override SValue Idx(SValue other)
         {
             if (other is not SInt idx) throw NotSupportedBetween(other, "Add");

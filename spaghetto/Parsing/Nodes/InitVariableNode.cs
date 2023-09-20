@@ -62,5 +62,9 @@
         {
             return "InitVariableNode:";
         }
+
+        public override string GenerateSource(int depth) {
+            return (isConst ? "const " : "") + (isFixedType ? "var " : "var% ") + ident.Text + (expr != null ? " = " + expr.GenerateSource(depth + 1) : "");
+        }
     }
 }

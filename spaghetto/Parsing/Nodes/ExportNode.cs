@@ -24,5 +24,9 @@
         {
             yield return new TokenNode(ident);
         }
+
+        public override string GenerateSource(int depth) {
+            return "export " + ident.Text + ";";
+        }
     }
 }

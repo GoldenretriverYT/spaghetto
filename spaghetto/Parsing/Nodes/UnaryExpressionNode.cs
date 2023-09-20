@@ -34,5 +34,9 @@
         {
             return "UnaryExpressionNode:";
         }
+
+        public override string GenerateSource(int depth) {
+            return token.Text + "(" + rhs.GenerateSource(depth + 1) + ")";
+        }
     }
 }

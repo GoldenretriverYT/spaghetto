@@ -1,4 +1,6 @@
-﻿namespace spaghetto.Parsing.Nodes
+﻿using System.Text;
+
+namespace spaghetto.Parsing.Nodes
 {
     internal class ForNode : SyntaxNode
     {
@@ -44,6 +46,25 @@
             yield return condNode;
             yield return stepNode;
             yield return block;
+        }
+
+        public override string ToString() {
+            return "ForNode:";
+        }
+
+        public override string GenerateSource(int depth) {
+            var sb = new StringBuilder();
+            
+            sb.Append("for (");
+            sb.Append(initialExpressionNode.GenerateSource(depth + 1));
+            sb.Append("; ");
+            sb.Append(condNode.GenerateSource(depth + 1));
+            sb.Append("; ");
+            sb.Append(stepNode.GenerateSource(depth + 1));
+            sb.Append(") ");
+            sb.Append(block.GenerateSource(depth + 1));
+
+            return sb.ToString();
         }
     }
 }

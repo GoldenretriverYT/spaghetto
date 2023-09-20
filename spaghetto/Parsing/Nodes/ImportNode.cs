@@ -1,4 +1,6 @@
-﻿namespace spaghetto.Parsing.Nodes
+﻿using System.Text;
+
+namespace spaghetto.Parsing.Nodes
 {
     internal class ImportNode : SyntaxNode
     {
@@ -54,6 +56,10 @@
         public override IEnumerable<SyntaxNode> GetChildren()
         {
             yield return new TokenNode(path);
+        }
+
+        public override string GenerateSource(int depth) {
+            return "import \"" + path.Text + "\";";
         }
     }
 }

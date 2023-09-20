@@ -21,5 +21,9 @@
         {
             return "BreakNode:";
         }
+
+        public override string GenerateSource(int depth) {
+            return "break;";
+        }
     }
 }

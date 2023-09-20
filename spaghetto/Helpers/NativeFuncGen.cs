@@ -5,6 +5,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace spaghetto.Helpers {
+    public enum NativeFuncGenType {
+        Static,
+        Instance
+    }
+    
     public static class NativeFuncGen {
         public static SNativeFunction New<T>(string name, Func<Scope, T, SValue> func, params string[] argNames) where T : SValue {
             List<Type> ts = new() { typeof(T) };
@@ -16,8 +21,8 @@ namespace spaghetto.Helpers {
                         throw new Exception($"Too many arguments passed to function {name}");
                     }
 
-                    if (args[i].GetType() != ts[i]) {
-                        throw new Exception($"Expected argument {i} to be a {typeof(T).Name}");
+                    if (args[i].GetType() != ts[i] && ts[i] != typeof(SValue)) {
+                        throw new Exception($"Expected argument {i} to be a {ts[i].Name}");
                     }
                 }
 
@@ -25,8 +30,10 @@ namespace spaghetto.Helpers {
             }, argNames.ToList());
         }
 
-        public static void AddNativeFunc<T>(this List<(string key, SValue value)> table, string name, Func<Scope, T, SValue> func, params string[] argNames) where T : SValue {
-            table.Add((name, New(name, func, argNames)));
+        public static void AddNativeFunc<T>(this List<(string key, SValue value)> table, NativeFuncGenType type, string name, Func<Scope, T, SValue> func, params string[] argNames) where T : SValue {
+            var f = New(name, func, argNames);
+            f.IsClassInstanceMethod = type == NativeFuncGenType.Instance;
+            table.Add((name, f));
         }
 
         public static SNativeFunction New<T, T2>(string name, Func<Scope, T, T2, SValue> func, params string[] argNames) where T : SValue where T2 : SValue {
@@ -39,8 +46,8 @@ namespace spaghetto.Helpers {
                         throw new Exception($"Too many arguments passed to function {name}");
                     }
 
-                    if (args[i].GetType() != ts[i]) {
-                        throw new Exception($"Expected argument {i} to be a {typeof(T).Name}");
+                    if (args[i].GetType() != ts[i] && ts[i] != typeof(SValue)) {
+                        throw new Exception($"Expected argument {i} to be a {ts[i].Name}");
                     }
                 }
 
@@ -48,8 +55,10 @@ namespace spaghetto.Helpers {
             }, argNames.ToList());
         }
 
-        public static void AddNativeFunc<T, T2>(this List<(string key, SValue value)> table, string name, Func<Scope, T, T2, SValue> func, params string[] argNames) where T : SValue where T2 : SValue {
-            table.Add((name, New(name, func, argNames)));
+        public static void AddNativeFunc<T, T2>(this List<(string key, SValue value)> table, NativeFuncGenType type, string name, Func<Scope, T, T2, SValue> func, params string[] argNames) where T : SValue where T2 : SValue {
+            var f = New(name, func, argNames);
+            f.IsClassInstanceMethod = type == NativeFuncGenType.Instance;
+            table.Add((name, f));
         }
         public static SNativeFunction New<T, T2, T3>(string name, Func<Scope, T, T2, T3, SValue> func, params string[] argNames) where T : SValue where T2 : SValue where T3 : SValue {
             List<Type> ts = new() { typeof(T), typeof(T2), typeof(T3) };
@@ -61,8 +70,8 @@ namespace spaghetto.Helpers {
                         throw new Exception($"Too many arguments passed to function {name}");
                     }
 
-                    if (args[i].GetType() != ts[i]) {
-                        throw new Exception($"Expected argument {i} to be a {typeof(T).Name}");
+                    if (args[i].GetType() != ts[i] && ts[i] != typeof(SValue)) {
+                        throw new Exception($"Expected argument {i} to be a {ts[i].Name}");
                     }
                 }
 
@@ -70,8 +79,10 @@ namespace spaghetto.Helpers {
             }, argNames.ToList());
         }
 
-        public static void AddNativeFunc<T, T2, T3>(this List<(string key, SValue value)> table, string name, Func<Scope, T, T2, T3, SValue> func, params string[] argNames) where T : SValue where T2 : SValue where T3 : SValue {
-            table.Add((name, New(name, func, argNames)));
+        public static void AddNativeFunc<T, T2, T3>(this List<(string key, SValue value)> table, NativeFuncGenType type, string name, Func<Scope, T, T2, T3, SValue> func, params string[] argNames) where T : SValue where T2 : SValue where T3 : SValue {
+            var f = New(name, func, argNames);
+            f.IsClassInstanceMethod = type == NativeFuncGenType.Instance;
+            table.Add((name, f));
         }
 
         public static SNativeFunction New<T, T2, T3, T4>(string name, Func<Scope, T, T2, T3, T4, SValue> func, params string[] argNames) where T : SValue where T2 : SValue where T3 : SValue where T4 : SValue {
@@ -84,8 +95,8 @@ namespace spaghetto.Helpers {
                         throw new Exception($"Too many arguments passed to function {name}");
                     }
 
-                    if (args[i].GetType() != ts[i]) {
-                        throw new Exception($"Expected argument {i} to be a {typeof(T).Name}");
+                    if (args[i].GetType() != ts[i] && ts[i] != typeof(SValue)) {
+                        throw new Exception($"Expected argument {i} to be a {ts[i].Name}");
                     }
                 }
 
@@ -93,8 +104,10 @@ namespace spaghetto.Helpers {
             }, argNames.ToList());
         }
 
-        public static void AddNativeFunc<T, T2, T3, T4>(this List<(string key, SValue value)> table, string name, Func<Scope, T, T2, T3, T4, SValue> func, params string[] argNames) where T : SValue where T2 : SValue where T3 : SValue where T4 : SValue {
-            table.Add((name, New(name, func, argNames)));
+        public static void AddNativeFunc<T, T2, T3, T4>(this List<(string key, SValue value)> table, NativeFuncGenType type, string name, Func<Scope, T, T2, T3, T4, SValue> func, params string[] argNames) where T : SValue where T2 : SValue where T3 : SValue where T4 : SValue {
+            var f = New(name, func, argNames);
+            f.IsClassInstanceMethod = type == NativeFuncGenType.Instance;
+            table.Add((name, f));
         }
 
         public static SNativeFunction New<T, T2, T3, T4, T5>(string name, Func<Scope, T, T2, T3, T4, T5, SValue> func, params string[] argNames) where T : SValue where T2 : SValue where T3 : SValue where T4 : SValue where T5 : SValue {
@@ -107,8 +120,8 @@ namespace spaghetto.Helpers {
                         throw new Exception($"Too many arguments passed to function {name}");
                     }
 
-                    if (args[i].GetType() != ts[i]) {
-                        throw new Exception($"Expected argument {i} to be a {typeof(T).Name}");
+                    if (args[i].GetType() != ts[i] && ts[i] != typeof(SValue)) {
+                        throw new Exception($"Expected argument {i} to be a {ts[i].Name}");
                     }
                 }
 
@@ -116,8 +129,10 @@ namespace spaghetto.Helpers {
             }, argNames.ToList());
         }
 
-        public static void AddNativeFunc<T, T2, T3, T4, T5>(this List<(string key, SValue value)> table, string name, Func<Scope, T, T2, T3, T4, T5, SValue> func, params string[] argNames) where T : SValue where T2 : SValue where T3 : SValue where T4 : SValue where T5 : SValue {
-            table.Add((name, New(name, func, argNames)));
+        public static void AddNativeFunc<T, T2, T3, T4, T5>(this List<(string key, SValue value)> table, NativeFuncGenType type, string name, Func<Scope, T, T2, T3, T4, T5, SValue> func, params string[] argNames) where T : SValue where T2 : SValue where T3 : SValue where T4 : SValue where T5 : SValue {
+            var f = New(name, func, argNames);
+            f.IsClassInstanceMethod = type == NativeFuncGenType.Instance;
+            table.Add((name, f));
         }
 
         public static SNativeFunction New<T, T2, T3, T4, T5, T6>(string name, Func<Scope, T, T2, T3, T4, T5, T6, SValue> func, params string[] argNames) where T : SValue where T2 : SValue where T3 : SValue where T4 : SValue where T5 : SValue where T6 : SValue {
@@ -130,8 +145,8 @@ namespace spaghetto.Helpers {
                         throw new Exception($"Too many arguments passed to function {name}");
                     }
 
-                    if (args[i].GetType() != ts[i]) {
-                        throw new Exception($"Expected argument {i} to be a {typeof(T).Name}");
+                    if (args[i].GetType() != ts[i] && ts[i] != typeof(SValue)) {
+                        throw new Exception($"Expected argument {i} to be a {ts[i].Name}");
                     }
                 }
 
@@ -139,8 +154,10 @@ namespace spaghetto.Helpers {
             }, argNames.ToList());
         }
 
-        public static void AddNativeFunc<T, T2, T3, T4, T5, T6>(this List<(string key, SValue value)> table, string name, Func<Scope, T, T2, T3, T4, T5, T6, SValue> func, params string[] argNames) where T : SValue where T2 : SValue where T3 : SValue where T4 : SValue where T5 : SValue where T6 : SValue {
-            table.Add((name, New(name, func, argNames)));
+        public static void AddNativeFunc<T, T2, T3, T4, T5, T6>(this List<(string key, SValue value)> table, NativeFuncGenType type, string name, Func<Scope, T, T2, T3, T4, T5, T6, SValue> func, params string[] argNames) where T : SValue where T2 : SValue where T3 : SValue where T4 : SValue where T5 : SValue where T6 : SValue {
+            var f = New(name, func, argNames);
+            f.IsClassInstanceMethod = type == NativeFuncGenType.Instance;
+            table.Add((name, f));
         }
     }
 }

@@ -32,5 +32,9 @@
         {
             return "IdentNode:";
         }
+
+        public override string GenerateSource(int depth) {
+            return Token.Text;
+        }
     }
 }

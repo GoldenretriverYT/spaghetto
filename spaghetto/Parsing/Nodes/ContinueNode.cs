@@ -21,5 +21,9 @@
         {
             return "ContinueNode:";
         }
+
+        public override string GenerateSource(int depth) {
+            return "continue;";
+        }
     }
 }

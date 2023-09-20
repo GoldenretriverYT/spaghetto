@@ -38,5 +38,10 @@
         {
             return "ReturnNode:";
         }
+
+        public override string GenerateSource(int depth) {
+            if (ReturnValueNode == null) return "return;";
+            else return "return " + ReturnValueNode.GenerateSource(depth + 1) + ";";
+        }
     }
 }

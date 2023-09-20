@@ -1,4 +1,6 @@
-﻿namespace spaghetto.Parsing.Nodes
+﻿using System.Text;
+
+namespace spaghetto.Parsing.Nodes
 {
     internal class BlockNode : SyntaxNode
     {
@@ -53,6 +55,31 @@
         public override string ToString()
         {
             return "BlockNode:";
+        }
+
+        public override string GenerateSource(int depth) {
+            if (depth == 0) {
+                // This is the root node, dont emit curly braces
+
+                var sb = new StringBuilder();
+
+                foreach (var node in Nodes) {
+                    sb.Append(node.GenerateSource(depth + 1));
+                }
+
+                return sb.ToString();
+            } else {
+                var sb = new StringBuilder();
+                sb.Append("{");
+
+                foreach (var node in Nodes) {
+                    sb.Append(node.GenerateSource(depth+1));
+                }
+
+                sb.Append("}");
+
+                return sb.ToString();
+            }
         }
     }
 }

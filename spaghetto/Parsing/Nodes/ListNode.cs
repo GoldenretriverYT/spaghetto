@@ -1,4 +1,6 @@
-﻿namespace spaghetto.Parsing.Nodes
+﻿using System.Text;
+
+namespace spaghetto.Parsing.Nodes
 {
     internal class ListNode : SyntaxNode
     {
@@ -31,6 +33,19 @@
         public override string ToString()
         {
             return "ListNode:";
+        }
+
+        public override string GenerateSource(int depth) {
+            var sb = new StringBuilder();
+
+            sb.Append("[");
+
+            foreach(var n in list) {
+                sb.Append(n.GenerateSource(depth + 1));
+                if (n != list.Last()) sb.Append(",");
+            }
+
+            return sb.Append("]").ToString();
         }
     }
 }

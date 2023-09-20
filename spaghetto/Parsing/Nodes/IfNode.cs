@@ -1,4 +1,6 @@
-﻿namespace spaghetto.Parsing.Nodes
+﻿using System.Text;
+
+namespace spaghetto.Parsing.Nodes
 {
     internal class IfNode : SyntaxNode
     {
@@ -40,6 +42,24 @@
         public override string ToString()
         {
             return "IfNode:";
+        }
+
+        public override string GenerateSource(int depth) {
+            var sb = new StringBuilder();
+
+            sb.Append("if (");
+            sb.Append(Conditions[0].cond.GenerateSource(depth + 1));
+            sb.Append(") ");
+            sb.Append(Conditions[0].block.GenerateSource(depth + 1));
+
+            for (int i = 1; i < Conditions.Count; i++) {
+                sb.Append(" elseif (");
+                sb.Append(Conditions[i].cond.GenerateSource(depth + 1));
+                sb.Append(") ");
+                sb.Append(Conditions[i].block.GenerateSource(depth + 1));
+            }
+
+            return sb.ToString();
         }
     }
 }

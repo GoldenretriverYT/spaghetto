@@ -1,4 +1,5 @@
 ﻿using spaghetto.Helpers;
+using System.Text;
 
 namespace spaghetto.Parsing.Nodes
 {
@@ -39,6 +40,21 @@ namespace spaghetto.Parsing.Nodes
         public override string ToString()
         {
             return "CallNode:";
+        }
+
+        public override string GenerateSource(int depth) {
+            var sb = new StringBuilder();
+
+            sb.Append(ToCallNode.GenerateSource(depth + 1));
+            sb.Append("(");
+            
+            foreach(var n in argumentNodes) {
+                sb.Append(n.GenerateSource(depth + 1));
+            }
+
+            sb.Append(")");
+
+            return sb.ToString();
         }
     }
 }

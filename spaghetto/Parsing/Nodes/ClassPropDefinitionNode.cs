@@ -23,5 +23,9 @@
             yield return new TokenNode(Name);
             yield return Expression;
         }
+
+        public override string GenerateSource(int depth) {
+            return (IsStatic ? "static " : "") + "prop " + Name.Text + " = " + Expression.GenerateSource(depth + 1);
+        }
     }
 }
