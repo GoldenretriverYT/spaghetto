@@ -112,7 +112,7 @@ if-expr       : KEYWORD:if LPAREN expr RPAREN scoped-or-expr
 for-expr      : KEYWORD:for LPAREN expression SEMICOLON expression SEMICOLON expression RPAREN
                 scoped-or-expr
 
-repeat-expr   : KEYWORD:repeat BANG LPAREN expr KEYWORD:times RPAREN scoped-or-expr
+repeat-expr   : KEYWORD:repeat BANG? LPAREN expr KEYWORD:times RPAREN scoped-or-expr
               
 while-expr    : KEYWORD:while expr
                 scoped-or-expr
