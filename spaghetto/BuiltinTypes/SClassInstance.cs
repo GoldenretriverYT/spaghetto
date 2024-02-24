@@ -108,41 +108,5 @@ namespace spaghetto {
         public override bool IsTruthy() {
             return true;
         }
-
-        public override SValue Add(SValue other)
-        {
-            var overload = GetValue("$$op+");
-            if (overload == null) base.Add(other);
-
-            var ret = overload.Call(new Scope(0), new List<SValue>() { this, this, other }); // TODO: Use proper scope; dont forget to reset state then
-            return ret;
-        }
-
-        public override SValue Sub(SValue other)
-        {
-            var overload = GetValue("$$op-");
-            if (overload == null) base.Sub(other);
-
-            var ret = overload.Call(new Scope(0), new List<SValue>() { this, this, other }); // TODO: Use proper scope; dont forget to reset state then
-            return ret;
-        }
-
-        public override SValue Mul(SValue other)
-        {
-            var overload = GetValue("$$op*");
-            if (overload == null) base.Mul(other);
-
-            var ret = overload.Call(new Scope(0), new List<SValue>() { this, this, other }); // TODO: Use proper scope; dont forget to reset state then
-            return ret;
-        }
-
-        public override SValue Div(SValue other)
-        {
-            var overload = GetValue("$$op/");
-            if (overload == null) base.Div(other);
-
-            var ret = overload.Call(new Scope(0), new List<SValue>() { this, this, other }); // TODO: Use proper scope; dont forget to reset state then
-            return ret;
-        }
     }
 }

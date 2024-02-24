@@ -1,9 +1,15 @@
 ﻿using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace spaghetto {
     public class Lexer {
         public string Code { get; set; }
         public int Position { get; set; } = 0;
+
+        public int Line { get; set; } = 1;
+        public int Column { get; set; } = 1;
+
+        public string FileName { get; set; } = "unknown";
 
         public char Current => Peek(0);
 
@@ -12,106 +18,109 @@ namespace spaghetto {
             return Code[Position + off];
         }
 
-        public Lexer(string code) {
+        public Lexer(string code, string fileName = "unknown") {
             Code = code;
+            FileName = fileName;
         }
 
         public List<SyntaxToken> Lex() {
             List<SyntaxToken> tokens = new();
 
             while(Current != '\0') {
-                SyntaxToken insertToken = new(SyntaxType.BadToken, Position, null, Current.ToString());
+                Column++;
+
+                SyntaxToken insertToken = new(SyntaxType.BadToken, Position, null, Current.ToString(), Column, Line, FileName);
                 switch(Current) {
                     case ';':
-                        insertToken = (new(SyntaxType.Semicolon, Position, null, Current.ToString()));
+                        insertToken = (new(SyntaxType.Semicolon, Position, null, Current.ToString(), Column, Line, FileName));
                         break;
                     case '=':
                         if (Peek(1) == '=') {
                             Position++;
-                            insertToken = (new(SyntaxType.EqualsEquals, Position, null, "=="));
+                            insertToken = (new(SyntaxType.EqualsEquals, Position, null, "==", Column, Line, FileName));
                         } else if (Peek(1) == '>') {
                             Position++;
-                            insertToken = (new(SyntaxType.Arrow, Position, null, "=>"));
+                            insertToken = (new(SyntaxType.Arrow, Position, null, "=>", Column, Line, FileName));
                         } else {
-                            insertToken = (new(SyntaxType.Equals, Position, null, Current.ToString()));
+                            insertToken = (new(SyntaxType.Equals, Position, null, Current.ToString(), Column, Line, FileName));
                         }
 
                         break;
                     case '<':
                         if (Peek(1) == '=') {
                             Position++;
-                            insertToken = (new(SyntaxType.LessThanEqu, Position, null, "<="));
+                            insertToken = (new(SyntaxType.LessThanEqu, Position, null, "<=", Column, Line, FileName));
                         } else {
-                            insertToken = (new(SyntaxType.LessThan, Position, null, Current.ToString()));
+                            insertToken = (new(SyntaxType.LessThan, Position, null, Current.ToString(), Column, Line, FileName));
                         }
 
                         break;
                     case '>':
                         if (Peek(1) == '=') {
                             Position++;
-                            insertToken = (new(SyntaxType.GreaterThanEqu, Position, null, ">="));
+                            insertToken = (new(SyntaxType.GreaterThanEqu, Position, null, ">=", Column, Line, FileName));
                         } else {
-                            insertToken = (new(SyntaxType.GreaterThan, Position, null, Current.ToString()));
+                            insertToken = (new(SyntaxType.GreaterThan, Position, null, Current.ToString(), Column, Line, FileName));
                         }
 
                         break;
                     case '|':
                         if (Peek(1) == '|') {
                             Position++;
-                            insertToken = (new(SyntaxType.OrOr, Position, null, "||"));
+                            insertToken = (new(SyntaxType.OrOr, Position, null, "||", Column, Line, FileName));
                         } else {
-                            insertToken = (new(SyntaxType.BadToken, Position, null, Current.ToString()));
+                            insertToken = (new(SyntaxType.BadToken, Position, null, Current.ToString(), Column, Line, FileName));
                         }
 
                         break;
                     case '&':
                         if (Peek(1) == '&') {
                             Position++;
-                            insertToken = (new(SyntaxType.AndAnd, Position, null, "&&"));
+                            insertToken = (new(SyntaxType.AndAnd, Position, null, "&&", Column, Line, FileName));
                         } else {
-                            insertToken = (new(SyntaxType.BadToken, Position, null, Current.ToString()));
+                            insertToken = (new(SyntaxType.BadToken, Position, null, Current.ToString(), Column, Line, FileName));
                         }
 
                         break;
                     case '+':
                         if (Peek(1) == '=') {
                             Position++;
-                            insertToken = (new(SyntaxType.PlusEqu, Position, null, "+="));
+                            insertToken = (new(SyntaxType.PlusEqu, Position, null, "+=", Column, Line, FileName));
                         } else if (Peek(1) == '+') {
                             Position++;
-                            insertToken = (new(SyntaxType.PlusPlus, Position, null, "++"));
+                            insertToken = (new(SyntaxType.PlusPlus, Position, null, "++", Column, Line, FileName));
                         } else {
-                            insertToken = (new(SyntaxType.Plus, Position, null, Current.ToString()));
+                            insertToken = (new(SyntaxType.Plus, Position, null, Current.ToString(), Column, Line, FileName));
                         }
 
                         break;
                     case '-':
                         if (Peek(1) == '=') {
                             Position++;
-                            insertToken = (new(SyntaxType.MinusEqu, Position, null, "-="));
+                            insertToken = (new(SyntaxType.MinusEqu, Position, null, "-=", Column, Line, FileName));
                         } else if (Peek(1) == '-') {
                             Position++;
-                            insertToken = (new(SyntaxType.MinusMinus, Position, null, "--"));
+                            insertToken = (new(SyntaxType.MinusMinus, Position, null, "--", Column, Line, FileName));
                         } else {
-                            insertToken = (new(SyntaxType.Minus, Position, null, Current.ToString()));
+                            insertToken = (new(SyntaxType.Minus, Position, null, Current.ToString(), Column, Line, FileName));
                         }
 
                         break;
                     case '%':
                         if (Peek(1) == '=') {
                             Position++;
-                            insertToken = (new(SyntaxType.ModEqu, Position, null, "%="));
+                            insertToken = (new(SyntaxType.ModEqu, Position, null, "%=", Column, Line, FileName));
                         } else {
-                            insertToken = (new(SyntaxType.Mod, Position, null, Current.ToString()));
+                            insertToken = (new(SyntaxType.Mod, Position, null, Current.ToString(), Column, Line, FileName));
                         }
 
                         break;
                     case '*':
                         if (Peek(1) == '=') {
                             Position++;
-                            insertToken = (new(SyntaxType.MulEqu, Position, null, "*="));
+                            insertToken = (new(SyntaxType.MulEqu, Position, null, "*=", Column, Line, FileName));
                         } else {
-                            insertToken = (new(SyntaxType.Mul, Position, null, Current.ToString()));
+                            insertToken = (new(SyntaxType.Mul, Position, null, Current.ToString(), Column, Line, FileName));
                         }
 
                         break;
@@ -123,50 +132,50 @@ namespace spaghetto {
 
                         if (Peek(1) == '=') {
                             Position++;
-                            insertToken = (new(SyntaxType.DivEqu, Position, null, "/="));
+                            insertToken = (new(SyntaxType.DivEqu, Position, null, "/=", Column, Line, FileName));
                         } else {
-                            insertToken = (new(SyntaxType.Div, Position, null, Current.ToString()));
+                            insertToken = (new(SyntaxType.Div, Position, null, Current.ToString(), Column, Line, FileName));
                         }
 
                         break;
                     case '#':
-                        insertToken = (new(SyntaxType.Idx, Position, null, Current.ToString()));
+                        insertToken = (new(SyntaxType.Idx, Position, null, Current.ToString(), Column, Line, FileName));
                         break;
                     case '.':
-                        insertToken = (new(SyntaxType.Dot, Position, null, Current.ToString()));
+                        insertToken = (new(SyntaxType.Dot, Position, null, Current.ToString(), Column, Line, FileName));
                         break;
                     case ',':
-                        insertToken = (new(SyntaxType.Comma, Position, null, Current.ToString()));
+                        insertToken = (new(SyntaxType.Comma, Position, null, Current.ToString(), Column, Line, FileName));
                         break;
                     case '(':
-                        insertToken = (new(SyntaxType.LParen, Position, null, Current.ToString()));
+                        insertToken = (new(SyntaxType.LParen, Position, null, Current.ToString(), Column, Line, FileName));
                         break;
                     case ')':
-                        insertToken = (new(SyntaxType.RParen, Position, null, Current.ToString()));
+                        insertToken = (new(SyntaxType.RParen, Position, null, Current.ToString(), Column, Line, FileName));
                         break;
                     case '[':
-                        insertToken = (new(SyntaxType.LSqBracket, Position, null, Current.ToString()));
+                        insertToken = (new(SyntaxType.LSqBracket, Position, null, Current.ToString(), Column, Line, FileName));
                         break;
                     case ']':
-                        insertToken = (new(SyntaxType.RSqBracket, Position, null, Current.ToString()));
+                        insertToken = (new(SyntaxType.RSqBracket, Position, null, Current.ToString(), Column, Line, FileName));
                         break;
                     case '{':
-                        insertToken = (new(SyntaxType.LBraces, Position, null, Current.ToString()));
+                        insertToken = (new(SyntaxType.LBraces, Position, null, Current.ToString(), Column, Line, FileName));
                         break;
                     case '}':
-                        insertToken = (new(SyntaxType.RBraces, Position, null, Current.ToString()));
+                        insertToken = (new(SyntaxType.RBraces, Position, null, Current.ToString(), Column, Line, FileName));
                         break;
                     case '!':
                         if (Peek(1) == '=') {
                             Position++;
-                            insertToken = (new(SyntaxType.BangEquals, Position, null, "!="));
+                            insertToken = (new(SyntaxType.BangEquals, Position, null, "!=", Column, Line, FileName));
                         } else {
-                            insertToken = (new(SyntaxType.Bang, Position, null, Current.ToString()));
+                            insertToken = (new(SyntaxType.Bang, Position, null, Current.ToString(), Column, Line, FileName));
                         }
 
                         break;
                     case ':':
-                        insertToken = (new(SyntaxType.Colon, Position, null, Current.ToString()));
+                        insertToken = (new(SyntaxType.Colon, Position, null, Current.ToString(), Column, Line, FileName));
                         break;
                 }
 
@@ -187,12 +196,19 @@ namespace spaghetto {
                 }
             }
 
-            tokens.Add(new SyntaxToken(SyntaxType.EOF, Position, null, "<EOF>"));
+            tokens.Add(new SyntaxToken(SyntaxType.EOF, Position, null, "<EOF>", Column, Line, FileName));
             return tokens;
         }
 
         private void SkipComment() {
             while(Current != '\0' && Current != '\n') {
+                if(Current == '\n') {
+                    Line++;
+                    Column = 1;
+                } else {
+                    Column++;
+                }
+
                 Position++;
             }
         }
@@ -206,7 +222,7 @@ namespace spaghetto {
                 Position++;
             }
 
-            var token = new SyntaxToken(SyntaxType.Identifier, startPos, str, str);
+            var token = new SyntaxToken(SyntaxType.Identifier, startPos, str, str, Column, Line, FileName);
             SyntaxFacts.ClassifyIdentifier(ref token);
 
             return token;
@@ -218,11 +234,13 @@ namespace spaghetto {
             int startPos = Position;
 
             Position++;
+            Column++;
             
             while(!(Current == '"' && Peek(-1) != '\\') && Current != '\0') {
                 if (Current == '\\') {
                     anotherEscapeChar:
                     Position++;
+                    Column++;
 
                     switch (Current) {
                         case '"': str += "\""; break;
@@ -230,6 +248,7 @@ namespace spaghetto {
                         case '\\': {
                             str += "\\";
                             Position++;
+                            Column++;
                             if (Current == '"' || Current == '\0') goto done;
                             if (Current == '\\') goto anotherEscapeChar;
                             str += Current;
@@ -240,21 +259,24 @@ namespace spaghetto {
                     }
 
                     Position++;
+                    Column++;
                 } else {
                     str += Current;
                     Position++;
+                    Column++;
                 }
             }
 
             done:
 
             Position++;
+            Column++;
 
             if (Current == 'i') {
                 Position++;
-                return new(SyntaxType.Identifier, startPos, str, str);
+                return new(SyntaxType.Identifier, startPos, str, str, Column, Line, FileName);
             }else {
-                return new(SyntaxType.String, startPos, str, str);
+                return new(SyntaxType.String, startPos, str, str, Column, Line, FileName);
             }
         }
 
@@ -271,14 +293,15 @@ namespace spaghetto {
                 }
 
                 Position++;
+                Column++;
             }
 
             if(isDecimal) {
                 if (!float.TryParse(numStr, NumberStyles.Float, CultureInfo.InvariantCulture, out float floatVal)) throw new Exception("Invalid number (tried to parse " + numStr + " as float)");
-                return new(SyntaxType.Float, startPos, floatVal, numStr);
+                return new(SyntaxType.Float, startPos, floatVal, numStr, Column, Line, FileName);
             }else {
                 if (!int.TryParse(numStr, out int intVal)) throw new Exception("Invalid number!");
-                return new(SyntaxType.Int, startPos, intVal, numStr);
+                return new(SyntaxType.Int, startPos, intVal, numStr, Column, Line, FileName);
             }
         }
     }
@@ -290,11 +313,18 @@ namespace spaghetto {
         public object Value { get; set; }
         public string Text { get; set; }
 
-        public SyntaxToken(SyntaxType type, int pos, object val, string txt) {
+        public int Line { get; set; }
+        public int Column { get; set; }
+        public string FileName { get; set; }
+
+        public SyntaxToken(SyntaxType type, int pos, object val, string txt, int col, int line, string file) {
             Type = type;
             Position = pos;
             Value = val;
             Text = txt;
+            Line = line;
+            Column = col;
+            FileName = file;
         }
 
         public override string ToString() {

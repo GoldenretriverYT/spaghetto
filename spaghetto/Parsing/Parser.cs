@@ -8,10 +8,10 @@ namespace spaghetto.Parsing {
         public int Position = 0;
 
         public SyntaxToken Current => Peek(0);
-        public static SyntaxToken EmptyToken => new(SyntaxType.EOF, 0, null, null);
+        public static SyntaxToken EmptyToken => new(SyntaxType.EOF, 0, null, null, 0, 0, "<dynamically generated>");
 
         public SyntaxToken Peek(int off = 0) {
-            if (Position + off >= Tokens.Count || Position + off < 0) return new(SyntaxType.BadToken, 0, null, "");
+            if (Position + off >= Tokens.Count || Position + off < 0) return new(SyntaxType.BadToken, 0, null, "", 0, 0, "<dynamically generated>");
             return Tokens[Position + off];
         }
 
@@ -213,24 +213,9 @@ namespace spaghetto.Parsing {
                     var expr = ParseExpression();
 
                     nodes.Add(new ClassPropDefinitionNode(name, expr, isStatic));
-                } else if (Current.Text == "op") {
-                    Position++;
-
-                    var opTok = Current;
-                    Position++;
-
-                    if(opTok.Type is not (SyntaxType.Plus or SyntaxType.Minus or SyntaxType.Mul or SyntaxType.Div or SyntaxType.EqualsEquals
-                        or SyntaxType.LessThan or SyntaxType.LessThanEqu or SyntaxType.GreaterThan or SyntaxType.GreaterThanEqu)) {
-                        throw MakeException("Can not find or override operator of token type " + opTok.Type + " at position " + opTok.Position);
-                    }
-
-                    var args = ParseFunctionArgs();
-                    var body = ParseScopedStatements();
-
-                    nodes.Add(new ClassFunctionDefinitionNode(new(SyntaxType.Identifier, opTok.Position, "$$op" + opTok.Text, "$$op" + opTok.Text), args, body, false));
                 }
 
-                    while (Current.Type == SyntaxType.Semicolon) {
+                while (Current.Type == SyntaxType.Semicolon) {
                     Position++;
                 }
             }
@@ -263,7 +248,7 @@ namespace spaghetto.Parsing {
                 assignTok.Type = MapDoubleTokens(assignTok.Type);
                 Position++;
 
-                return new AssignVariableNode(ident, new BinaryExpressionNode(new IdentifierNode(ident), assignTok, new IntLiteralNode(new SyntaxToken(SyntaxType.Int, assignTok.Position, 1, "1"))));
+                return new AssignVariableNode(ident, new BinaryExpressionNode(new IdentifierNode(ident), assignTok, new IntLiteralNode(new SyntaxToken(SyntaxType.Int, assignTok.Position, 1, "1", 0, 0, "<dynamically generated>"))));
             } else {
                 return BinaryOperation(() => ParseCompExpression(), new List<SyntaxType>() { SyntaxType.AndAnd, SyntaxType.OrOr });
             }
@@ -368,7 +353,7 @@ namespace spaghetto.Parsing {
 
                             var binOpDot = accessStack.Clone();
                             binOpDot.NextNodes.Add(new IdentifierNode(ident));
-                            accessStack.NextNodes.Add(new AssignVariableNode(ident, new BinaryExpressionNode(binOpDot, assignTok, new IntLiteralNode(new SyntaxToken(SyntaxType.Int, assignTok.Position, 1, "1")))));
+                            accessStack.NextNodes.Add(new AssignVariableNode(ident, new BinaryExpressionNode(binOpDot, assignTok, new IntLiteralNode(new SyntaxToken(SyntaxType.Int, assignTok.Position, 1, "1", 0, 0, "<dynamically generated>")))));
                         } else {
                             var n = ParseCallExpression();
                             accessStack.NextNodes.Add(n);
@@ -553,7 +538,7 @@ namespace spaghetto.Parsing {
                 Position++;
                 lastBlock = ParseScopedOrStatement();
 
-                node.AddCase(new IntLiteralNode(new SyntaxToken(SyntaxType.Int, 0, 1, "1")), lastBlock);
+                node.AddCase(new IntLiteralNode(new SyntaxToken(SyntaxType.Int, 0, 1, "1", 0, 0, "<dynamically generated>")), lastBlock);
             }
 
             node.EndPosition = lastBlock.EndPosition;
@@ -698,7 +683,7 @@ namespace spaghetto.Parsing {
         }
 
         public ParsingException MakeException(string msg) {
-            return new ParsingException(msg, this, Position);
+            return new ParsingException(msg, this, Current.FileName, Current.Line, Current.Column);
         }
 
         public SyntaxType MapEqualsTokens(SyntaxType type) => type switch {
@@ -763,24 +748,23 @@ namespace spaghetto.Parsing {
 
         private string parseMessage;
         private Parser context;
-        private int tokenIdx;
+        private int line, col;
+        private string file;
 
-        private SyntaxToken CausingToken => context.Tokens[tokenIdx];
-        private string SurroundingText => ""; // TODO
-
-        public ParsingException(string parseMessage, Parser context, int tokenIdx = -1) {
+        public ParsingException(string parseMessage, Parser context, string file, int line, int col) {
             this.parseMessage = parseMessage;
             this.context = context;
-            this.tokenIdx = tokenIdx == -1 ? context.Position : tokenIdx;
+            this.line = line;
+            this.col = col;
+            this.file = file;
         }
 
         const string NORMAL = "\u001b[38;5;15m";
         const string ERROR = "\u001b[38;5;160m";
 
-        // TODO: Clean up this shit
         public string GetMessage() {
             return $@"{parseMessage}
-Position: {CausingToken.Position}";
+at {file}:{line} (col {col})";
         }
 
         public override string ToString() {
